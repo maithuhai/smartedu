@@ -891,6 +891,7 @@ const ROLE_GROUPS=[
 const ROLES=ROLE_GROUPS.flatMap(g=>g.roles.map(r=>({...r,kind:g.kind,to:g.to})));
 let lgRole='hocsinh', authView='login', authResetToken=null;
 let user=LS.get('user',null), orders=LS.get('orders',[]), acctTab='dashboard';
+let pfEditMode=false;
 let adminDays=30;
 let admUsersView='list', admUserSearch='', admUserRoleFilter='all', admUserStatusFilter='all', admSelectedUserId=null, admUserPage=0;
 let orderFilter='all';
@@ -907,25 +908,94 @@ let children=LS.get('children',[]);                 // hồ sơ con (phụ huynh
 function saveChildren(){LS.set('children',children);}
 let addresses=LS.get('addresses',[]);
 function saveAddresses(){LS.set('addresses',addresses);}
+let editingAddressId=null;
+const PROVINCES={
+  'TP. Hồ Chí Minh':{'Quận 1':['P. Bến Nghé','P. Bến Thành','P. Cầu Kho','P. Cô Giang'],'Quận 3':['P. Võ Thị Sáu','P. Nguyễn Thái Bình','P. Phạm Ngũ Lão'],'Quận 7':['P. Tân Phú','P. Tân Quy','P. Phú Thuận'],'Quận Bình Thạnh':['P. 1','P. 2','P. 11','P. 12'],'TP. Thủ Đức':['P. Linh Xuân','P. Hiệp Bình Chánh','P. An Khánh']},
+  'Hà Nội':{'Quận Ba Đình':['P. Phúc Xá','P. Trúc Bạch','P. Nguyễn Trung Trực'],'Quận Hoàn Kiếm':['P. Hàng Bạc','P. Hàng Gai','P. Tràng Tiền'],'Quận Đống Đa':['P. Văn Chương','P. Nam Đồng','P. Phương Liên'],'Quận Cầu Giấy':['P. Dịch Vọng','P. Nghĩa Đô','P. Quan Hoa'],'Quận Long Biên':['P. Bồ Đề','P. Ngọc Lâm','P. Gia Thụy']},
+  'Đà Nẵng':{'Quận Hải Châu':['P. Hải Châu 1','P. Hải Châu 2','P. Thạch Thang'],'Quận Thanh Khê':['P. Thanh Khê Đông','P. Xuân Hà','P. Tân Chính'],'Quận Sơn Trà':['P. Mân Thái','P. Phước Mỹ','P. An Hải Bắc']},
+  'Bình Dương':{'TP. Thủ Dầu Một':['P. Phú Cường','P. Hiệp Thành','P. Phú Hòa'],'TP. Dĩ An':['P. Dĩ An','P. Đông Hòa','P. An Bình'],'TP. Thuận An':['P. An Phú','P. Thuận Giao','P. Bình Chuẩn']},
+  'Đồng Nai':{'TP. Biên Hòa':['P. Trung Dũng','P. Tân Hiệp','P. Hòa Bình'],'H. Long Thành':['TT. Long Thành','X. An Phước','X. Tam An']},
+  'Cần Thơ':{'Q. Ninh Kiều':['P. An Bình','P. An Cư','P. An Lạc'],'Q. Bình Thủy':['P. Bình Thủy','P. Long Hòa','P. Long Tuyền']},
+  'Hải Phòng':{'Q. Hồng Bàng':['P. Hoàng Văn Thụ','P. Minh Khai','P. Quán Toan'],'Q. Ngô Quyền':['P. Đổng Quốc Bình','P. Cầu Tre','P. Vạn Mỹ']},
+  'Nghệ An':{'TP. Vinh':['P. Hưng Bình','P. Hà Huy Tập','P. Lê Lợi'],'H. Nghi Lộc':['X. Nghi Kim','X. Nghi Liên','X. Nghi Ân']},
+  'Khánh Hòa':{'TP. Nha Trang':['P. Vạn Thắng','P. Vạn Thạnh','P. Phương Sơn'],'H. Cam Lâm':['X. Cam Tân','X. Cam Hòa','X. Cam Hải Đông']},
+  'Lâm Đồng':{'TP. Đà Lạt':['P. 1','P. 2','P. 3','P. 4'],'H. Đức Trọng':['TT. Liên Nghĩa','X. N\'Thol Hạ','X. Tà Hine']}
+};
 // Auth users DB & tokens
 let authUsers=LS.get('authUsers',[]);
 function saveAuthUsers(){LS.set('authUsers',authUsers);}
 let resetTokens=LS.get('resetTokens',{});
 function saveResetTokens(){LS.set('resetTokens',resetTokens);}
+let loginLog=LS.get('loginLog',[]);
+function saveLoginLog(){LS.set('loginLog',loginLog);}
+let activeSessions=LS.get('activeSessions',null);
+function saveActiveSessions(){LS.set('activeSessions',activeSessions);}
+let privacySet=LS.get('privacy',{analytics:true,marketing:true,thirdParty:false,push:true});
+function savePrivacySet(){LS.set('privacy',privacySet);}
+let twoFAStep=null,twoFAMethod='sms';
 // Auth helpers
 function hashPw(pw){let h=0;for(let i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36);}
 function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);}
 function validEmail(s){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);}
 function validPw(s){return s&&s.length>=6;}
 function showAuthErr(id,msg){const el=document.getElementById(id);if(el){el.innerHTML=msg;el.style.display=msg?'':'none';}}
-function addAddress(){
-  const name=val('adName'),phone=val('adPhone'),addr=val('adAddr');
-  if(!addr){toast('Nhập địa chỉ');return;}
-  addresses.push({id:Date.now(),name:name||(user?user.name:''),phone:phone||(user?user.phone:''),addr,def:addresses.length===0});
-  saveAddresses();renderAccount();toast('Đã thêm địa chỉ');
+const EYE_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.94 17.94A10 10 0 0 1 12 20c-7 0-11-8-11-8a18 18 0 0 1 5.06-5.94M9.9 4.24A9 9 0 0 1 12 4c7 0 11 8 11 8a18 18 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function togglePw(id,btn){const el=document.getElementById(id);if(!el)return;const show=el.type==='password';el.type=show?'text':'password';btn.innerHTML=show?EYE_OFF_SVG:EYE_SVG;}
+function updatePwStrength(){const pw=val('rgPw')||'';const el=document.getElementById('pwStr');if(!el)return;const s=!pw?0:pw.length<6?1:pw.length>=10&&/[0-9]/.test(pw)&&/[^a-zA-Z0-9]/.test(pw)?4:pw.length>=8&&(/[0-9]/.test(pw)||/[^a-zA-Z0-9]/.test(pw))?3:2;const lbls=['','Quá ngắn','Yếu','Trung bình','Mạnh'];const cols=['','#e74c3c','#e67e22','#f39c12','#27ae60'];const pcts=[0,25,50,75,100];el.innerHTML='<div class="pws-bar"><div class="pws-fill" style="width:'+pcts[s]+'%;background:'+cols[s]+'"></div></div>'+(pw?'<span class="pws-lbl" style="color:'+cols[s]+'">'+lbls[s]+'</span>':'');}
+function _addrFullStr(province,district,ward,street){return [street,ward,district,province].filter(Boolean).join(', ');}
+function _addrFormVals(prefix){
+  prefix=prefix||'ad';
+  const name=val(prefix+'Name'),phone=val(prefix+'Phone');
+  const label=document.querySelector('input[name="'+prefix+'Label"]:checked');
+  const province=val(prefix+'Province'),district=val(prefix+'District'),ward=val(prefix+'Ward'),street=val(prefix+'Street');
+  return {name,phone,label:label?label.value:'Nhà',province,district,ward,street};
 }
-function removeAddress(id){addresses=addresses.filter(a=>a.id!==id);saveAddresses();renderAccount();}
+function addAddress(){
+  const v=_addrFormVals('ad');
+  if(!v.province){toast('Chọn Tỉnh/Thành phố');return;}
+  if(!v.district){toast('Chọn Quận/Huyện');return;}
+  if(!v.street){toast('Nhập số nhà, tên đường');return;}
+  const addr=_addrFullStr(v.province,v.district,v.ward,v.street);
+  addresses.push({id:Date.now(),name:v.name||(user?user.name:''),phone:v.phone||(user?user.phone:''),label:v.label,province:v.province,district:v.district,ward:v.ward,street:v.street,addr,def:addresses.length===0});
+  saveAddresses();editingAddressId=null;renderAccount();toast('Đã thêm địa chỉ');
+}
+function editAddress(id){editingAddressId=id;renderAccount();}
+function cancelEditAddress(){editingAddressId=null;renderAccount();}
+function updateAddress(id){
+  const a=addresses.find(x=>x.id===id);if(!a)return;
+  const v=_addrFormVals('ea');
+  if(!v.province){toast('Chọn Tỉnh/Thành phố');return;}
+  if(!v.street){toast('Nhập số nhà, tên đường');return;}
+  a.name=v.name||a.name;a.phone=v.phone||a.phone;a.label=v.label;
+  a.province=v.province;a.district=v.district;a.ward=v.ward;a.street=v.street;
+  a.addr=_addrFullStr(v.province,v.district,v.ward,v.street);
+  saveAddresses();editingAddressId=null;renderAccount();toast('Đã cập nhật địa chỉ');
+}
+function removeAddress(id){addresses=addresses.filter(a=>a.id!==id);if(editingAddressId===id)editingAddressId=null;saveAddresses();renderAccount();}
 function setDefaultAddress(id){addresses.forEach(a=>{a.def=(a.id===id);});saveAddresses();renderAccount();}
+function _addrProvinceOpts(sel){return Object.keys(PROVINCES).map(p=>'<option'+(sel===p?' selected':'')+'>'+p+'</option>').join('');}
+function _addrDistrictOpts(prov,sel){const dists=PROVINCES[prov]?Object.keys(PROVINCES[prov]):[];return dists.map(d=>'<option'+(sel===d?' selected':'')+'>'+d+'</option>').join('');}
+function _addrWardOpts(prov,dist,sel){const wards=PROVINCES[prov]&&PROVINCES[prov][dist]?PROVINCES[prov][dist]:[];return wards.map(w=>'<option'+(sel===w?' selected':'')+'>'+w+'</option>').join('');}
+function onAddrProvinceChange(pid,did,wid){const prov=document.getElementById(pid).value;document.getElementById(did).innerHTML='<option value="">-- Quận/Huyện --</option>'+_addrDistrictOpts(prov,'');document.getElementById(wid).innerHTML='<option value="">-- Phường/Xã --</option>';}
+function onAddrDistrictChange(pid,did,wid){const prov=document.getElementById(pid).value;const dist=document.getElementById(did).value;document.getElementById(wid).innerHTML='<option value="">-- Phường/Xã --</option>'+_addrWardOpts(prov,dist,'');}
+function _addrLabelBtns(prefix,sel){return ['Nhà','Văn phòng','Khác'].map(l=>'<label class="addr-type-btn'+(sel===l?' on':'')+'"><input type="radio" name="'+prefix+'Label" value="'+l+'" '+(sel===l?'checked':'')+' style="display:none" onchange="this.closest(\'.addr-type-row\').querySelectorAll(\'.addr-type-btn\').forEach(b=>b.classList.remove(\'on\'));this.closest(\'.addr-type-btn\').classList.add(\'on\')">'+l+'</label>').join('');}
+function _addrForm(prefix,a){
+  a=a||{};
+  const prov=a.province||'';const dist=a.district||'';const ward=a.ward||'';
+  return '<div class="form-row"><div class="form-field"><label>Họ tên người nhận</label><input id="'+prefix+'Name" value="'+(a.name||(user?user.name:'')).replace(/"/g,'&quot;')+'"></div>'+
+    '<div class="form-field"><label>Số điện thoại</label><input id="'+prefix+'Phone" placeholder="09xx xxx xxx" value="'+(a.phone||(user?user.phone:'')||'')+'"></div></div>'+
+    '<div class="form-field"><label>Loại địa chỉ</label><div class="addr-type-row">'+_addrLabelBtns(prefix,a.label||'Nhà')+'</div></div>'+
+    '<div class="form-row"><div class="form-field"><label>Tỉnh / Thành phố</label>'+
+      '<select id="'+prefix+'Province" onchange="onAddrProvinceChange(\''+prefix+'Province\',\''+prefix+'District\',\''+prefix+'Ward\')">'+
+      '<option value="">-- Chọn Tỉnh/TP --</option>'+_addrProvinceOpts(prov)+'</select></div>'+
+    '<div class="form-field"><label>Quận / Huyện</label>'+
+      '<select id="'+prefix+'District" onchange="onAddrDistrictChange(\''+prefix+'Province\',\''+prefix+'District\',\''+prefix+'Ward\')">'+
+      '<option value="">-- Quận/Huyện --</option>'+_addrDistrictOpts(prov,dist)+'</select></div></div>'+
+    '<div class="form-row"><div class="form-field"><label>Phường / Xã / Thị trấn</label>'+
+      '<select id="'+prefix+'Ward"><option value="">-- Phường/Xã --</option>'+_addrWardOpts(prov,dist,ward)+'</select></div>'+
+    '<div class="form-field"><label>Số nhà, tên đường</label><input id="'+prefix+'Street" placeholder="VD: 12 Nguyễn Huệ" value="'+(a.street||'').replace(/"/g,'&quot;')+'"></div></div>';
+}
 function gradeAud(g){const n=parseInt((g||'').replace(/\D/g,''))||6;return n<=5?'tieuhoc':n<=9?'thcs':'thpt';}
 function addChild(){const name=val('chName');if(!name){toast('Nhập tên của con');return;}children.push({name,grade:document.getElementById('chGrade').value});saveChildren();toast('Đã thêm hồ sơ con');renderAccount();}
 function removeChild(i){children.splice(i,1);saveChildren();renderAccount();}
@@ -966,7 +1036,6 @@ const DEMO_ACCOUNTS=[
   {role:'hocsinh', label:'Học sinh',               email:'hocsinh@demo.vn',  pw:'demo123'},
   {role:'sinhvien',label:'Sinh viên',              email:'sinhvien@demo.vn', pw:'demo123'},
   {role:'parent',  label:'Phụ huynh',              email:'phuhuynh@demo.vn', pw:'demo123'},
-  {role:'school',  label:'Trường học / Tổ chức',   email:'truonghoc@demo.vn',pw:'demo123'},
 ];
 function demoFill(role,email,pw){
   lgRole=role;
@@ -990,38 +1059,47 @@ function _loginForm(sel){
   const prefill=DEMO_ACCOUNTS.find(a=>a.role===sel.k);
   const emailVal=prefill?prefill.email:'';
   const pwVal=prefill?prefill.pw:'';
-  return _demoPanel()+
-    '<div class="form-field"><label>Email</label>'+
+  return '<div class="form-field"><label>Email</label>'+
     '<input id="lgEmail" type="email" placeholder="ten@email.com" autocomplete="email" value="'+emailVal+'"></div>'+
     '<div class="form-field"><div class="auth-label-row"><label>Mật khẩu</label>'+
     '<a class="auth-link" onclick="authTab(\'forgot\')">Quên mật khẩu?</a></div>'+
-    '<input id="lgPw" type="password" placeholder="Tối thiểu 6 ký tự" autocomplete="current-password" value="'+pwVal+'" onkeydown="if(event.key===\'Enter\')doLogin()"></div>'+
+    '<div class="pw-wrap"><input id="lgPw" type="password" placeholder="Tối thiểu 6 ký tự" autocomplete="current-password" value="'+pwVal+'" onkeydown="if(event.key===\'Enter\')doLogin()">'+
+    '<button type="button" class="pw-toggle" onclick="togglePw(\'lgPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>'+
     '<div class="auth-check-row"><label class="auth-check"><input type="checkbox" id="lgRemember"'+(rem?' checked':'')+'>'+
     '<span>Ghi nhớ đăng nhập</span></label></div>'+
     '<div id="lgErr" class="field-error"></div>'+
     '<button class="btn-primary" style="width:100%;margin-top:6px" onclick="doLogin()">Đăng nhập — '+sel.name+'</button>'+
     '<div class="auth-sep">hoặc tiếp tục với</div>'+
     '<div class="social-btns">'+
-    '<button class="sb-google" onclick="doSocialAuth(\'google\')">Google</button>'+
-    '<button class="sb-fb" onclick="doSocialAuth(\'facebook\')">Facebook</button>'+
+    '<button class="sb-google" onclick="doSocialAuth(\'google\')">G&nbsp;Google</button>'+
+    '<button class="sb-fb" onclick="doSocialAuth(\'facebook\')">f&nbsp;Facebook</button>'+
     '</div>'+
     '<p class="auth-switch">Chưa có tài khoản? <a class="auth-link" onclick="authTab(\'register\')">Đăng ký ngay</a></p>';
 }
 function _registerForm(sel){
-  return '<div class="form-field"><label>Họ và tên</label>'+
+  return '<div class="form-row">'+
+    '<div class="form-field"><label>Họ và tên</label>'+
     '<input id="rgName" placeholder="Nguyễn Văn An" autocomplete="name"></div>'+
+    '<div class="form-field"><label>Số điện thoại <span class="opt-tag">(tùy chọn)</span></label>'+
+    '<input id="rgPhone" type="tel" placeholder="0912 345 678" autocomplete="tel"></div>'+
+    '</div>'+
     '<div class="form-field"><label>Email</label>'+
     '<input id="rgEmail" type="email" placeholder="ten@email.com" autocomplete="email"></div>'+
-    '<div class="form-row">'+
-    '<div class="form-field"><label>Mật khẩu</label><input id="rgPw" type="password" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password"></div>'+
-    '<div class="form-field"><label>Xác nhận</label><input id="rgPw2" type="password" placeholder="Nhập lại" autocomplete="new-password" onkeydown="if(event.key===\'Enter\')doRegister()"></div>'+
-    '</div>'+
+    '<div class="form-field"><label>Mật khẩu</label>'+
+    '<div class="pw-wrap"><input id="rgPw" type="password" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" oninput="updatePwStrength()">'+
+    '<button type="button" class="pw-toggle" onclick="togglePw(\'rgPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div>'+
+    '<div id="pwStr"></div></div>'+
+    '<div class="form-field"><label>Xác nhận mật khẩu</label>'+
+    '<div class="pw-wrap"><input id="rgPw2" type="password" placeholder="Nhập lại mật khẩu" autocomplete="new-password" onkeydown="if(event.key===\'Enter\')doRegister()">'+
+    '<button type="button" class="pw-toggle" onclick="togglePw(\'rgPw2\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>'+
+    '<div class="auth-check-row auth-terms"><label class="auth-check"><input type="checkbox" id="rgTerms">'+
+    '<span>Tôi đồng ý với <a class="auth-link" href="#" onclick="event.preventDefault();alert(\'Điều khoản sẽ được cập nhật sớm!\')">Điều khoản sử dụng</a></span></label></div>'+
     '<div id="rgErr" class="field-error"></div>'+
     '<button class="btn-primary" style="width:100%;margin-top:6px" onclick="doRegister()">Tạo tài khoản — '+sel.name+'</button>'+
     '<div class="auth-sep">hoặc tiếp tục với</div>'+
     '<div class="social-btns">'+
-    '<button class="sb-google" onclick="doSocialAuth(\'google\')">Google</button>'+
-    '<button class="sb-fb" onclick="doSocialAuth(\'facebook\')">Facebook</button>'+
+    '<button class="sb-google" onclick="doSocialAuth(\'google\')">G&nbsp;Google</button>'+
+    '<button class="sb-fb" onclick="doSocialAuth(\'facebook\')">f&nbsp;Facebook</button>'+
     '</div>'+
     '<p class="auth-switch">Đã có tài khoản? <a class="auth-link" onclick="authTab(\'login\')">Đăng nhập</a></p>';
 }
@@ -1088,6 +1166,7 @@ function doLogin(){
 }
 function doRegister(){
   const name=(val('rgName')||'').trim();
+  const phone=(val('rgPhone')||'').trim();
   const email=(val('rgEmail')||'').trim().toLowerCase();
   const pw=val('rgPw')||'',pw2=val('rgPw2')||'';
   const sel=ROLES.find(r=>r.k===lgRole)||ROLES[0];
@@ -1096,11 +1175,12 @@ function doRegister(){
   if(!validEmail(email)){showAuthErr('rgErr','Email không hợp lệ');return;}
   if(!validPw(pw)){showAuthErr('rgErr','Mật khẩu phải từ 6 ký tự trở lên');return;}
   if(pw!==pw2){showAuthErr('rgErr','Mật khẩu xác nhận không khớp');return;}
+  if(!document.getElementById('rgTerms')?.checked){showAuthErr('rgErr','Vui lòng đồng ý với Điều khoản sử dụng');return;}
   if(authUsers.find(u=>u.email===email)){
     showAuthErr('rgErr','Email này đã được đăng ký. <a class="auth-link" onclick="authTab(\'login\')">Đăng nhập?</a>');return;
   }
-  const nu={id:'u'+Date.now().toString(36),name,email,pwHash:hashPw(pw),role:lgRole,
-    points:0,phone:'',ref:refCode(name),checkin:null,streak:0,createdAt:todayStr()};
+  const nu={id:'u'+Date.now().toString(36),name,email,phone:phone||'',pwHash:hashPw(pw),role:lgRole,
+    points:0,ref:refCode(name),checkin:null,streak:0,createdAt:todayStr()};
   authUsers.push(nu);saveAuthUsers();
   user={...nu};saveUser();
   toast('Tạo tài khoản thành công · '+ROLELBL[lgRole]);acctTab='dashboard';go('account');
@@ -1108,7 +1188,7 @@ function doRegister(){
 function doSocialAuth(provider){
   const sel=ROLES.find(r=>r.k===lgRole)||ROLES[0];
   if(sel.kind==='redirect'){window.location.href=sel.to;return;}
-  const pname=provider==='google'?'Google':'Facebook';
+  const pname=provider==='google'?'Google':provider==='facebook'?'Facebook':'Zalo';
   const fakeName=prompt('Giả lập đăng nhập qua '+pname+'\n\nNhập tên hiển thị:','');
   if(fakeName===null)return;
   const displayName=fakeName.trim()||pname+' User';
@@ -1382,38 +1462,123 @@ function acctContent(){
       '<p style="font-size:12px;color:var(--text-soft);margin-top:10px">Thông tin chỉ dùng để xác thực và không chia sẻ bên ngoài EduMart.</p></div>';
   }
   if(acctTab==='profile'){
-    return '<div class="panel"><h3>Hồ sơ của tôi</h3>'+
-      '<div class="form-field"><label>Họ và tên</label><input id="pfName" value="'+user.name.replace(/"/g,'&quot;')+'"></div>'+
-      '<div class="form-row"><div class="form-field"><label>Số điện thoại</label><input id="pfPhone" value="'+(user.phone||'')+'"></div><div class="form-field"><label>Email</label><input id="pfEmail" value="'+(user.email||'')+'" placeholder="ban@email.com"></div></div>'+
-      '<div class="form-field"><label>Ngày sinh</label><input id="pfDob" type="date" value="'+(user.dob||'')+'"></div>'+
-      '<div class="form-field"><label>Phân hệ & Vai trò</label>'+
-        '<div style="font-size:12px;color:var(--text-soft);margin-bottom:6px">Người mua: Học sinh / Sinh viên / Phụ huynh &nbsp;·&nbsp; Hoặc: Trường học / Tổ chức</div>'+
-        '<select id="pfRole">'+['hocsinh','sinhvien','parent','school'].map(k=>'<option value="'+k+'"'+(user.role===k?' selected':'')+'>'+ROLELBL[k]+'</option>').join('')+'</select>'+
+    const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
+    function dobDisplay(d){if(!d)return '—';const p=d.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:'—';}
+    const genderLabel=user.gender&&user.gender!==''?user.gender:'—';
+    const roleSpecificView=user.role==='hocsinh'?'<div class="pf-info-item"><div class="pf-info-label">Lớp</div><div class="pf-info-value">'+(user.grade||'—')+'</div></div>':
+      user.role==='sinhvien'?'<div class="pf-info-item"><div class="pf-info-label">Chuyên ngành</div><div class="pf-info-value">'+(user.major||'—')+'</div></div>'+
+        '<div class="pf-info-item"><div class="pf-info-label">Trường</div><div class="pf-info-value">'+(user.university||'—')+'</div></div>':
+      user.role==='school'?'<div class="pf-info-item"><div class="pf-info-label">Tên tổ chức</div><div class="pf-info-value">'+(user.orgName||'—')+'</div></div>'+
+        '<div class="pf-info-item"><div class="pf-info-label">Mã số thuế</div><div class="pf-info-value">'+(user.taxCode||'—')+'</div></div>':'';
+    if(!pfEditMode){
+      return '<div class="panel">'+
+        '<div class="prof-hdr">'+
+          '<div class="prof-av-lg">'+user.name.charAt(0).toUpperCase()+'</div>'+
+          '<div class="prof-hdr-info">'+
+            '<div class="prof-nm-lg">'+user.name+'</div>'+
+            '<div class="prof-role-lbl">'+ROLELBL[user.role]+'<span class="prof-ref-tag">Mã: '+(user.ref||'N/A')+'</span></div>'+
+            (isSocial?'<div class="pf-social-tag">Đăng nhập qua '+(user.provider||'mạng xã hội')+'</div>':'')+
+          '</div>'+
+          '<button class="btn-ghost pf-edit-toggle" onclick="pfEditMode=true;renderAccount()">'+
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+            ' Chỉnh sửa'+
+          '</button>'+
+        '</div>'+
+        '<div class="sec-divider"></div>'+
+        '<div class="pf-section-title">Thông tin cá nhân</div>'+
+        '<div class="pf-info-grid">'+
+          '<div class="pf-info-item"><div class="pf-info-label">Họ và tên</div><div class="pf-info-value">'+user.name+'</div></div>'+
+          '<div class="pf-info-item"><div class="pf-info-label">Giới tính</div><div class="pf-info-value">'+genderLabel+'</div></div>'+
+          '<div class="pf-info-item"><div class="pf-info-label">Số điện thoại</div><div class="pf-info-value">'+(user.phone||'—')+
+            (user.phone?'<span class="pf-badge unverified">Chưa xác minh</span>':'')+'</div></div>'+
+          '<div class="pf-info-item"><div class="pf-info-label">Ngày sinh</div><div class="pf-info-value">'+dobDisplay(user.dob)+'</div></div>'+
+          roleSpecificView+
+        '</div>'+
+        '<div class="sec-divider"></div>'+
+        '<div class="pf-section-title">Liên hệ</div>'+
+        '<div class="pf-info-grid">'+
+          '<div class="pf-info-item pf-info-full"><div class="pf-info-label">Email</div>'+
+            '<div class="pf-info-value">'+(user.email||'—')+
+              '<span class="pf-badge locked"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Liên hệ hỗ trợ để đổi</span>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }
+    const genderOpts=['','Nam','Nữ','Khác'].map(g=>'<option value="'+g+'"'+((user.gender||'')===g?' selected':'')+'>'+( g||'— Chưa chọn —')+'</option>').join('');
+    return '<div class="panel">'+
+      '<div class="prof-hdr">'+
+        '<div class="prof-av-lg">'+user.name.charAt(0).toUpperCase()+'</div>'+
+        '<div class="prof-hdr-info">'+
+          '<div class="prof-nm-lg">'+user.name+'</div>'+
+          '<div class="prof-role-lbl">'+ROLELBL[user.role]+'<span class="prof-ref-tag">Mã: '+(user.ref||'N/A')+'</span></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;align-items:center">'+
+          '<button class="btn-primary pf-save-hdr" onclick="saveProfile()">Lưu thay đổi</button>'+
+          '<button class="btn-ghost" onclick="pfEditMode=false;renderAccount()">Hủy</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sec-divider"></div>'+
+      '<div class="pf-section-title">Thông tin cá nhân</div>'+
+      '<div class="form-row">'+
+        '<div class="form-field"><label>Họ và tên <span style="color:#c8362a">*</span></label><input id="pfName" value="'+user.name.replace(/"/g,'&quot;')+'"></div>'+
+        '<div class="form-field"><label>Giới tính</label><select id="pfGender">'+genderOpts+'</select></div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-field"><label>Số điện thoại</label><input id="pfPhone" value="'+(user.phone||'')+'" placeholder="09xx xxx xxx" inputmode="numeric"></div>'+
+        '<div class="form-field"><label>Ngày sinh</label><input id="pfDob" type="date" value="'+(user.dob||'')+'"></div>'+
       '</div>'+
       (user.role==='hocsinh'?'<div class="form-field"><label>Lớp học hiện tại</label><select id="pfGrade">'+Array.from({length:12},(_,i)=>'<option'+(user.grade==='Lớp '+(i+1)?' selected':'')+'>Lớp '+(i+1)+'</option>').join('')+'</select></div>':'')+
-      (user.role==='sinhvien'?'<div class="form-row"><div class="form-field"><label>Chuyên ngành</label><input id="pfMajor" value="'+(user.major||'').replace(/"/g,'&quot;')+'" placeholder="VD: Công nghệ thông tin, Kinh tế..."></div><div class="form-field"><label>Trường đại học / Cao đẳng</label><input id="pfUni" value="'+(user.university||'').replace(/"/g,'&quot;')+'" placeholder="VD: ĐH Bách Khoa Hà Nội..."></div></div>':'')+
+      (user.role==='sinhvien'?'<div class="form-row"><div class="form-field"><label>Chuyên ngành</label><input id="pfMajor" value="'+(user.major||'').replace(/"/g,'&quot;')+'" placeholder="VD: Công nghệ thông tin..."></div><div class="form-field"><label>Trường đại học / Cao đẳng</label><input id="pfUni" value="'+(user.university||'').replace(/"/g,'&quot;')+'" placeholder="VD: ĐH Bách Khoa Hà Nội"></div></div>':'')+
       (user.role==='school'?'<div class="form-row"><div class="form-field"><label>Tên tổ chức / Trường</label><input id="pfOrg" value="'+(user.orgName||'').replace(/"/g,'&quot;')+'" placeholder="VD: Trường THPT Nguyễn Huệ"></div><div class="form-field"><label>Mã số thuế (nếu có)</label><input id="pfTax" value="'+(user.taxCode||'')+'" placeholder="0100100000"></div></div>':'')+
-      '<button class="btn-primary" onclick="saveProfile()">Lưu thay đổi</button>'+
+      '<div class="sec-divider"></div>'+
+      '<div class="pf-section-title">Liên hệ</div>'+
+      '<div class="form-field"><label>Email</label>'+
+        '<div class="pf-email-locked">'+
+          '<input value="'+(user.email||'')+'" disabled style="flex:1;opacity:.7;cursor:not-allowed">'+
+          '<span class="pf-lock-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Liên hệ hỗ trợ để đổi</span>'+
+        '</div>'+
+      '</div>'+
     '</div>';
   }
   if(acctTab==='address'){
-    const addrCards=addresses.map(a=>'<div class="order-card" style="margin-bottom:10px">'+
-      '<div class="oh"><span style="font-weight:600">'+a.name+' · '+a.phone+
-        (a.def?'<span class="ostatus" style="margin-left:8px">Mặc định</span>':'')+'</span>'+
-        '<div style="display:flex;gap:6px">'+
-        (!a.def?'<button class="act-track" onclick="setDefaultAddress('+a.id+')">Đặt mặc định</button>':'')+
-        '<button class="act-track" style="color:var(--coral)" onclick="removeAddress('+a.id+')">Xóa</button>'+
-        '</div></div>'+
-      '<div style="font-size:13.5px;color:var(--text-soft);margin-top:4px">'+a.addr+'</div></div>').join('');
-    return '<div class="panel"><h3>Sổ địa chỉ</h3>'+
-      (addresses.length?addrCards:'<p style="color:var(--text-soft)">Chưa có địa chỉ nào. Thêm để thanh toán nhanh hơn.</p>')+
-      '<div style="border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;margin-top:14px">'+
-        '<div style="font-weight:600;margin-bottom:12px">+ Thêm địa chỉ mới</div>'+
-        '<div class="form-row"><div class="form-field"><label>Họ tên người nhận</label><input id="adName" value="'+(user.name||'').replace(/"/g,'&quot;')+'"></div>'+
-        '<div class="form-field"><label>Số điện thoại</label><input id="adPhone" value="'+(user.phone||'')+'"></div></div>'+
-        '<div class="form-field"><label>Địa chỉ chi tiết (số nhà, đường, phường, quận, tỉnh)</label><input id="adAddr" placeholder="VD: 12 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM"></div>'+
-        '<button class="btn-primary" onclick="addAddress()">Lưu địa chỉ</button>'+
-      '</div></div>';
+    const ADDR_ICONS={Nhà:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>','Văn phòng':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',Khác:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'};
+    const addrCards=addresses.map(a=>{
+      if(editingAddressId===a.id){
+        return '<div class="addr-card addr-edit-card">'+
+          '<div class="addr-edit-header"><span class="addr-badge '+(a.def?'def':'')+'">Đang chỉnh sửa</span></div>'+
+          _addrForm('ea',a)+
+          '<div style="display:flex;gap:8px;margin-top:14px">'+
+          '<button class="btn-primary" style="flex:1" onclick="updateAddress('+a.id+')">Lưu thay đổi</button>'+
+          '<button class="btn-ghost" onclick="cancelEditAddress()">Hủy</button>'+
+          '</div></div>';
+      }
+      const lbl=a.label||'Nhà';
+      return '<div class="addr-card'+(a.def?' addr-default':'')+'">'+
+        '<div class="addr-card-top">'+
+          '<span class="addr-type-tag"><span class="addr-type-icon">'+ADDR_ICONS[lbl]+'</span>'+lbl+'</span>'+
+          (a.def?'<span class="addr-badge def">Mặc định</span>':'')+
+          '<div class="addr-actions">'+
+          (!a.def?'<button class="act-track" onclick="setDefaultAddress('+a.id+')">Đặt mặc định</button>':'')+
+          '<button class="act-track" onclick="editAddress('+a.id+')">Sửa</button>'+
+          '<button class="act-track" style="color:var(--coral)" onclick="removeAddress('+a.id+')">Xóa</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="addr-name">'+a.name+' · <span class="addr-phone">'+a.phone+'</span></div>'+
+        '<div class="addr-detail">'+a.addr+'</div>'+
+      '</div>';
+    }).join('');
+    const showAddForm=editingAddressId===null&&editingAddressId!=='hide';
+    return '<div class="panel">'+
+      '<div class="addr-header"><h3 style="margin:0">Sổ địa chỉ</h3>'+
+        '<span style="font-size:13px;color:var(--text-soft)">'+addresses.length+' địa chỉ đã lưu</span></div>'+
+      (addresses.length?'<div class="addr-list">'+addrCards+'</div>':'<div class="addr-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--line)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><p>Chưa có địa chỉ nào được lưu.<br>Thêm địa chỉ để thanh toán nhanh hơn!</p></div>')+
+      (showAddForm&&editingAddressId===null?'<div class="addr-add-section">'+
+        '<div class="addr-add-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm địa chỉ mới</div>'+
+        _addrForm('ad')+
+        '<button class="btn-primary" style="margin-top:14px" onclick="addAddress()">Lưu địa chỉ</button>'+
+      '</div>':'')+
+    '</div>';
   }
   if(acctTab==='points'){
     const logRows=pointsLog.length?pointsLog.map(l=>'<div class="oi" style="font-size:13.5px"><div style="flex:1"><b>'+l.desc+'</b><div style="font-size:12px;color:var(--text-soft)">'+l.date+'</div></div><div style="color:#1a7a4a;font-weight:700">+'+l.pts+' điểm</div></div>').join(''):'<p style="color:var(--text-soft);font-size:13.5px">Chưa có giao dịch điểm nào. Mua hàng để tích điểm!</p>';
@@ -1452,15 +1617,156 @@ function acctContent(){
       '<button class="btn-primary" onclick="submitTeacherVerify()">Gửi yêu cầu xác thực</button>'+
       '<p style="font-size:12px;color:var(--text-soft);margin-top:10px">Thông tin chỉ dùng để xác thực và không chia sẻ bên ngoài EduMart.</p></div>';
   }
+  /* ── Bảo mật ── */
+  if(acctTab==='security'){
+    const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
+    const has2FA=user.twoFA===true;
+    const methodLabel={'sms':'SMS về SĐT','totp':'Ứng dụng TOTP','email':'Email'}[user.twoFAMethod||'sms']||'SMS';
+    let tfaHtml='';
+    if(twoFAStep==='method'){
+      tfaHtml='<div class="tfa-setup">'+
+        '<div style="font-weight:600;margin-bottom:12px">Chọn phương thức xác thực:</div>'+
+        [['sms','SMS về số điện thoại','Nhận OTP qua tin nhắn'],['totp','Ứng dụng TOTP','Google / Microsoft Authenticator'],['email','Email','Nhận OTP qua email đăng ký']].map(([k,t,d])=>
+          '<label class="tfa-opt'+(twoFAMethod===k?' on':'')+'"><input type="radio" name="tfaM" value="'+k+'"'+(twoFAMethod===k?' checked':'')+' onchange="twoFAMethod=\''+k+'\';document.querySelectorAll(\'.tfa-opt\').forEach(x=>x.classList.toggle(\'on\',x.querySelector(\'input\').value===\''+k+'\'))">'+
+          '<div><div style="font-weight:600;font-size:13.5px">'+t+'</div><div style="font-size:12px;color:var(--text-soft)">'+d+'</div></div></label>'
+        ).join('')+
+        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="twoFAStep=\'otp\';renderAccount()">Tiếp theo →</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
+      '</div>';
+    } else if(twoFAStep==='otp'){
+      const dest={'sms':'SĐT '+(user.phone||'của bạn'),'totp':'ứng dụng xác thực','email':'email '+(user.email||'của bạn')}[twoFAMethod]||'';
+      tfaHtml='<div class="tfa-setup">'+
+        '<div style="font-size:13.5px;margin-bottom:14px">Nhập mã OTP gửi đến <b>'+dest+'</b> <span style="font-size:12px;color:var(--text-soft)">(demo: <b>123456</b>)</span></div>'+
+        '<div class="otp-row">'+Array.from({length:6},(_,i)=>'<input class="otp-box" id="ob'+i+'" type="text" maxlength="1" inputmode="numeric" onkeyup="otpNav('+i+',event)">').join('')+'</div>'+
+        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="confirm2FA()">Xác nhận OTP</button><button class="btn-ghost" onclick="twoFAStep=\'method\';renderAccount()">← Quay lại</button></div>'+
+      '</div>';
+    } else if(twoFAStep==='disable'){
+      tfaHtml='<div class="tfa-setup">'+
+        '<div style="font-size:13.5px;margin-bottom:12px">Nhập mật khẩu để tắt 2FA:</div>'+
+        '<div class="pw-wrap" style="max-width:320px"><input id="tfaDPw" type="password" placeholder="Mật khẩu tài khoản">'+
+        '<button type="button" class="pw-toggle" onclick="togglePw(\'tfaDPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div>'+
+        '<div id="tfaDErr" class="field-error"></div>'+
+        '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn-primary" onclick="disable2FA()">Tắt 2FA</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
+      '</div>';
+    } else {
+      tfaHtml='<div class="two-fa-row">'+
+        '<div><div style="font-weight:600;font-size:14px">'+(has2FA?'🛡 Đang bật — '+methodLabel:'⚪ Chưa bật')+'</div>'+
+        '<div style="font-size:13px;color:var(--text-soft);margin-top:4px">'+(has2FA?'Bật từ: '+(user.twoFADate||todayStr()):'Thêm lớp bảo mật bằng OTP mỗi lần đăng nhập.')+'</div></div>'+
+        '<button class="btn-ghost" style="white-space:nowrap" onclick="twoFAStep=\''+(has2FA?'disable':'method')+'\';renderAccount()">'+(has2FA?'Tắt 2FA':'Bật 2FA')+'</button>'+
+      '</div>'+
+      (!has2FA?'<p style="font-size:12.5px;color:var(--text-soft);margin-top:8px">Hỗ trợ: SMS · TOTP (Google Authenticator) · Email</p>':'');
+    }
+    return '<div class="panel">'+
+      '<h3 style="margin:0 0 16px">Đổi mật khẩu</h3>'+
+      (isSocial?
+        '<div class="info-note">Tài khoản đăng nhập qua <b>'+(user.provider||'mạng xã hội')+'</b> không dùng mật khẩu. Sử dụng nút Social để đăng nhập.</div>':
+        '<div class="form-field"><label>Mật khẩu hiện tại</label>'+
+          '<div class="pw-wrap"><input id="cpOld" type="password" placeholder="Mật khẩu đang dùng">'+
+          '<button type="button" class="pw-toggle" onclick="togglePw(\'cpOld\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>'+
+        '<div class="form-row">'+
+          '<div class="form-field"><label>Mật khẩu mới</label>'+
+            '<div class="pw-wrap"><input id="cpNew" type="password" placeholder="Tối thiểu 6 ký tự" oninput="updateCpStrength()">'+
+            '<button type="button" class="pw-toggle" onclick="togglePw(\'cpNew\',this)" tabindex="-1">'+EYE_SVG+'</button></div>'+
+            '<div id="cpStr"></div></div>'+
+          '<div class="form-field"><label>Xác nhận mật khẩu mới</label>'+
+            '<div class="pw-wrap"><input id="cpNew2" type="password" placeholder="Nhập lại" onkeydown="if(event.key===\'Enter\')doChangePw()">'+
+            '<button type="button" class="pw-toggle" onclick="togglePw(\'cpNew2\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>'+
+        '</div>'+
+        '<div id="cpErr" class="field-error"></div>'+
+        '<button class="btn-primary" onclick="doChangePw()">Cập nhật mật khẩu</button>'
+      )+
+      '<div class="sec-divider"></div>'+
+      '<h3 style="margin:0 0 14px">Xác thực 2 yếu tố (2FA)</h3>'+
+      tfaHtml+
+    '</div>';
+  }
+  /* ── Thiết bị & Lịch sử ── */
+  if(acctTab==='devices'){
+    const sessions=getActiveSessions();
+    const log=getLoginLog();
+    const hasOthers=sessions.some(s=>!s.current);
+    const sessHtml=sessions.map(s=>'<div class="device-card'+(s.current?' device-current':'')+'">'+
+      '<span class="dev-icon">'+s.icon+'</span>'+
+      '<div class="dev-info"><div class="dev-name">'+s.device+(s.current?' <span class="badge-cur">Thiết bị này</span>':'')+'</div>'+
+      '<div class="dev-meta">'+s.ip+' · '+s.loc+' · '+s.last+'</div></div>'+
+      (!s.current?'<button class="btn-ghost" style="white-space:nowrap;font-size:12.5px;padding:8px 14px" onclick="revokeDevice(\''+s.id+'\')">Thu hồi</button>':'')+
+    '</div>').join('');
+    const logHtml=log.map(l=>'<div class="login-log-item">'+
+      '<span class="log-dot'+(l.ok?'':' log-fail')+'"></span>'+
+      '<div class="log-info"><div class="log-dev">'+l.device+(l.note?' · <span style="color:var(--text-soft);font-size:12px">'+l.note+'</span>':'')+'</div>'+
+      '<div class="log-meta">'+l.date+' '+l.time+' · '+l.ip+' · '+l.loc+'</div></div>'+
+      '<span class="log-status'+(l.ok?'':' log-status-fail')+'">'+(l.ok?'Thành công':'Thất bại')+'</span>'+
+    '</div>').join('');
+    const failCount=log.filter(l=>!l.ok).length;
+    return '<div class="panel">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
+        '<h3 style="margin:0">Thiết bị đang đăng nhập</h3>'+
+        (hasOthers?'<button class="btn-ghost" style="font-size:12.5px;padding:8px 14px" onclick="revokeAllDevices()">Thu hồi tất cả</button>':'')+
+      '</div>'+
+      sessHtml+
+      (failCount?'<div class="info-note" style="margin-top:14px">⚠ Phát hiện <b>'+failCount+'</b> lần đăng nhập thất bại. <a style="color:var(--ink);font-weight:600;cursor:pointer" onclick="acctTab=\'security\';renderAccount()">Đổi mật khẩu ngay</a></div>':'')+
+      '<div class="sec-divider"></div>'+
+      '<h3 style="margin:0 0 14px">Lịch sử đăng nhập</h3>'+
+      (log.length?logHtml:'<p style="color:var(--text-soft)">Chưa có lịch sử.</p>')+
+    '</div>';
+  }
+  /* ── Quyền riêng tư ── */
+  if(acctTab==='privacy'){
+    const rows=[
+      ['analytics','📊','Dữ liệu hành vi mua sắm','Giúp cải thiện gợi ý sản phẩm phù hợp với bạn.'],
+      ['marketing','📧','Nhận email marketing','Khuyến mãi, sản phẩm mới và bản tin hàng tuần.'],
+      ['thirdParty','🤝','Chia sẻ dữ liệu bên thứ ba','Đối tác quảng cáo và phân tích. Tắt sẽ thu hồi quyền OAuth đã cấp.'],
+      ['push','🔔','Thông báo đẩy (push)','Đơn hàng, khuyến mãi qua trình duyệt.'],
+    ];
+    return '<div class="panel">'+
+      '<h3 style="margin:0 0 16px">Quyền riêng tư & Dữ liệu</h3>'+
+      rows.map(([key,ic,title,desc])=>'<div class="privacy-row">'+
+        '<div class="privacy-info"><div class="privacy-title">'+ic+' '+title+'</div><div class="privacy-desc">'+desc+'</div></div>'+
+        '<label class="toggle-sw"><input type="checkbox" id="pv_'+key+'"'+(privacySet[key]?' checked':'')+' onchange="privacySet[\''+key+'\']=this.checked"><span class="toggle-track"><span class="toggle-thumb"></span></span></label>'+
+      '</div>').join('')+
+      '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'+
+        '<button class="btn-primary" onclick="doSavePrivacy()">Lưu cài đặt</button>'+
+        '<button class="btn-ghost" onclick="toast(\'Dữ liệu sẽ được gửi vào email trong 24h\')">📥 Tải dữ liệu của tôi</button>'+
+      '</div>'+
+      '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-soft)">'+
+        'Xem <a class="auth-link" href="#" onclick="event.preventDefault()">Chính sách bảo mật</a> · <a class="auth-link" href="#" onclick="event.preventDefault()">Điều khoản sử dụng</a>'+
+      '</div>'+
+    '</div>';
+  }
+  /* ── Xóa tài khoản ── */
+  if(acctTab==='danger'){
+    const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
+    const hasActive=orders.some(o=>orderStage(o)<4);
+    return '<div class="panel">'+
+      '<h3 style="margin:0 0 4px;color:#c0392b">⚠ Vùng nguy hiểm</h3>'+
+      '<p style="font-size:13px;color:var(--text-soft);margin:0 0 18px">Các thao tác trong mục này có thể gây mất dữ liệu và không thể hoàn tác.</p>'+
+      '<div class="danger-zone">'+
+        '<div class="danger-zone-title">🗑 Xóa tài khoản vĩnh viễn</div>'+
+        '<div class="danger-zone-desc" style="margin:6px 0 14px">Sau khi xóa: toàn bộ đơn hàng, điểm thưởng và dữ liệu sẽ bị ẩn. Tài khoản bị <b>xóa vĩnh viễn sau 30 ngày</b>. Không thể khôi phục sau thời hạn này.</div>'+
+        (hasActive?
+          '<div class="info-note" style="background:#fff8f7;border-color:#f5c6c0;color:#c0392b">Bạn có đơn hàng đang xử lý. Vui lòng chờ hoàn tất trước khi xóa tài khoản.</div>':
+          (!isSocial?
+            '<div class="form-field"><label>Nhập mật khẩu để xác nhận</label>'+
+              '<div class="pw-wrap"><input id="delPw" type="password" placeholder="Mật khẩu tài khoản của bạn">'+
+              '<button type="button" class="pw-toggle" onclick="togglePw(\'delPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>':'')
+        )+
+        '<div id="delErr" class="field-error"></div>'+
+        (!hasActive?'<button class="btn-delete" onclick="doDeleteAccount()">Xóa tài khoản của tôi</button>':'')+
+      '</div>'+
+    '</div>';
+  }
 }
 function saveProfile(){
-  const name=val('pfName'),phone=val('pfPhone'),email=val('pfEmail'),dob=document.getElementById('pfDob')?.value||'';
-  const role=document.getElementById('pfRole')?.value;
-  if(name)user.name=name;
-  if(phone)user.phone=phone;
-  user.email=email;
+  const name=val('pfName');
+  if(!name||name.length<2){toast('Họ tên không được để trống (tối thiểu 2 ký tự)');return;}
+  const phone=val('pfPhone');
+  if(phone&&!/^0\d{9}$/.test(phone)){toast('Số điện thoại không hợp lệ (VD: 0912345678)');return;}
+  const dob=document.getElementById('pfDob')?.value||'';
+  if(dob){const d=new Date(dob);const now=new Date();if(isNaN(d.getTime())||d>now){toast('Ngày sinh không hợp lệ');return;}}
+  const gender=document.getElementById('pfGender')?.value;
+  user.name=name;
+  user.phone=phone;
   if(dob)user.dob=dob;
-  if(role&&ROLELBL[role])user.role=role;
+  if(gender!==undefined)user.gender=gender;
   const grade=document.getElementById('pfGrade')?.value;
   const major=val('pfMajor'), uni=val('pfUni');
   const orgName=val('pfOrg'), taxCode=val('pfTax');
@@ -1470,7 +1776,8 @@ function saveProfile(){
   if(orgName)user.orgName=orgName;
   if(taxCode)user.taxCode=taxCode;
   saveUser();
-  document.querySelector('.acct-user .nm').textContent=user.name;
+  pfEditMode=false;
+  renderAccount();
   toast('Đã lưu thay đổi hồ sơ');
 }
 function submitTeacherVerify(){
@@ -1484,6 +1791,101 @@ function submitStudentVerify(){
   if(!sid||!uni){toast('Nhập mã số sinh viên và tên trường nhé');return;}
   user.studentVerified='pending';user.studentId=sid;user.svUni=uni;user.svVfyDate=todayStr();
   saveUser();toast('Đã gửi hồ sơ — EduMart sẽ phê duyệt trong 1–2 ngày làm việc');renderAccount();
+}
+/* ── Security functions ── */
+function updateCpStrength(){const pw=val('cpNew')||'';const el=document.getElementById('cpStr');if(!el)return;const s=!pw?0:pw.length<6?1:pw.length>=10&&/[0-9]/.test(pw)&&/[^a-zA-Z0-9]/.test(pw)?4:pw.length>=8&&(/[0-9]/.test(pw)||/[^a-zA-Z0-9]/.test(pw))?3:2;const lbls=['','Quá ngắn','Yếu','Trung bình','Mạnh'];const cols=['','#e74c3c','#e67e22','#f39c12','#27ae60'];const pcts=[0,25,50,75,100];el.innerHTML='<div class="pws-bar"><div class="pws-fill" style="width:'+pcts[s]+'%;background:'+cols[s]+'"></div></div>'+(pw?'<span class="pws-lbl" style="color:'+cols[s]+'">'+lbls[s]+'</span>':'');}
+function doChangePw(){
+  const oldPw=val('cpOld')||'',newPw=val('cpNew')||'',newPw2=val('cpNew2')||'';
+  if(!oldPw){showAuthErr('cpErr','Nhập mật khẩu hiện tại');return;}
+  if(user.pwHash!==hashPw(oldPw)){showAuthErr('cpErr','Mật khẩu hiện tại không đúng');return;}
+  if(!validPw(newPw)){showAuthErr('cpErr','Mật khẩu mới phải từ 6 ký tự trở lên');return;}
+  if(newPw===oldPw){showAuthErr('cpErr','Mật khẩu mới phải khác mật khẩu cũ');return;}
+  if(newPw!==newPw2){showAuthErr('cpErr','Mật khẩu xác nhận không khớp');return;}
+  const idx=authUsers.findIndex(u=>u.id===user.id);
+  if(idx>-1){authUsers[idx].pwHash=hashPw(newPw);saveAuthUsers();}
+  user.pwHash=hashPw(newPw);saveUser();
+  const now=new Date();
+  loginLog.unshift({id:Date.now(),time:now.getHours()+':'+String(now.getMinutes()).padStart(2,'0'),date:todayStr(),device:'Trình duyệt hiện tại',ip:'103.xx.xx.x',loc:'Hà Nội, VN',ok:true,note:'Đổi mật khẩu'});
+  saveLoginLog();
+  showAuthErr('cpErr','');toast('✅ Đã cập nhật mật khẩu!');renderAccount();
+}
+function otpNav(i,e){
+  const boxes=document.querySelectorAll('.otp-box');
+  if(e.key>='0'&&e.key<='9'&&i<5)setTimeout(()=>boxes[i+1]?.focus(),10);
+  if(e.key==='Backspace'&&i>0&&!boxes[i].value)boxes[i-1]?.focus();
+}
+function confirm2FA(){
+  const otp=Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join('');
+  if(otp.length<6){toast('Nhập đủ 6 số OTP');return;}
+  if(otp!=='123456'){toast('Mã OTP không đúng — demo: 123456');return;}
+  user.twoFA=true;user.twoFAMethod=twoFAMethod;user.twoFADate=todayStr();
+  saveUser();twoFAStep=null;
+  toast('🛡 Đã bật xác thực 2 yếu tố!');
+  renderAccount();
+  const codes=Array.from({length:6},()=>(Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)).toUpperCase()).join('\n');
+  setTimeout(()=>alert('Mã dự phòng — lưu nơi an toàn:\n\n'+codes+'\n\nMỗi mã chỉ dùng 1 lần.'),400);
+}
+function disable2FA(){
+  const pw=val('tfaDPw')||'';
+  if(!pw){showAuthErr('tfaDErr','Nhập mật khẩu để xác nhận');return;}
+  if(hashPw(pw)!==user.pwHash){showAuthErr('tfaDErr','Mật khẩu không đúng');return;}
+  user.twoFA=false;delete user.twoFAMethod;delete user.twoFADate;
+  saveUser();twoFAStep=null;toast('Đã tắt xác thực 2 yếu tố');renderAccount();
+}
+/* ── Device & Log functions ── */
+function getActiveSessions(){
+  if(!activeSessions||!activeSessions.length){
+    activeSessions=[
+      {id:'s_cur',device:'Chrome · '+(navigator.userAgent.includes('Win')?'Windows':navigator.userAgent.includes('Mac')?'macOS':'Linux'),icon:'💻',ip:'103.21.xx.x',loc:'Hà Nội, VN',last:'Đang hoạt động',current:true},
+      {id:'s_mob',device:'Safari · iPhone',icon:'📱',ip:'118.69.xx.x',loc:'TP.HCM, VN',last:'2 giờ trước',current:false},
+    ];
+    saveActiveSessions();
+  }
+  return activeSessions;
+}
+function getLoginLog(){
+  if(!loginLog||!loginLog.length){
+    const now=new Date();
+    const fmt=(d)=>d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+    const d1=new Date(now);d1.setDate(d1.getDate()-1);
+    const d3=new Date(now);d3.setDate(d3.getDate()-3);
+    loginLog=[
+      {id:1,time:'14:32',date:fmt(now),device:'Chrome · Windows',ip:'103.21.xx.x',loc:'Hà Nội, VN',ok:true},
+      {id:2,time:'09:15',date:fmt(d1),device:'Safari · iPhone',ip:'118.69.xx.x',loc:'TP.HCM, VN',ok:true},
+      {id:3,time:'23:44',date:fmt(d1),device:'Firefox · Unknown',ip:'45.xx.xx.x',loc:'Singapore',ok:false},
+      {id:4,time:'11:00',date:fmt(d3),device:'Chrome · Windows',ip:'103.21.xx.x',loc:'Hà Nội, VN',ok:true},
+    ];
+    saveLoginLog();
+  }
+  return loginLog;
+}
+function revokeDevice(id){
+  activeSessions=(activeSessions||[]).filter(s=>s.id!==id);
+  saveActiveSessions();toast('Đã thu hồi quyền truy cập của thiết bị');renderAccount();
+}
+function revokeAllDevices(){
+  activeSessions=(activeSessions||[]).filter(s=>s.current);
+  saveActiveSessions();toast('Đã đăng xuất khỏi tất cả thiết bị khác');renderAccount();
+}
+/* ── Privacy functions ── */
+function doSavePrivacy(){
+  ['analytics','marketing','thirdParty','push'].forEach(k=>{const el=document.getElementById('pv_'+k);if(el)privacySet[k]=el.checked;});
+  savePrivacySet();toast('Đã lưu cài đặt quyền riêng tư');
+}
+/* ── Delete account ── */
+function doDeleteAccount(){
+  const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
+  if(!isSocial){
+    const pw=val('delPw')||'';
+    if(!pw){showAuthErr('delErr','Nhập mật khẩu để xác nhận');return;}
+    if(hashPw(pw)!==user.pwHash){showAuthErr('delErr','Mật khẩu không đúng');return;}
+  }
+  if(!confirm('Xác nhận xóa tài khoản?\n\nTài khoản sẽ bị xóa vĩnh viễn sau 30 ngày.\nHành động này KHÔNG THỂ hoàn tác.'))return;
+  const idx=authUsers.findIndex(u=>u.id===user.id);
+  if(idx>-1){authUsers[idx].deletedAt=todayStr();saveAuthUsers();}
+  user=null;LS.set('user',null);
+  toast('Tài khoản đã được đánh dấu xóa. Sẽ xóa vĩnh viễn sau 30 ngày.');
+  go('home');
 }
 /* ── ADMIN MOCK DATA ──────────────────────────────── */
 const ADM={
@@ -1908,7 +2310,8 @@ function navForRole(r){
   /* Xác thực giáo viên — Người mua (không áp dụng Trường học) */
   if(user&&r!=='school'&&(user.teacherVerified||r==='hocsinh'||r==='sinhvien'||r==='parent'))
     nav.push(['teacher','Xác thực giáo viên']);
-  nav.push(['profile','Hồ sơ'],['address','Sổ địa chỉ'],['points','Điểm thưởng']);
+  nav.push(['profile','Hồ sơ'],['address','Sổ địa chỉ'],['points','Điểm thưởng'],
+    ['security','Bảo mật'],['devices','Thiết bị & Lịch sử'],['privacy','Quyền riêng tư'],['danger','Xóa tài khoản']);
   return nav;
 }
 function renderAccount(){
@@ -1916,7 +2319,7 @@ function renderAccount(){
   const nav=navForRole(user.role);
   document.getElementById('app').innerHTML=
   '<div class="acct"><aside class="acct-side"><div class="acct-user"><div class="av">'+user.name.charAt(0).toUpperCase()+'</div><div><div class="nm">'+user.name+'</div><div class="rl">'+ROLELBL[user.role]+'</div></div></div>'+
-    '<div class="acct-nav">'+nav.map(n=>'<button class="'+(acctTab===n[0]?'on':'')+'" onclick="acctTab=\''+n[0]+'\';renderAccount()">'+n[1]+'</button>').join('')+'<button class="danger" onclick="logout()">Đăng xuất</button></div></aside>'+
+    '<div class="acct-nav">'+nav.map(n=>'<button class="'+(acctTab===n[0]?'on':'')+(n[0]==='danger'?' nav-del':'')+'" onclick="acctTab=\''+n[0]+'\';twoFAStep=null;pfEditMode=false;renderAccount()">'+n[1]+'</button>').join('')+'<button class="danger" onclick="logout()">Đăng xuất</button></div></aside>'+
     '<div>'+acctContent()+'</div></div>';
 }
 
