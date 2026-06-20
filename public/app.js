@@ -6614,14 +6614,6 @@ function renderVPPStore(){
       '</div>'+
     '</div>'+
 
-    '<h2 class="vpp-sec-h">📦 Danh mục</h2>'+
-    '<div class="vpp-cats">'+Object.entries(VPP_SUBS).map(([k,v])=>{const cnt=P.filter(p=>p.cat==='vpp'&&p.sub===k).length;const items=P.filter(p=>p.cat==='vpp'&&p.sub===k).slice(0,3);return '<div class="vpp-cat" onclick="vppSub=\''+k+'\';go(\'listing\',\'vpp\')">'+
-      '<div class="vc-head"><span class="vc-icon">'+v.icon+'</span><div><div class="vc-nm">'+v.lbl+'</div><div class="vc-cnt">'+cnt+' sản phẩm</div></div></div>'+
-      '<div class="vc-desc">'+v.desc+'</div>'+
-      '<div class="vc-items">'+items.map(p=>'<div class="vci-nm">'+p.name+'</div>').join('')+'</div>'+
-      '<div class="vc-more">Xem tất cả ›</div>'+
-    '</div>';}).join('')+'</div>'+
-
     '<h2 class="vpp-sec-h">🔥 Bán chạy nhất</h2>'+
     '<div class="vpp-grid">'+bestsellers.map(vCard).join('')+'</div>'+
 
