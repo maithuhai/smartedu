@@ -360,9 +360,15 @@ function hmColl(c,tall){
   '</div>';
 }
 
+function updateShelfArrows(){
+  const t=document.getElementById('shelfTrack');
+  if(!t)return;
+  const l=document.querySelector('.bs-arr-l');
+  if(l)l.classList.toggle('vis',t.scrollLeft>4);
+}
 function shelfScroll(dir){
   const t=document.getElementById('shelfTrack');
-  if(t)t.scrollBy({left:dir*560,behavior:'smooth'});
+  if(t){t.scrollBy({left:dir*560,behavior:'smooth'});setTimeout(updateShelfArrows,350);}
 }
 
 function renderHome(){
@@ -485,12 +491,12 @@ function renderHome(){
         '<h2 class="bs-section-title">📚 Sách nổi bật</h2>'+
       '</div>'+
       '<div class="bs-section-right">'+
-        '<button class="bs-arr-btn" onclick="shelfScroll(-1)" aria-label="Trước"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>'+
-        '<button class="bs-arr-btn" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
         '<a class="bs-viewall" onclick="go(\'listing\',\'sach\')">Xem tất cả <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>'+
       '</div>'+
     '</div>'+
-    '<div class="bs-track" id="shelfTrack">'+
+    '<div class="bs-carousel-wrap">'+
+      '<button class="bs-arr bs-arr-l" onclick="shelfScroll(-1)" aria-label="Trước"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>'+
+      '<div class="bs-track" id="shelfTrack" onscroll="updateShelfArrows()">'+
       featBooks.map(p=>{
         const slug=HIMG[p.id];
         const disc=Math.round((1-p.price/p.old)*100);
@@ -526,6 +532,8 @@ function renderHome(){
           '</div>'+
         '</div>';
       }).join('')+
+    '</div>'+
+    '<button class="bs-arr bs-arr-r" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
     '</div>'+
   '</div>'+
 
