@@ -360,8 +360,15 @@ function hmColl(c,tall){
   '</div>';
 }
 
+function shelfScroll(dir){
+  const t=document.getElementById('shelfTrack');
+  if(t)t.scrollBy({left:dir*560,behavior:'smooth'});
+}
+
 function renderHome(){
   const bestSach=P.filter(p=>p.cat==='sach').slice(0,5);
+  const featBooks=P.filter(p=>p.cat==='sach').sort((a,b)=>b.sold*b.rate-a.sold*a.rate).slice(0,8);
+  const bsTagMap={1:{l:'Bán chạy',c:'#c0392b'},2:{l:'Kinh điển',c:'#8e44ad'},3:{l:'Best seller',c:'#2980b9'},4:{l:'Yêu thích',c:'#c1572f'},5:{l:'HOT',c:'#e67e22'},6:{l:'Luyện thi',c:'#1a7a4a'},26:{l:'Giáo viên',c:'#27ae60'},27:{l:'Phương pháp',c:'#3498db'}};
   const vpp=P.filter(p=>p.cat==='vpp');
   const tb=P.filter(p=>p.cat==='tbgd');
   const flashItems=[7,4,1,5,9].map(id=>P.find(x=>x.id===id));
@@ -467,6 +474,56 @@ function renderHome(){
       '</div>'+
       '<div class="fline"></div>'+
       '<div class="hm-grid g5">'+flashItems.map(p=>hmCard(p,true)).join('')+'</div>'+
+    '</div>'+
+  '</div>'+
+
+  /* ── Sách nổi bật — Bookshelf Row ── */
+  '<div class="bs-section">'+
+    '<div class="bs-section-hd">'+
+      '<div class="bs-section-left">'+
+        '<span class="kick">Biên tập viên gợi ý</span>'+
+        '<h2 class="bs-section-title">📚 Sách nổi bật</h2>'+
+      '</div>'+
+      '<div class="bs-section-right">'+
+        '<button class="bs-arr-btn" onclick="shelfScroll(-1)" aria-label="Trước"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>'+
+        '<button class="bs-arr-btn" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
+        '<a class="bs-viewall" onclick="go(\'listing\',\'sach\')">Xem tất cả <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="bs-track" id="shelfTrack">'+
+      featBooks.map(p=>{
+        const slug=HIMG[p.id];
+        const disc=Math.round((1-p.price/p.old)*100);
+        const sold=p.sold>=1000?(p.sold/1000).toFixed(1)+'k':String(p.sold);
+        const tag=bsTagMap[p.id];
+        const cover=slug
+          ?'<img src="'+uimg(slug,400)+'" alt="'+p.name+'" loading="lazy" class="bs-img">'
+          :'<div class="bs-grad" style="background:linear-gradient(155deg,'+p.c+' 0%,rgba(0,0,0,.6) 100%)"><div class="bs-grad-nm">'+p.name+'</div><div class="bs-grad-by">'+p.by+'</div></div>';
+        return '<div class="bs-item" onclick="go(\'product\','+p.id+')">'+
+          '<div class="bs-cover">'+
+            cover+
+            (tag?'<span class="bs-tag" style="background:'+tag.c+'">'+tag.l+'</span>':'')+
+            (disc>0?'<span class="bs-disc">-'+disc+'%</span>':'')+
+            '<div class="bs-hover-panel">'+
+              '<div class="bs-rate-row">'+
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f1c40f"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg> '+
+                p.rate.toFixed(1)+' · '+sold+' bán'+
+              '</div>'+
+              '<button class="bs-cart-btn" onclick="event.stopPropagation();addToCart('+p.id+')">'+
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Thêm vào giỏ'+
+              '</button>'+
+            '</div>'+
+          '</div>'+
+          '<div class="bs-info">'+
+            '<div class="bs-nm">'+p.name+'</div>'+
+            '<div class="bs-by">'+p.by+'</div>'+
+            '<div class="bs-pr">'+
+              '<span class="bs-now">'+fmt(p.price)+'</span>'+
+              (disc>0?'<span class="bs-old">'+fmt(p.old)+'</span>':'')+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
     '</div>'+
   '</div>'+
 
