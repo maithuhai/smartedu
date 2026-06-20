@@ -1684,3 +1684,217 @@
 .bsr-price{font-size:14px;font-weight:700;color:var(--coral);}
 @media(max-width:900px){.bsr-grid{grid-template-columns:repeat(3,1fr);}.bsr-rank{font-size:64px;}}
 @media(max-width:600px){.bsr-grid{grid-template-columns:repeat(2,1fr);gap:12px;}.bsr-rank{font-size:52px;}.bsr-title{font-size:12px;}}
+
+/* ── Admin Shop / NCC Management ──────────────────────── */
+
+/* Extra badge colors */
+.adm-badge.adm-badge-orange{background:#fff3e0;color:#e67e22;}
+.adm-badge.adm-badge-blue{background:#e8f4fd;color:#2980b9;}
+
+/* Tab bar */
+.adm-shops-tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:2px solid var(--line);padding-bottom:0;}
+.adm-shops-tab{padding:10px 18px;font-size:13.5px;font-weight:500;color:var(--text-soft);background:none;border:none;border-bottom:2.5px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:7px;}
+.adm-shops-tab:hover{color:var(--ink-deep);}
+.adm-shops-tab.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:600;}
+.adm-tab-badge{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+
+/* Active filter button */
+.adm-filter-on{border-color:var(--ink)!important;color:var(--ink)!important;background:#fff3f2!important;font-weight:600;}
+
+/* Document sections inside detail card */
+.adm-ncc-doc-section{margin-top:18px;padding-top:16px;border-top:1.5px solid var(--surface);}
+.adm-ncc-doc-title{font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em;}
+
+/* Review / rejection note banner */
+.adm-ncc-note{padding:14px 16px;border-radius:10px;margin-bottom:16px;background:#fffbe8;border:1.5px solid #f5d76e;}
+.adm-ncc-note.red{background:#fff0ee;border-color:#f5c0b8;}
+.adm-ncc-note.blue{background:#e8f4fd;border-color:#aed6f1;}
+.adm-ncc-note-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;color:var(--ink-deep);}
+.adm-ncc-note.red .adm-ncc-note-label{color:#c0392b;}
+.adm-ncc-note.blue .adm-ncc-note-label{color:#2980b9;}
+
+/* Stats grid inside seller detail (6 cells, 3 cols) */
+.adm-ncc-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+
+/* Commission cards */
+.adm-comm-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.adm-comm-card{border:1.5px solid var(--line);border-radius:12px;padding:14px;background:var(--paper);transition:border-color .15s;}
+.adm-comm-card:hover{border-color:#ccc;}
+.adm-comm-cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.adm-comm-rate{font-size:22px;font-weight:700;color:var(--ink-deep);}
+.adm-comm-sellers{font-size:11.5px;color:var(--text-soft);}
+
+@media (max-width:900px){
+  .adm-comm-grid{grid-template-columns:repeat(3,1fr);}
+  .adm-ncc-stat-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:600px){
+  .adm-shops-tab{padding:8px 12px;font-size:12.5px;}
+  .adm-comm-grid{grid-template-columns:1fr 1fr;}
+  .adm-ncc-stat-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* ── Admin Product Management ──────────────────────── */
+
+/* Product description block */
+.adm-prod-desc{font-size:13.5px;line-height:1.7;color:var(--text);margin-top:10px;padding:14px;background:var(--surface);border-radius:10px;}
+
+/* Category management grid */
+.adm-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:4px;}
+.adm-cat-card{border:1.5px solid var(--line);border-radius:12px;padding:16px;background:var(--paper);transition:border-color .15s;}
+.adm-cat-card:hover{border-color:#ccc;}
+.adm-cat-hidden{opacity:.55;}
+.adm-cat-icon{font-size:28px;margin-bottom:8px;line-height:1;}
+.adm-cat-name{font-size:14.5px;font-weight:600;color:var(--ink-deep);margin-bottom:4px;}
+.adm-cat-desc{font-size:12px;color:var(--text-soft);line-height:1.45;margin-bottom:10px;min-height:36px;}
+.adm-cat-meta{display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+.adm-cat-card-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.adm-cat-order-btns{display:flex;gap:3px;}
+.adm-cat-order-btn{font-size:12px;padding:5px 8px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;color:var(--text);}
+.adm-cat-order-btn:not(:disabled):hover{background:var(--surface);}
+.adm-cat-order-btn:disabled{opacity:.35;cursor:default;}
+.adm-vis-btn-on{color:#27ae60;border-color:#a8dfbc;}
+.adm-vis-btn-on:hover{background:#edfaf2;}
+.adm-vis-btn-off{color:var(--text-soft);border-color:var(--line);}
+.adm-vis-btn-off:hover{background:var(--surface);}
+
+/* Category add/edit forms */
+.adm-cat-add-form{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;}
+.adm-cat-edit-form{background:var(--surface);border-radius:8px;padding:14px;margin-top:12px;border-top:1.5px solid var(--line);}
+
+@media (max-width:800px){.adm-cat-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:500px){.adm-cat-grid{grid-template-columns:1fr;}}
+
+/* ── Admin Order Management ──────────────────────── */
+
+/* Status/refund flags inline in table */
+.adm-ord-flag{font-size:12px;margin-left:3px;vertical-align:middle;}
+.adm-ord-flag.complaint{color:#c0392b;}
+.adm-ord-flag.refund{color:#2980b9;}
+
+/* Info boxes on detail page */
+.adm-ord-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.adm-ord-info-box{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:12px;}
+
+/* Complaint / refund side-by-side */
+.adm-ord-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* Section cards (complaint & refund blocks) */
+.adm-ord-section{border:1.5px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);}
+
+/* Status history timeline */
+.adm-ord-timeline{display:flex;flex-direction:column;}
+.adm-ord-timeline-item{display:flex;gap:10px;padding-bottom:14px;position:relative;}
+.adm-ord-timeline-item:not(:last-child)::before{content:'';position:absolute;left:7px;top:18px;bottom:0;width:2px;background:var(--line);}
+.adm-ord-timeline-dot{width:16px;height:16px;border-radius:50%;background:var(--ink);flex-shrink:0;margin-top:3px;}
+.adm-ord-timeline-body{flex:1;}
+.adm-ord-timeline-status{font-weight:600;font-size:13.5px;color:var(--ink-deep);}
+.adm-ord-timeline-meta{font-size:12px;color:var(--text-soft);margin-top:2px;line-height:1.5;}
+
+/* Complaint description */
+.adm-ord-complaint-desc{font-size:13.5px;line-height:1.65;padding:12px;background:var(--paper);border-radius:8px;color:var(--text);margin-top:4px;}
+
+/* Filter select used in order list */
+.adm-filter-sel{padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;background:var(--surface);color:var(--ink-deep);cursor:pointer;font-family:inherit;}
+.adm-filter-sel:focus{outline:none;border-color:var(--ink);}
+
+/* Link button for order IDs in intervention log */
+.adm-ord-link-btn{background:none;border:none;color:var(--ink);cursor:pointer;font-weight:600;font-size:inherit;padding:0;text-decoration:underline;font-family:monospace;}
+
+@media (max-width:900px){
+  .adm-ord-info-grid{grid-template-columns:1fr 1fr;}
+  .adm-ord-dual-grid{grid-template-columns:1fr;}
+  .adm-kpi-grid[style*="repeat(5"]{grid-template-columns:repeat(3,1fr) !important;}
+}
+@media (max-width:600px){
+  .adm-ord-info-grid{grid-template-columns:1fr;}
+  .adm-kpi-grid[style*="repeat(5"]{grid-template-columns:1fr 1fr !important;}
+}
+
+/* ── Quản lý Tài chính ────────────────────────── */
+.fin-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.fin-chart-wrap{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px;}
+.fin-chart-title{font-size:14px;font-weight:700;color:var(--ink-deep);margin-bottom:12px;}
+.fin-chart-bars{display:flex;align-items:flex-end;gap:10px;height:130px;padding-bottom:4px;}
+.fin-chart-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:0;}
+.fin-bar-wrap{display:flex;gap:3px;align-items:flex-end;height:110px;}
+.fin-bar{width:18px;border-radius:4px 4px 0 0;transition:height .3s;}
+.fin-bar-gmv{background:#c0392b;}
+.fin-bar-comm{background:#27ae60;}
+.fin-chart-label{font-size:11px;color:var(--text-soft);margin-top:4px;text-align:center;}
+.fin-chart-legend{display:flex;align-items:center;font-size:12px;color:var(--text-soft);margin-top:10px;gap:6px;}
+.fin-legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;}
+
+.fin-cats{display:flex;flex-direction:column;gap:10px;}
+.fin-cat-row{display:grid;grid-template-columns:130px 1fr 34px 1fr;align-items:center;gap:8px;}
+.fin-cat-name{font-size:13px;color:var(--text);}
+.fin-cat-bar-bg{background:var(--line);border-radius:4px;height:10px;overflow:hidden;}
+.fin-cat-bar-fill{height:10px;border-radius:4px;transition:width .4s;}
+.fin-cat-pct{font-size:12.5px;font-weight:700;color:var(--ink-deep);text-align:right;}
+.fin-cat-val{font-size:11.5px;color:var(--text-soft);}
+
+.fin-wd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.fin-wd-card{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;overflow:hidden;}
+.fin-wd-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--paper);border-bottom:1px solid var(--line);}
+.fin-wd-id{font-family:monospace;font-size:13.5px;font-weight:700;color:var(--ink-deep);}
+.fin-wd-body{padding:12px 14px;}
+.fin-wd-actions{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px;}
+
+@media (max-width:1100px){.fin-wd-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:900px){.fin-dual-grid{grid-template-columns:1fr;}.fin-wd-grid{grid-template-columns:1fr 1fr;}.fin-cat-row{grid-template-columns:110px 1fr 30px;}.fin-cat-val{display:none;}}
+@media (max-width:600px){.fin-wd-grid{grid-template-columns:1fr;}.fin-cat-row{grid-template-columns:90px 1fr 30px;}}
+
+/* ── Quản lý Nội dung (CMS) ───────────────────── */
+/* Blog editor layout */
+.cms-editor-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+.cms-editor-main{display:flex;flex-direction:column;gap:14px;}
+.cms-editor-side{display:flex;flex-direction:column;gap:14px;}
+
+/* Form elements */
+.cms-field-group{display:flex;flex-direction:column;gap:6px;}
+.cms-label{font-size:13px;font-weight:600;color:var(--ink-deep);}
+.cms-input{padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--surface);color:var(--ink-deep);font-family:inherit;width:100%;box-sizing:border-box;transition:border-color .2s;}
+.cms-input:focus{outline:none;border-color:var(--ink);}
+.cms-input[type=date]{cursor:pointer;}
+.cms-textarea{padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--surface);color:var(--ink-deep);font-family:inherit;width:100%;box-sizing:border-box;resize:vertical;transition:border-color .2s;}
+.cms-textarea:focus{outline:none;border-color:var(--ink);}
+
+/* Rich text toolbar */
+.cms-toolbar{display:flex;align-items:center;gap:2px;padding:6px 8px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px 8px 0 0;border-bottom:none;flex-wrap:wrap;}
+.cms-tb-btn{padding:4px 9px;border:none;border-radius:5px;background:transparent;cursor:pointer;font-size:13px;color:var(--ink-deep);font-family:inherit;transition:background .15s;}
+.cms-tb-btn:hover{background:var(--line);}
+.cms-tb-sep{width:1px;height:18px;background:var(--line);margin:0 4px;}
+
+/* contenteditable editor area */
+.cms-editor{min-height:280px;padding:14px 16px;border:1.5px solid var(--line);border-radius:0 0 8px 8px;background:var(--surface);font-size:14px;line-height:1.75;color:var(--ink-deep);outline:none;overflow-y:auto;}
+.cms-editor:focus{border-color:var(--ink);}
+.cms-editor h2{font-size:18px;font-weight:700;margin:14px 0 6px;color:var(--ink-deep);}
+.cms-editor h3{font-size:15px;font-weight:700;margin:12px 0 4px;color:var(--ink-deep);}
+.cms-editor p{margin:0 0 10px;}
+.cms-editor ul,.cms-editor ol{margin:0 0 10px;padding-left:22px;}
+.cms-editor a{color:var(--ink);}
+.cms-editor img{max-width:100%;border-radius:6px;margin:8px 0;}
+
+/* Sidebar sections */
+.cms-side-section{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;}
+.cms-side-title{font-size:13.5px;font-weight:700;color:var(--ink-deep);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+
+/* Banner list */
+.cms-banner-list{display:flex;flex-direction:column;gap:10px;}
+.cms-banner-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;transition:opacity .2s;}
+.cms-banner-inactive{opacity:.55;}
+.cms-banner-order{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cms-banner-info{flex:1;min-width:0;}
+.cms-banner-title{font-weight:600;font-size:14px;color:var(--ink-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cms-banner-meta{font-size:12.5px;color:var(--text-soft);margin-top:3px;}
+.cms-banner-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+
+@media (max-width:1000px){.cms-editor-layout{grid-template-columns:1fr;}}
+@media (max-width:700px){.cms-banner-card{flex-wrap:wrap;}.cms-banner-actions{width:100%;}}
+
+/* ===== Promo Management ===== */
+.promo-form-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;}
+.promo-fs-card{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px;}
+.promo-fs-card:hover{border-color:var(--ink);box-shadow:0 2px 10px rgba(200,54,42,.08);}
+.promo-fs-hint{background:var(--paper);border-left:3px solid var(--ink);border-radius:0 6px 6px 0;padding:9px 12px;font-size:13px;color:var(--text-soft);line-height:1.5;}
+@media (max-width:900px){.promo-form-grid{grid-template-columns:1fr;}}

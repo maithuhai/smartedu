@@ -1233,6 +1233,31 @@ let profileTab='info';
 let pfEditMode=false, emailChangeStep=null, emailChangePending='';
 let adminDays=30;
 let admUsersView='list', admUserSearch='', admUserRoleFilter='all', admUserStatusFilter='all', admSelectedUserId=null, admUserPage=0;
+let admShopsTab='pending', admShopsView='list', admShopsSelectedId=null;
+let admShopsPendingSearch='', admShopsPendingPage=0;
+let admShopsActiveSearch='', admShopsActiveFilter='all', admShopsActivePage=0;
+let admProductsTab='pending', admProductsView='list', admProductsSelectedId=null;
+let admPendingSearch='', admPendingPage=0;
+let admReportedSearch='', admReportedPage=0;
+let admCatView='list';
+let admOrdersTab='all', admOrdersView='list', admOrdersSelectedId=null;
+let admOrdersSearch='', admOrdersStatusFilter='all', admOrdersSellerFilter='all';
+let admOrdersPage=0, admComplaintsPage=0;
+let admFinTab='overview', admFinWithdrawTab='pending', admFinPayPage=0, admFinWdPage=0;
+let admFinPaySearch='', admFinWdSearch='';
+let admCmsTab='blog', admCmsBannerSubTab='banners';
+let admBlogPage=0, admBlogSearch='', admBlogStatusFilter='all', admBlogCatFilter='all';
+let admBlogEditId=null;
+let admCmntPage=0, admCmntSearch='', admCmntStatusFilter='all';
+let admBannerEditId=null;
+let admStaticPage='about';
+// Promotion Management
+let admPromoTab='vouchers';
+let admVoucherPage=0, admVoucherSearch='', admVoucherStatusFilter='all';
+let admVoucherEditId=null;
+let admFlashSaleEditId=null, admFlashSaleDetailId=null;
+let admFsFilter='all';
+let admPointsTab='settings';
 let orderFilter='all';
 let libFilter='all';
 let bstabFmt='all';
@@ -2400,6 +2425,535 @@ const ADM={
     {tp:'order',text:'#EDU-28461 · NXB Giáo dục VN · 890.000đ',               t:'3 giờ'}
   ]
 };
+/* ── SELLER APP & ACTIVE SELLER DATA ─────────────────────── */
+let sellerApps=LS.get('sellerApps',null);
+if(!sellerApps){
+  sellerApps=[
+    {id:'sapp-001',shopName:'Sách & VPP Minh Long',ownerName:'Nguyễn Văn Long',email:'minhlong.vpp@gmail.com',phone:'0912 345 678',submittedAt:'10/06/2025',status:'pending',category:'sach',
+     gpkd:{number:'ĐKKD-HN-2024-112345',issued:'05/03/2024',place:'Sở KH&ĐT Hà Nội',type:'Hộ kinh doanh cá thể'},
+     cccd:{number:'034089012345',name:'Nguyễn Văn Long',issued:'15/01/2021',place:'Công an TP Hà Nội'},
+     shopInfo:{name:'Sách & VPP Minh Long',desc:'Chuyên cung cấp sách giáo khoa, sách tham khảo và văn phòng phẩm cho học sinh toàn cấp. Hàng nhập trực tiếp từ các NXB uy tín trong nước.',address:'45 Nguyễn Trãi, Thanh Xuân, Hà Nội',bank:'Vietcombank – 1234567890089 – Nguyễn Văn Long',mainCats:['Sách GK','Sách tham khảo','Văn phòng phẩm']},
+     reviewNote:'',reviewedBy:null,reviewedAt:null},
+    {id:'sapp-002',shopName:'Thiết bị GD EduTech',ownerName:'Trần Thị Huyền',email:'edutech.tb@gmail.com',phone:'0987 654 321',submittedAt:'09/06/2025',status:'more-info',category:'tbgd',
+     gpkd:{number:'GP-HCM-2023-887766',issued:'12/08/2023',place:'Sở KH&ĐT TP.HCM',type:'Công ty TNHH'},
+     cccd:{number:'079234567890',name:'Trần Thị Huyền',issued:'20/05/2019',place:'Công an TP.HCM'},
+     shopInfo:{name:'EduTech – Thiết bị Giáo dục',desc:'Cung cấp thiết bị thí nghiệm, dụng cụ học tập chuyên dụng cho trường học và trung tâm giáo dục. Đối tác chính thức của nhiều thương hiệu châu Âu.',address:'201 Lê Lợi, Q1, TP.HCM',bank:'Techcombank – 9988776655 – Trần Thị Huyền',mainCats:['Thiết bị thí nghiệm','Dụng cụ GD','Đồ dùng học sinh']},
+     reviewNote:'Vui lòng bổ sung ảnh chụp GPKD bản gốc và ảnh CCCD 2 mặt còn hiệu lực.',reviewedBy:'Admin EduMart',reviewedAt:'10/06/2025'},
+    {id:'sapp-003',shopName:'Nhà sách Hoàng Gia',ownerName:'Lê Minh Hoàng',email:'hoanggiabooks@outlook.com',phone:'0365 111 222',submittedAt:'07/06/2025',status:'pending',category:'sach',
+     gpkd:{number:'ĐKKD-DN-2022-004512',issued:'10/11/2022',place:'Sở KH&ĐT Đà Nẵng',type:'Hộ kinh doanh cá thể'},
+     cccd:{number:'048199012344',name:'Lê Minh Hoàng',issued:'03/07/2020',place:'Công an TP Đà Nẵng'},
+     shopInfo:{name:'Nhà sách Hoàng Gia',desc:'Chuyên kinh doanh sách văn học, sách giáo dục tâm lý và sách ngoại ngữ. Đang mở rộng kênh online sau 5 năm bán lẻ trực tiếp tại Đà Nẵng.',address:'78 Trần Phú, Hải Châu, Đà Nẵng',bank:'BIDV – 3344556677889 – Lê Minh Hoàng',mainCats:['Sách văn học','Sách ngoại ngữ','Sách kỹ năng']},
+     reviewNote:'',reviewedBy:null,reviewedAt:null},
+    {id:'sapp-004',shopName:'VPP Phương Nam',ownerName:'Nguyễn Phương Linh',email:'vpp.phuongnam@gmail.com',phone:'0777 888 999',submittedAt:'05/06/2025',status:'rejected',category:'vpp',
+     gpkd:{number:'ĐKKD-CT-2021-000123',issued:'20/09/2021',place:'Sở KH&ĐT Cần Thơ',type:'Hộ kinh doanh cá thể'},
+     cccd:{number:'092123456780',name:'Nguyễn Phương Linh',issued:'01/03/2022',place:'Công an TP Cần Thơ'},
+     shopInfo:{name:'VPP Phương Nam',desc:'Cung cấp văn phòng phẩm số lượng lớn, nhập khẩu từ Trung Quốc.',address:'33 Nguyễn Văn Cừ, Ninh Kiều, Cần Thơ',bank:'Agribank – 5566778899 – Nguyễn Phương Linh',mainCats:['Văn phòng phẩm nhập khẩu']},
+     reviewNote:'Hồ sơ không đủ điều kiện: Giấy phép kinh doanh hết hạn hiệu lực. Mô tả sản phẩm không rõ nguồn gốc xuất xứ. Đề nghị nộp lại sau khi gia hạn GPKD.',reviewedBy:'Admin EduMart',reviewedAt:'06/06/2025'},
+    {id:'sapp-005',shopName:'Đinh Tị Books Online',ownerName:'Đinh Thị Tú',email:'dinhtitubooks@gmail.com',phone:'0901 234 567',submittedAt:'01/06/2025',status:'pending',category:'sach',
+     gpkd:{number:'GP-HN-2020-556677',issued:'14/06/2020',place:'Sở KH&ĐT Hà Nội',type:'Công ty TNHH MTV'},
+     cccd:{number:'001984567890',name:'Đinh Thị Tú',issued:'25/10/2022',place:'Công an TP Hà Nội'},
+     shopInfo:{name:'Đinh Tị Books Online',desc:'Thương hiệu sách trẻ em và sách kỹ năng sống uy tín. Đã có 3 năm kinh nghiệm phát hành sách bản quyền quốc tế. Muốn mở rộng kênh thương mại điện tử.',address:'12 Đinh Tiên Hoàng, Hoàn Kiếm, Hà Nội',bank:'MB Bank – 0987654321 – Đinh Thị Tú',mainCats:['Sách thiếu nhi','Sách kỹ năng','Sách ngoại ngữ']},
+     reviewNote:'',reviewedBy:null,reviewedAt:null}
+  ];
+  LS.set('sellerApps',sellerApps);
+}
+function saveSellerApps(){LS.set('sellerApps',sellerApps);}
+
+let activeSellers=LS.get('activeSellers',null);
+if(!activeSellers){
+  activeSellers=[
+    {id:'seller-001',shopName:'NXB Giáo dục VN',ownerName:'Trần Thị Hoa',email:'nxbgd@official.vn',phone:'024 3868 4070',joinedAt:'10/01/2023',status:'active',category:'sach',rating:4.9,totalProducts:248,
+     stats:{totalOrders:4820,totalRevenue:284000000,returnRate:0.25,thisMonthOrders:420,thisMonthRev:28000000,growth:12.3},
+     violations:[],commissionOverride:null,warnings:0},
+    {id:'seller-002',shopName:'Fahasa Official',ownerName:'Phan Hải Đăng',email:'seller@fahasa.com',phone:'028 3822 6999',joinedAt:'15/02/2023',status:'active',category:'sach',rating:4.8,totalProducts:1240,
+     stats:{totalOrders:3640,totalRevenue:198000000,returnRate:0.8,thisMonthOrders:350,thisMonthRev:19800000,growth:8.7},
+     violations:[],commissionOverride:6,warnings:0},
+    {id:'seller-003',shopName:'Alphabooks',ownerName:'Nguyễn Bảo Thư',email:'contact@alphabooks.vn',phone:'028 3930 6455',joinedAt:'01/03/2023',status:'active',category:'sach',rating:4.7,totalProducts:534,
+     stats:{totalOrders:2910,totalRevenue:156000000,returnRate:1.2,thisMonthOrders:290,thisMonthRev:15600000,growth:15.2},
+     violations:[],commissionOverride:null,warnings:0},
+    {id:'seller-004',shopName:'Đinh Tị Books',ownerName:'Lê Quang Định',email:'dinhtibooks@gmail.com',phone:'024 3944 8812',joinedAt:'20/04/2023',status:'warning',category:'sach',rating:4.1,totalProducts:128,
+     stats:{totalOrders:2180,totalRevenue:124000000,returnRate:3.8,thisMonthOrders:140,thisMonthRev:8000000,growth:-2.1},
+     violations:[
+       {id:'v-004-1',type:'description',desc:'Mô tả sản phẩm sai so với hàng thực tế — 14 khiếu nại được xác nhận trong tháng 5',date:'02/06/2025',severity:'medium',action:'warning',note:'Cảnh báo lần 1. Yêu cầu cập nhật lại toàn bộ mô tả sản phẩm trong 7 ngày.'},
+       {id:'v-004-2',type:'return',desc:'Tỷ lệ hoàn hàng vượt ngưỡng cho phép (>3%)',date:'28/05/2025',severity:'low',action:'noted',note:'Ghi nhận. Theo dõi thêm 30 ngày.'}
+     ],commissionOverride:null,warnings:1},
+    {id:'seller-005',shopName:'Sbooks',ownerName:'Hoàng Thị Lan',email:'sbooks.official@gmail.com',phone:'0906 123 456',joinedAt:'10/05/2023',status:'active',category:'sach',rating:4.6,totalProducts:312,
+     stats:{totalOrders:1840,totalRevenue:98000000,returnRate:1.5,thisMonthOrders:180,thisMonthRev:9800000,growth:6.4},
+     violations:[],commissionOverride:null,warnings:0},
+    {id:'seller-006',shopName:'VPP Minh Phát',ownerName:'Vũ Minh Phát',email:'minhphat.vpp@gmail.com',phone:'0383 456 789',joinedAt:'15/06/2023',status:'suspended',category:'vpp',rating:3.2,totalProducts:89,
+     stats:{totalOrders:890,totalRevenue:42000000,returnRate:6.5,thisMonthOrders:0,thisMonthRev:0,growth:-45.0},
+     violations:[
+       {id:'v-006-1',type:'fake',desc:'Bán hàng giả mạo thương hiệu — 8 đơn hàng xác nhận có hàng kém chất lượng không đúng mô tả',date:'12/06/2025',severity:'high',action:'suspended',note:'Đình chỉ 30 ngày. Yêu cầu cung cấp hóa đơn nhập hàng toàn bộ sản phẩm đang bán.'},
+       {id:'v-006-2',type:'description',desc:'Mô tả sai chất liệu sản phẩm — 27 khiếu nại trong tháng 5',date:'01/06/2025',severity:'medium',action:'warning',note:'Cảnh báo lần 1.'}
+     ],commissionOverride:null,warnings:2,
+     suspendedUntil:'12/07/2025',suspendedReason:'Bán hàng giả mạo thương hiệu — vi phạm nghiêm trọng Điều 5.3 Quy chế sàn'},
+    {id:'seller-007',shopName:'EduPro Thiết bị GD',ownerName:'Ngô Thanh Tùng',email:'edupro.tbgd@gmail.com',phone:'0912 999 777',joinedAt:'22/03/2024',status:'active',category:'tbgd',rating:4.5,totalProducts:76,
+     stats:{totalOrders:560,totalRevenue:38000000,returnRate:0.5,thisMonthOrders:62,thisMonthRev:4200000,growth:22.1},
+     violations:[],commissionOverride:null,warnings:0}
+  ];
+  LS.set('activeSellers',activeSellers);
+}
+function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
+
+let commissionCfg=LS.get('commissionCfg',null);
+if(!commissionCfg){
+  commissionCfg={
+    byCategory:{sach:8,vpp:10,tbgd:12,ebook:15,audiobook:15},
+    history:[
+      {id:'ch-001',date:'01/04/2025',field:'cat:sach',oldVal:10,newVal:8,by:'Admin EduMart',reason:'Kích cầu nhà bán sách trong giai đoạn đầu năm học'},
+      {id:'ch-002',date:'15/03/2025',field:'seller:seller-002',oldVal:8,newVal:6,by:'Admin EduMart',reason:'Ưu đãi đặc biệt cho đối tác chiến lược Fahasa'},
+      {id:'ch-003',date:'01/01/2025',field:'cat:ebook',oldVal:12,newVal:15,by:'Admin EduMart',reason:'Điều chỉnh theo chi phí hạ tầng nội dung số'}
+    ]
+  };
+  LS.set('commissionCfg',commissionCfg);
+}
+function saveCommissionCfg(){LS.set('commissionCfg',commissionCfg);}
+
+/* ── PRODUCT ADMIN DATA ─────────────────────── */
+let pendingProds=LS.get('pendingProds',null);
+if(!pendingProds){
+  pendingProds=[
+    {id:'pp-001',sellerId:'seller-001',sellerName:'NXB Giáo dục VN',name:'Bộ SGK Lớp 1 Kết nối tri thức 2025-2026',by:'Bộ Giáo dục và Đào tạo',cat:'sach',genre:'sgk',aud:['tieuhoc'],price:195000,oldPrice:220000,desc:'Bộ sách giáo khoa lớp 1 theo chương trình GDPT 2018 bộ Kết nối tri thức với cuộc sống, gồm 5 cuốn: Tiếng Việt, Toán, Tự nhiên và Xã hội, Đạo đức, Hoạt động trải nghiệm. In ấn sắc nét, bìa cứng chống thấm.',imageCount:4,submittedAt:'17/06/2025',status:'pending',reviewNote:'',reviewedBy:null,reviewedAt:null},
+    {id:'pp-002',sellerId:'seller-003',sellerName:'Alphabooks',name:'Nhà Giả Kim - Paulo Coelho (Tái bản 2025)',by:'Paulo Coelho',cat:'sach',genre:'vanhoc',aud:['thpt','sinhvien'],price:88000,oldPrice:110000,desc:'Tiểu thuyết bestseller toàn cầu của Paulo Coelho về hành trình tìm kiếm kho báu và ý nghĩa cuộc đời. Bản dịch mới nhất 2025 của Lê Chu Cầu, bìa mềm 228 trang.',imageCount:3,submittedAt:'16/06/2025',status:'needs-edit',reviewNote:'Vui lòng bổ sung thông tin: số ISBN, nhà xuất bản, năm xuất bản, và cập nhật ảnh bìa độ phân giải cao hơn (tối thiểu 800×1200px).',reviewedBy:'Admin EduMart',reviewedAt:'17/06/2025'},
+    {id:'pp-003',sellerId:'seller-005',sellerName:'Sbooks',name:'Bộ bút màu 36 cây Staedtler Triangular',by:'Staedtler',cat:'vpp',genre:null,aud:['tieuhoc','thcs'],price:145000,oldPrice:168000,desc:'Bộ bút màu gỗ 36 màu cao cấp Staedtler Noris Triangular, thiết kế thân tam giác chống lăn, ngòi bút mềm mại cho nét vẽ đồng đều, màu sắc tươi sáng không phai, phù hợp học sinh tiểu học và trung học.',imageCount:5,submittedAt:'15/06/2025',status:'pending',reviewNote:'',reviewedBy:null,reviewedAt:null},
+    {id:'pp-004',sellerId:'seller-002',sellerName:'Fahasa Official',name:'Dế Mèn Phiêu Lưu Ký - Tô Hoài (Bản minh họa đặc biệt)',by:'Tô Hoài',cat:'sach',genre:'thieunhi',aud:['tieuhoc','thcs'],price:72000,oldPrice:85000,desc:'Tác phẩm văn học kinh điển Việt Nam, bản đặc biệt với 48 trang minh họa màu của họa sĩ Tạ Huy Long. Bìa cứng, giấy tốt, phù hợp làm quà tặng.',imageCount:6,submittedAt:'14/06/2025',status:'approved',reviewNote:'',reviewedBy:'Admin EduMart',reviewedAt:'15/06/2025'},
+    {id:'pp-005',sellerId:'seller-006',sellerName:'VPP Minh Phát',name:'Vở Ô ly 4 ô 200 trang (Hộp 20 quyển)',by:'Không rõ thương hiệu',cat:'vpp',genre:null,aud:['tieuhoc'],price:65000,oldPrice:null,desc:'Hộp 20 quyển vở ô ly 4 ô, 200 trang/quyển. Giấy trắng sáng 70gsm.',imageCount:2,submittedAt:'13/06/2025',status:'rejected',reviewNote:'Hồ sơ seller bị đình chỉ (vi phạm Điều 5.3). Không thể duyệt sản phẩm mới trong thời gian đình chỉ. Vui lòng chờ đến 12/07/2025.',reviewedBy:'Admin EduMart',reviewedAt:'14/06/2025'},
+    {id:'pp-006',sellerId:'seller-007',sellerName:'EduPro Thiết bị GD',name:'Kính hiển vi sinh học EduScope Pro 1000x',by:'EduScope',cat:'tbgd',genre:null,aud:['thcs','thpt','school'],price:1850000,oldPrice:2200000,desc:'Kính hiển vi sinh học quang học 4 vật kính (4x, 10x, 40x, 100x), độ phóng đại tối đa 1000x. Thích hợp phòng thí nghiệm trường THCS và THPT. Kèm bộ tiêu bản mẫu vật 12 chiếc.',imageCount:7,submittedAt:'12/06/2025',status:'pending',reviewNote:'',reviewedBy:null,reviewedAt:null}
+  ];
+  LS.set('pendingProds',pendingProds);
+}
+function savePendingProds(){LS.set('pendingProds',pendingProds);}
+
+let reportedProds=LS.get('reportedProds',null);
+if(!reportedProds){
+  reportedProds=[
+    {id:'rp-001',productId:18,productName:'Giải Nhanh Bài Tập Vật Lý 12',sellerId:'seller-004',sellerName:'Đinh Tị Books',cat:'sach',price:58000,reportCount:14,reports:[{reason:'Mô tả sai nội dung',count:8,date:'10/06/2025'},{reason:'Ảnh sản phẩm không đúng thực tế',count:4,date:'11/06/2025'},{reason:'Giá không minh bạch',count:2,date:'12/06/2025'}],status:'active',reviewStatus:'pending',reportedAt:'10/06/2025',resolvedAt:null,resolvedBy:null,adminNote:''},
+    {id:'rp-002',productId:34,productName:'Bút bi Thiên Long xanh (Hộp 10 cây)',sellerId:'seller-006',sellerName:'VPP Minh Phát',cat:'vpp',price:35000,reportCount:23,reports:[{reason:'Hàng giả/nhái thương hiệu',count:15,date:'08/06/2025'},{reason:'Chất lượng kém, không đúng mô tả',count:8,date:'09/06/2025'}],status:'hidden',reviewStatus:'resolved',reportedAt:'08/06/2025',resolvedAt:'12/06/2025',resolvedBy:'Admin EduMart',adminNote:'Đã ẩn sản phẩm và cảnh báo seller. Liên quan vụ đình chỉ seller VPP Minh Phát.'},
+    {id:'rp-003',productId:21,productName:'Từ điển Anh-Việt Oxford 2024',sellerId:'seller-005',sellerName:'Sbooks',cat:'sach',price:125000,reportCount:6,reports:[{reason:'Ảnh bìa sản phẩm bị mờ, không rõ',count:3,date:'14/06/2025'},{reason:'Mô tả thiếu thông tin NXB và ISBN',count:3,date:'15/06/2025'}],status:'active',reviewStatus:'pending',reportedAt:'14/06/2025',resolvedAt:null,resolvedBy:null,adminNote:''},
+    {id:'rp-004',productId:8,productName:'Thước kẻ 30cm Thiên Long',sellerId:'seller-004',sellerName:'Đinh Tị Books',cat:'vpp',price:12000,reportCount:4,reports:[{reason:'Giá quá cao so với thị trường',count:4,date:'16/06/2025'}],status:'active',reviewStatus:'pending',reportedAt:'16/06/2025',resolvedAt:null,resolvedBy:null,adminNote:''}
+  ];
+  LS.set('reportedProds',reportedProds);
+}
+function saveReportedProds(){LS.set('reportedProds',reportedProds);}
+
+let adminCats=LS.get('adminCats',null);
+if(!adminCats){
+  adminCats=[
+    {id:'c-sach',key:'sach',name:'Sách',icon:'📚',desc:'Sách giáo khoa, sách tham khảo, sách văn học và các loại sách khác',order:1,visible:true,type:'main'},
+    {id:'c-vpp',key:'vpp',name:'Văn phòng phẩm',icon:'✏️',desc:'Bút, vở, dụng cụ học tập và đồ dùng văn phòng các loại',order:2,visible:true,type:'main'},
+    {id:'c-tbgd',key:'tbgd',name:'Thiết bị giáo dục',icon:'🔬',desc:'Thiết bị thí nghiệm, máy tính khoa học, bản đồ, dụng cụ giảng dạy',order:3,visible:true,type:'main'},
+    {id:'c-ebook',key:'ebook',name:'Ebook',icon:'📱',desc:'Sách điện tử định dạng PDF, EPUB cho mọi thiết bị',order:4,visible:true,type:'main'},
+    {id:'c-audio',key:'audiobook',name:'Sách nói',icon:'🎧',desc:'Sách audio chất lượng cao, nghe mọi lúc mọi nơi',order:5,visible:true,type:'main'},
+    {id:'g-sgk',key:'sgk',name:'Sách giáo khoa',icon:'📖',desc:'SGK chính khóa theo chương trình GDPT 2018 của Bộ GD&ĐT',order:1,visible:true,type:'genre',parentKey:'sach'},
+    {id:'g-thamkhao',key:'thamkhao',name:'Sách tham khảo',icon:'📝',desc:'Sách bài tập, đề thi thử, tài liệu ôn luyện các môn',order:2,visible:true,type:'genre',parentKey:'sach'},
+    {id:'g-vanhoc',key:'vanhoc',name:'Văn học',icon:'📜',desc:'Tiểu thuyết, truyện ngắn, thơ ca trong nước và dịch thuật quốc tế',order:3,visible:true,type:'genre',parentKey:'sach'},
+    {id:'g-thieunhi',key:'thieunhi',name:'Thiếu nhi',icon:'🌟',desc:'Truyện tranh, sách tô màu, truyện cổ tích cho trẻ em',order:4,visible:true,type:'genre',parentKey:'sach'},
+    {id:'g-kynang',key:'kynang',name:'Kỹ năng sống',icon:'💡',desc:'Sách phát triển bản thân, kỹ năng mềm, quản lý thời gian',order:5,visible:true,type:'genre',parentKey:'sach'},
+    {id:'g-ngoaingu',key:'ngoaingu',name:'Ngoại ngữ',icon:'🌍',desc:'Giáo trình ngoại ngữ, từ điển, tài liệu luyện thi IELTS/TOEIC',order:6,visible:true,type:'genre',parentKey:'sach'}
+  ];
+  LS.set('adminCats',adminCats);
+}
+function saveAdminCats(){LS.set('adminCats',adminCats);}
+
+/* ── ADMIN SYSTEM ORDERS DATA ────────────────────── */
+let sysOrders=LS.get('sysOrders',null);
+if(!sysOrders){
+  sysOrders=[
+    {id:'EDU-28471',buyerId:'mock-01',buyerName:'Nguyễn Văn An',buyerEmail:'nva001@gmail.com',buyerPhone:'0912 345 111',
+     sellerId:'seller-001',sellerName:'NXB Giáo dục VN',
+     items:[{prodId:1,prodName:'Bộ SGK lớp 6 - Kết nối tri thức',qty:1,unitPrice:187000},{prodId:6,prodName:'Luyện thi THPT QG môn Toán',qty:1,unitPrice:95000}],
+     subtotal:282000,shippingFee:25000,discount:0,total:307000,paymentMethod:'momo',
+     shippingAddr:'45 Nguyễn Trãi, Thanh Xuân, Hà Nội',orderDate:'10/06/2025',status:'delivered',
+     statusHistory:[
+       {status:'pending',date:'10/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'10/06/2025',note:'Seller xác nhận đơn hàng',by:'seller'},
+       {status:'shipping',date:'11/06/2025',note:'Đã bàn giao cho GHTK',by:'seller'},
+       {status:'delivered',date:'13/06/2025',note:'Giao hàng thành công',by:'system'}
+     ],
+     complaint:{reason:'Nhận được sách cũ, không phải bản 2025',desc:'Đặt bộ SGK lớp 6 bản Kết nối tri thức 2025 nhưng nhận được sách in lại từ năm 2023. Bìa bị nhàu, một số trang bị cong. Yêu cầu đổi hàng hoặc hoàn tiền.',filedAt:'14/06/2025',status:'open',resolution:'',resolvedAt:null,resolvedBy:null},
+     refund:null,adminLog:[]},
+    {id:'EDU-28468',buyerId:'mock-02',buyerName:'Trần Thị Bình',buyerEmail:'ttbinh@yahoo.com',buyerPhone:'0987 654 321',
+     sellerId:'seller-002',sellerName:'Fahasa Official',
+     items:[{prodId:4,prodName:'Mắt biếc',qty:1,unitPrice:88000},{prodId:3,prodName:'Tư duy nhanh và chậm',qty:1,unitPrice:169000}],
+     subtotal:257000,shippingFee:30000,discount:0,total:287000,paymentMethod:'cod',
+     shippingAddr:'78 Trần Hưng Đạo, Q1, TP.HCM',orderDate:'09/06/2025',status:'completed',
+     statusHistory:[
+       {status:'pending',date:'09/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'09/06/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'10/06/2025',note:'Đã giao GHTK',by:'seller'},
+       {status:'delivered',date:'12/06/2025',note:'Giao thành công',by:'system'},
+       {status:'completed',date:'12/06/2025',note:'Người mua xác nhận',by:'buyer'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28461',buyerId:'mock-03',buyerName:'Lê Hồng Phúc',buyerEmail:'lhphuc@gmail.com',buyerPhone:'0905 111 222',
+     sellerId:'seller-003',sellerName:'Alphabooks',
+     items:[{prodId:5,prodName:'Atomic Habits - Thay đổi tí hon',qty:2,unitPrice:145000},{prodId:24,prodName:'Cây chuối non đi giày xanh',qty:1,unitPrice:110000}],
+     subtotal:400000,shippingFee:30000,discount:30000,total:400000,paymentMethod:'bank',
+     shippingAddr:'12 Lê Duẩn, Đà Nẵng',orderDate:'08/06/2025',status:'shipping',
+     statusHistory:[
+       {status:'pending',date:'08/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'08/06/2025',note:'Xác nhận',by:'seller'},
+       {status:'processing',date:'09/06/2025',note:'Đang đóng gói',by:'seller'},
+       {status:'shipping',date:'10/06/2025',note:'Đã bàn giao ViettelPost. Mã: VT2025061001',by:'seller'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28445',buyerId:'mock-04',buyerName:'Phạm Minh Tuấn',buyerEmail:'pmtuan@edu.vn',buyerPhone:'024 3333 4444',
+     sellerId:'seller-004',sellerName:'Đinh Tị Books',
+     items:[{prodId:23,prodName:'Tắt đèn - Ngô Tất Tố',qty:3,unitPrice:72000}],
+     subtotal:216000,shippingFee:25000,discount:0,total:241000,paymentMethod:'momo',
+     shippingAddr:'Trường THPT Nguyễn Du, Hà Nội',orderDate:'05/06/2025',status:'delivered',
+     statusHistory:[
+       {status:'pending',date:'05/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'05/06/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'06/06/2025',note:'Đang giao',by:'seller'},
+       {status:'delivered',date:'07/06/2025',note:'Đã giao',by:'system'}
+     ],
+     complaint:{reason:'Mô tả sản phẩm không đúng thực tế',desc:'Sách được mô tả là "mới 100%, chất lượng cao" nhưng nhận được sản phẩm bìa bị ố vàng và giấy đã ngả màu. Yêu cầu trả lại toàn bộ 3 cuốn.',filedAt:'08/06/2025',status:'resolved',resolution:'Đã liên hệ seller yêu cầu đổi hàng mới. Seller xác nhận giao hàng mới trong 3 ngày và hoàn 15% giá trị đơn.',resolvedAt:'10/06/2025',resolvedBy:'Admin EduMart'},
+     refund:null,adminLog:[{id:'log-a1',action:'Giải quyết khiếu nại',note:'Đã liên hệ seller, yêu cầu đổi hàng mới',date:'10/06/2025',by:'Admin EduMart'}]},
+    {id:'EDU-28440',buyerId:'mock-06',buyerName:'Vũ Quốc Bảo',buyerEmail:'vqbao@gmail.com',buyerPhone:'0909 888 777',
+     sellerId:'seller-001',sellerName:'NXB Giáo dục VN',
+     items:[{prodId:1,prodName:'Bộ SGK lớp 6 - Kết nối tri thức',qty:2,unitPrice:187000},{prodId:25,prodName:'Bộ SGK lớp 1 - Cánh Diều',qty:1,unitPrice:165000}],
+     subtotal:539000,shippingFee:0,discount:0,total:539000,paymentMethod:'momo',
+     shippingAddr:'88 Đinh Tiên Hoàng, Bình Thạnh, TP.HCM',orderDate:'01/06/2025',status:'refunded',
+     statusHistory:[
+       {status:'pending',date:'01/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'01/06/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'02/06/2025',note:'Đang giao',by:'seller'},
+       {status:'delivered',date:'04/06/2025',note:'Đã giao',by:'system'},
+       {status:'refunded',date:'07/06/2025',note:'Hoàn tiền thành công: 539.000đ',by:'Admin EduMart'}
+     ],
+     complaint:{reason:'Giao nhầm sản phẩm',desc:'Đặt SGK lớp 6 bộ Kết nối tri thức nhưng nhận được bộ Cánh Diều. Yêu cầu hoàn tiền toàn bộ vì không còn thời gian để đổi hàng.',filedAt:'05/06/2025',status:'resolved',resolution:'Xác nhận lỗi từ phía seller. Đã hoàn tiền toàn bộ 539.000đ vào ví MoMo trong 24h.',resolvedAt:'07/06/2025',resolvedBy:'Admin EduMart'},
+     refund:{amount:539000,reason:'Giao nhầm hàng',status:'completed',requestedAt:'05/06/2025',processedAt:'07/06/2025',processedBy:'Admin EduMart',note:'Hoàn tiền vào ví MoMo trong 24h'},
+     adminLog:[
+       {id:'log-b1',action:'Khởi tạo hoàn tiền: 539.000đ',note:'Giao nhầm hàng',date:'06/06/2025',by:'Admin EduMart'},
+       {id:'log-b2',action:'Hoàn tiền hoàn tất: 539.000đ',note:'',date:'07/06/2025',by:'Admin EduMart'}
+     ]},
+    {id:'EDU-28425',buyerId:'mock-06',buyerName:'Vũ Quốc Bảo',buyerEmail:'vqbao@gmail.com',buyerPhone:'0909 888 777',
+     sellerId:'seller-005',sellerName:'Sbooks',
+     items:[{prodId:16,prodName:'Tiếng Anh giao tiếp cấp tốc (ebook)',qty:1,unitPrice:59000},{prodId:15,prodName:'Lập trình JavaScript từ con số 0 (ebook)',qty:1,unitPrice:79000}],
+     subtotal:138000,shippingFee:0,discount:0,total:138000,paymentMethod:'momo',
+     shippingAddr:'88 Đinh Tiên Hoàng, Bình Thạnh, TP.HCM',orderDate:'15/05/2025',status:'processing',
+     statusHistory:[
+       {status:'pending',date:'15/05/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'15/05/2025',note:'Xác nhận',by:'seller'},
+       {status:'processing',date:'15/05/2025',note:'Đang chuẩn bị file ebook',by:'seller'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28410',buyerId:'mock-07',buyerName:'Đặng Thu Hà',buyerEmail:'dtha@gmail.com',buyerPhone:'0378 111 222',
+     sellerId:'seller-002',sellerName:'Fahasa Official',
+     items:[{prodId:2,prodName:'Dế Mèn phiêu lưu ký',qty:2,unitPrice:45000}],
+     subtotal:90000,shippingFee:30000,discount:0,total:120000,paymentMethod:'cod',
+     shippingAddr:'21 Lê Lợi, Cần Thơ',orderDate:'20/05/2025',status:'cancelled',
+     statusHistory:[
+       {status:'pending',date:'20/05/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'20/05/2025',note:'Xác nhận',by:'seller'},
+       {status:'cancelled',date:'21/05/2025',note:'Người mua hủy: Đặt nhầm số lượng',by:'buyer'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28398',buyerId:'mock-08',buyerName:'Ngô Văn Hải',buyerEmail:'nvhai@outlook.com',buyerPhone:'0901 555 666',
+     sellerId:'seller-006',sellerName:'VPP Minh Phát',
+     items:[{prodId:7,prodName:'Combo bút bi Thiên Long 20 cây',qty:1,unitPrice:48000}],
+     subtotal:48000,shippingFee:25000,discount:0,total:73000,paymentMethod:'momo',
+     shippingAddr:'55 Nguyễn Huệ, Đà Nẵng',orderDate:'10/05/2025',status:'delivered',
+     statusHistory:[
+       {status:'pending',date:'10/05/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'10/05/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'11/05/2025',note:'Đang giao',by:'seller'},
+       {status:'delivered',date:'13/05/2025',note:'Đã giao',by:'system'}
+     ],
+     complaint:{reason:'Hàng giả, không phải Thiên Long chính hãng',desc:'Bút nhận được có bao bì in kém chất lượng, logo Thiên Long bị mờ và sai màu. Ngòi bút bị rò mực, không viết được. Đây là hàng nhái thương hiệu.',filedAt:'14/05/2025',status:'investigating',resolution:'',resolvedAt:null,resolvedBy:null},
+     refund:{amount:73000,reason:'Hàng giả không đúng mô tả',status:'requested',requestedAt:'14/05/2025',processedAt:null,processedBy:null,note:''},
+     adminLog:[
+       {id:'log-c1',action:'Chuyển khiếu nại sang Đang xem xét',note:'',date:'15/05/2025',by:'Admin EduMart'},
+       {id:'log-c2',action:'Cập nhật trạng thái: Đang giao → Đã giao',note:'Xác nhận lại theo GHTK',date:'16/05/2025',by:'Admin EduMart'}
+     ]},
+    {id:'EDU-28380',buyerId:'mock-09',buyerName:'Bùi Thị Lan',buyerEmail:'btlan@gmail.com',buyerPhone:'0346 777 888',
+     sellerId:'seller-007',sellerName:'EduPro Thiết bị GD',
+     items:[{prodId:61,prodName:'Kính hiển vi học sinh 400x – 1000x',qty:1,unitPrice:680000}],
+     subtotal:680000,shippingFee:50000,discount:0,total:730000,paymentMethod:'bank',
+     shippingAddr:'Trường THPT Chu Văn An, Hà Nội',orderDate:'05/05/2025',status:'completed',
+     statusHistory:[
+       {status:'pending',date:'05/05/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'05/05/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'07/05/2025',note:'Đã bàn giao Viettel',by:'seller'},
+       {status:'delivered',date:'10/05/2025',note:'Giao thành công',by:'system'},
+       {status:'completed',date:'11/05/2025',note:'Người mua xác nhận hoàn thành',by:'buyer'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28355',buyerId:'mock-11',buyerName:'Lý Thị Kim',buyerEmail:'ltkim@gmail.com',buyerPhone:'0923 111 999',
+     sellerId:'seller-001',sellerName:'NXB Giáo dục VN',
+     items:[{prodId:26,prodName:'Sách giáo viên Ngữ văn lớp 10',qty:2,unitPrice:62000},{prodId:27,prodName:'Hướng dẫn dạy học theo phương pháp tích cực',qty:1,unitPrice:118000}],
+     subtotal:242000,shippingFee:25000,discount:0,total:267000,paymentMethod:'momo',
+     shippingAddr:'15 Trần Phú, Cần Thơ',orderDate:'18/06/2025',status:'pending',
+     statusHistory:[{status:'pending',date:'18/06/2025',note:'Đặt hàng thành công',by:'system'}],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28340',buyerId:'mock-12',buyerName:'Đinh Văn Mạnh',buyerEmail:'dvmanh@edu.vn',buyerPhone:'028 9999 3333',
+     sellerId:'seller-003',sellerName:'Alphabooks',
+     items:[{prodId:3,prodName:'Tư duy nhanh và chậm',qty:1,unitPrice:169000}],
+     subtotal:169000,shippingFee:30000,discount:0,total:199000,paymentMethod:'bank',
+     shippingAddr:'33 Nguyễn Đình Chiểu, Q3, TP.HCM',orderDate:'17/06/2025',status:'confirmed',
+     statusHistory:[
+       {status:'pending',date:'17/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'17/06/2025',note:'Seller xác nhận đơn hàng',by:'seller'}
+     ],
+     complaint:null,refund:null,adminLog:[]},
+    {id:'EDU-28315',buyerId:'mock-14',buyerName:'Phan Văn Lợi',buyerEmail:'pvloi@gmail.com',buyerPhone:'0912 666 777',
+     sellerId:'seller-005',sellerName:'Sbooks',
+     items:[{prodId:5,prodName:'Atomic Habits - Thay đổi tí hon',qty:1,unitPrice:145000},{prodId:22,prodName:'Luyện nghe Tiếng Anh mỗi ngày (sách nói)',qty:1,unitPrice:55000}],
+     subtotal:200000,shippingFee:30000,discount:0,total:230000,paymentMethod:'momo',
+     shippingAddr:'99 Hoàng Diệu, Đà Nẵng',orderDate:'16/06/2025',status:'shipping',
+     statusHistory:[
+       {status:'pending',date:'16/06/2025',note:'Đặt hàng thành công',by:'system'},
+       {status:'confirmed',date:'16/06/2025',note:'Xác nhận',by:'seller'},
+       {status:'shipping',date:'17/06/2025',note:'Đã bàn giao GHTK',by:'seller'}
+     ],
+     complaint:null,refund:null,adminLog:[]}
+  ];
+  LS.set('sysOrders',sysOrders);
+}
+function saveAdminOrders(){LS.set('sysOrders',sysOrders);}
+
+/* ── FINANCE DATA ────────────────────────────────── */
+/* Tĩnh: biểu đồ tổng quan (không persist) */
+const FIN_MONTHS=['T1/25','T2/25','T3/25','T4/25','T5/25','T6/25'];
+const FIN_GMV   =[480,520,610,555,590,627];   // triệu đồng, GMV nền tảng
+const FIN_COMM  =[48.1,52.0,61.1,55.7,59.1,62.8]; // hoa hồng thu được
+const FIN_CATS=[
+  {name:'Sách giáo khoa',  pct:38,rate:8,  gmvM:238.3,commM:19.1,clr:'#c0392b'},
+  {name:'Văn phòng phẩm',  pct:22,rate:10, gmvM:137.9,commM:13.8,clr:'#e67e22'},
+  {name:'Thiết bị giáo dục',pct:18,rate:12,gmvM:112.9,commM:13.5,clr:'#2980b9'},
+  {name:'Ebook & Sách nói', pct:14,rate:15,gmvM:87.8, commM:13.2,clr:'#27ae60'},
+  {name:'Khác',             pct:8, rate:10, gmvM:50.2, commM:5.0, clr:'#8e44ad'}
+];
+
+/* Danh sách yêu cầu rút tiền của seller */
+let finWithdrawals=LS.get('finWithdrawals',null);
+if(!finWithdrawals){
+  finWithdrawals=[
+    {id:'WD-001',sellerId:'seller-001',sellerName:'NXB Giáo dục VN',category:'sach',
+     amount:25000000,availableBalance:32000000,bank:'Vietcombank – 1234567890 – Trần Thị Hoa',
+     requestedAt:'18/06/2025',status:'pending',note:'',processedAt:null,processedBy:null,rejectedReason:''},
+    {id:'WD-002',sellerId:'seller-002',sellerName:'Fahasa Official',category:'sach',
+     amount:18000000,availableBalance:21500000,bank:'BIDV – 9988776655 – Phan Hải Đăng',
+     requestedAt:'17/06/2025',status:'pending',note:'',processedAt:null,processedBy:null,rejectedReason:''},
+    {id:'WD-005',sellerId:'seller-007',sellerName:'EduPro Thiết bị GD',category:'tbgd',
+     amount:5500000,availableBalance:6800000,bank:'MB Bank – 5566778899 – Ngô Thanh Tùng',
+     requestedAt:'14/06/2025',status:'pending',note:'',processedAt:null,processedBy:null,rejectedReason:''},
+    {id:'WD-003',sellerId:'seller-003',sellerName:'Alphabooks',category:'sach',
+     amount:12500000,availableBalance:14200000,bank:'Techcombank – 3344556677 – Nguyễn Bảo Thư',
+     requestedAt:'16/06/2025',status:'processing',note:'Đã chuyển khoản, chờ xác nhận ngân hàng.',processedAt:'18/06/2025',processedBy:'Admin EduMart',rejectedReason:''},
+    {id:'WD-004',sellerId:'seller-005',sellerName:'Sbooks',category:'sach',
+     amount:8200000,availableBalance:9100000,bank:'VCB – 1122334455 – Hoàng Thị Lan',
+     requestedAt:'15/06/2025',status:'paid',note:'',processedAt:'17/06/2025',processedBy:'Admin EduMart',rejectedReason:''},
+    {id:'WD-006',sellerId:'seller-006',sellerName:'VPP Minh Phát',category:'vpp',
+     amount:3000000,availableBalance:3200000,bank:'Agribank – 7788990011 – Vũ Minh Phát',
+     requestedAt:'13/06/2025',status:'rejected',note:'',processedAt:'14/06/2025',processedBy:'Admin EduMart',rejectedReason:'Tài khoản seller đang bị đình chỉ đến 12/07/2025. Không thể thanh toán trong thời gian đình chỉ.'},
+    {id:'WD-007',sellerId:'seller-004',sellerName:'Đinh Tị Books',category:'sach',
+     amount:9800000,availableBalance:11500000,bank:'VietinBank – 2233445566 – Lê Quang Định',
+     requestedAt:'10/06/2025',status:'paid',note:'',processedAt:'12/06/2025',processedBy:'Admin EduMart',rejectedReason:''}
+  ];
+  LS.set('finWithdrawals',finWithdrawals);
+}
+function saveFinWithdrawals(){LS.set('finWithdrawals',finWithdrawals);}
+
+/* Lịch sử thanh toán đã hoàn thành */
+let finPayments=LS.get('finPayments',null);
+if(!finPayments){
+  finPayments=[
+    {id:'PAY-WD007',sellerId:'seller-004',sellerName:'Đinh Tị Books',amount:9800000,period:'01/06/2025 – 12/06/2025',paidAt:'12/06/2025',bank:'VietinBank – 2233445566 – Lê Quang Định',ref:'TX20250612001',by:'Admin EduMart'},
+    {id:'PAY-WD004',sellerId:'seller-005',sellerName:'Sbooks',amount:8200000,period:'01/06/2025 – 17/06/2025',paidAt:'17/06/2025',bank:'VCB – 1122334455 – Hoàng Thị Lan',ref:'TX20250617001',by:'Admin EduMart'},
+    {id:'PAY-001',sellerId:'seller-001',sellerName:'NXB Giáo dục VN',amount:22000000,period:'01/05/2025 – 31/05/2025',paidAt:'05/06/2025',bank:'Vietcombank – 1234567890 – Trần Thị Hoa',ref:'TX20250605001',by:'Admin EduMart'},
+    {id:'PAY-002',sellerId:'seller-002',sellerName:'Fahasa Official',amount:16500000,period:'01/05/2025 – 31/05/2025',paidAt:'05/06/2025',bank:'BIDV – 9988776655 – Phan Hải Đăng',ref:'TX20250605002',by:'Admin EduMart'},
+    {id:'PAY-003',sellerId:'seller-003',sellerName:'Alphabooks',amount:11800000,period:'01/05/2025 – 31/05/2025',paidAt:'06/06/2025',bank:'Techcombank – 3344556677 – Nguyễn Bảo Thư',ref:'TX20250606001',by:'Admin EduMart'},
+    {id:'PAY-004',sellerId:'seller-005',sellerName:'Sbooks',amount:7200000,period:'01/05/2025 – 31/05/2025',paidAt:'07/06/2025',bank:'VCB – 1122334455 – Hoàng Thị Lan',ref:'TX20250607001',by:'Admin EduMart'},
+    {id:'PAY-005',sellerId:'seller-007',sellerName:'EduPro Thiết bị GD',amount:4100000,period:'01/05/2025 – 31/05/2025',paidAt:'07/06/2025',bank:'MB Bank – 5566778899 – Ngô Thanh Tùng',ref:'TX20250607002',by:'Admin EduMart'},
+    {id:'PAY-006',sellerId:'seller-001',sellerName:'NXB Giáo dục VN',amount:19500000,period:'01/04/2025 – 30/04/2025',paidAt:'05/05/2025',bank:'Vietcombank – 1234567890 – Trần Thị Hoa',ref:'TX20250505001',by:'Admin EduMart'},
+    {id:'PAY-007',sellerId:'seller-002',sellerName:'Fahasa Official',amount:14200000,period:'01/04/2025 – 30/04/2025',paidAt:'05/05/2025',bank:'BIDV – 9988776655 – Phan Hải Đăng',ref:'TX20250505002',by:'Admin EduMart'},
+    {id:'PAY-008',sellerId:'seller-004',sellerName:'Đinh Tị Books',amount:8900000,period:'01/04/2025 – 30/04/2025',paidAt:'08/05/2025',bank:'VietinBank – 2233445566 – Lê Quang Định',ref:'TX20250508001',by:'Admin EduMart'}
+  ];
+  LS.set('finPayments',finPayments);
+}
+function saveFinPayments(){LS.set('finPayments',finPayments);}
+
+/* ── CMS DATA ─────────────────────────────────── */
+let cmsBlogs=LS.get('cmsBlogs',null);
+if(!cmsBlogs){
+  cmsBlogs=[
+    {id:'blog-001',title:'10 phương pháp học hiệu quả cho học sinh THPT',slug:'10-phuong-phap-hoc-hieu-qua',
+     category:'hoc-tap',tags:['học tập','kỹ năng','THPT','ôn thi'],status:'published',featured:true,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Khám phá 10 phương pháp học tập khoa học giúp học sinh THPT đạt kết quả tốt nhất trong kỳ thi.',
+     content:'<h2>Giới thiệu</h2><p>Việc học hiệu quả không chỉ phụ thuộc vào thời gian mà còn vào phương pháp. Dưới đây là 10 phương pháp được các chuyên gia giáo dục khuyến nghị.</p><h2>1. Phương pháp Pomodoro</h2><p>Chia nhỏ thời gian học thành các phiên <strong>25 phút</strong>, xen kẽ nghỉ ngắn 5 phút. Sau 4 phiên, nghỉ dài 15–30 phút.</p><h2>2. Mind Map tư duy</h2><p>Sử dụng sơ đồ tư duy để kết nối các khái niệm, giúp ghi nhớ lâu hơn và hệ thống hóa kiến thức.</p>',
+     publishedAt:'15/06/2025',createdAt:'14/06/2025',updatedAt:'15/06/2025',views:1247,commentCount:8},
+    {id:'blog-002',title:'Top 20 cuốn sách không thể thiếu cho học sinh lớp 10',slug:'top-20-sach-hoc-sinh-lop-10',
+     category:'thu-vien',tags:['sách hay','lớp 10','văn học','khoa học'],status:'published',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Danh sách 20 đầu sách được các thầy cô và chuyên gia giáo dục đề xuất cho học sinh đầu cấp THPT.',
+     content:'<h2>Nhóm sách Ngữ văn</h2><ul><li><em>Tắt đèn</em> – Ngô Tất Tố</li><li><em>Số đỏ</em> – Vũ Trọng Phụng</li></ul><h2>Nhóm sách Khoa học</h2><ul><li><em>Vật lý vui</em> – Perelman</li><li><em>Những tia sáng của Einstein</em></li></ul>',
+     publishedAt:'10/06/2025',createdAt:'09/06/2025',updatedAt:'10/06/2025',views:842,commentCount:5},
+    {id:'blog-003',title:'EduMart ra mắt tính năng gợi ý sách thông minh bằng AI',slug:'edumart-goi-y-sach-ai',
+     category:'tin-tuc',tags:['tin tức','AI','tính năng mới'],status:'published',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'EduMart chính thức triển khai hệ thống gợi ý sách cá nhân hóa dựa trên AI, giúp mỗi học sinh tìm đúng sách phù hợp.',
+     content:'<h2>Tính năng gợi ý thông minh</h2><p>Dựa trên lịch sử mua hàng, độ tuổi, lớp học và sở thích, hệ thống AI của EduMart sẽ đề xuất các đầu sách phù hợp nhất cho từng học sinh.</p><p>Tính năng này hiện đang trong giai đoạn <strong>thử nghiệm beta</strong> và sẽ ra mắt chính thức vào tháng 8/2025.</p>',
+     publishedAt:'05/06/2025',createdAt:'04/06/2025',updatedAt:'05/06/2025',views:628,commentCount:3},
+    {id:'blog-004',title:'Hướng dẫn chọn văn phòng phẩm chất lượng cao cho năm học mới',slug:'chon-van-phong-pham-chat-luong',
+     category:'chia-se',tags:['văn phòng phẩm','năm học mới','mẹo hay'],status:'published',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Bộ văn phòng phẩm đúng chuẩn giúp học sinh học tập hiệu quả hơn. Cùng EduMart tìm hiểu cách chọn đồ dùng học tập thông minh.',
+     content:'<h2>Chọn bút viết</h2><p>Bút bi ngòi 0.5mm phù hợp cho chữ viết nhỏ gọn. Các thương hiệu uy tín như Thiên Long, Bến Nghé được nhiều giáo viên khuyên dùng.</p><h2>Vở và sổ ghi chép</h2><p>Vở ô ly 5mm lý tưởng cho các môn tự nhiên. Chọn giấy 70gsm trở lên để không bị thấm mực.</p>',
+     publishedAt:'01/06/2025',createdAt:'30/05/2025',updatedAt:'01/06/2025',views:391,commentCount:2},
+    {id:'blog-005',title:'Ebook vs Sách giấy: Đâu là lựa chọn tốt hơn cho học sinh?',slug:'ebook-vs-sach-giay',
+     category:'thu-vien',tags:['ebook','sách giấy','so sánh'],status:'draft',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Cuộc tranh luận giữa ebook và sách giấy vẫn chưa có hồi kết. Bài viết này phân tích ưu nhược điểm của cả hai.',
+     content:'<h2>Ưu điểm của Ebook</h2><p>Tiện lợi, nhẹ nhàng, có thể mang theo hàng nghìn cuốn. Tìm kiếm nội dung dễ dàng.</p><h2>Ưu điểm của Sách giấy</h2><p>Không gây mỏi mắt, dễ ghi chú, phù hợp với học sinh nhỏ tuổi hơn.</p>',
+     publishedAt:'',createdAt:'20/05/2025',updatedAt:'25/05/2025',views:0,commentCount:0},
+    {id:'blog-006',title:'Kỹ năng đọc sách hiệu quả trong 30 phút mỗi ngày',slug:'ky-nang-doc-sach-30-phut',
+     category:'hoc-tap',tags:['đọc sách','kỹ năng','thói quen'],status:'draft',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Chỉ cần 30 phút đọc sách mỗi ngày, bạn có thể đọc tới 12 cuốn sách một năm. Hãy bắt đầu ngay hôm nay!',
+     content:'<h2>Tại sao 30 phút là đủ?</h2><p>Nghiên cứu cho thấy đọc sách tập trung 30 phút hiệu quả hơn đọc lan man 2 tiếng.</p>',
+     publishedAt:'',createdAt:'18/05/2025',updatedAt:'18/05/2025',views:0,commentCount:0},
+    {id:'blog-007',title:'Flash Sale Mùa Tựu Trường – Giảm đến 50% toàn bộ sách giáo khoa',slug:'flash-sale-tuu-truong',
+     category:'khuyen-mai',tags:['khuyến mãi','flash sale','sách giáo khoa'],status:'hidden',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Chương trình Flash Sale mùa tựu trường với hàng nghìn đầu sách giảm giá tới 50%. Chỉ diễn ra từ 28-31/08/2025.',
+     content:'<h2>Thông tin chương trình</h2><p>Thời gian: <strong>28/08/2025 – 31/08/2025</strong><br>Giảm giá: Lên đến 50% toàn bộ SGK<br>Freeship cho đơn từ 150.000đ.</p>',
+     publishedAt:'',createdAt:'15/05/2025',updatedAt:'15/05/2025',views:0,commentCount:0},
+    {id:'blog-008',title:'Chào mừng năm học mới 2025–2026: EduMart đồng hành cùng bạn',slug:'chao-mung-nam-hoc-moi-2025',
+     category:'tin-tuc',tags:['năm học mới','thông báo'],status:'published',featured:false,
+     authorName:'Admin EduMart',thumbnail:'',
+     excerpt:'Năm học 2025–2026 đã bắt đầu. EduMart tự hào là người bạn đồng hành tin cậy của hơn 500.000 học sinh và phụ huynh trên toàn quốc.',
+     content:'<h2>Năm học mới, hành trình mới</h2><p>EduMart vui mừng chào đón năm học 2025–2026 với nhiều tính năng và dịch vụ mới, giúp việc học tập trở nên dễ dàng và thú vị hơn bao giờ hết.</p>',
+     publishedAt:'01/09/2025',createdAt:'01/09/2025',updatedAt:'01/09/2025',views:2104,commentCount:12}
+  ];
+  LS.set('cmsBlogs',cmsBlogs);
+}
+function saveCmsBlogs(){LS.set('cmsBlogs',cmsBlogs);}
+
+let cmsComments=LS.get('cmsComments',null);
+if(!cmsComments){
+  cmsComments=[
+    {id:'cmt-001',blogId:'blog-001',blogTitle:'10 phương pháp học hiệu quả cho học sinh THPT',userId:'user-101',userName:'Nguyễn Văn An',content:'Bài viết rất hay và hữu ích! Mình đã áp dụng Pomodoro được 2 tuần và thấy hiệu quả hơn hẳn.',createdAt:'16/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-002',blogId:'blog-001',blogTitle:'10 phương pháp học hiệu quả cho học sinh THPT',userId:'user-102',userName:'Trần Thị Bình',content:'Cảm ơn EduMart! Mình sẽ chia sẻ cho các bạn trong lớp.',createdAt:'16/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-003',blogId:'blog-001',blogTitle:'10 phương pháp học hiệu quả cho học sinh THPT',userId:'user-103',userName:'Lê Hoàng Dũng',content:'Bài hay nhưng thiếu phần ví dụ thực tế. Mong có bài viết sâu hơn.',createdAt:'17/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-004',blogId:'blog-001',blogTitle:'10 phương pháp học hiệu quả cho học sinh THPT',userId:'user-spam-01',userName:'SpamBot2025',content:'Mua sách lậu giá rẻ tại link... [SPAM]',createdAt:'17/06/2025',status:'deleted',bannedUser:true},
+    {id:'cmt-005',blogId:'blog-001',blogTitle:'10 phương pháp học hiệu quả cho học sinh THPT',userId:'user-104',userName:'Phạm Minh Châu',content:'Phương pháp số 7 mình chưa hiểu lắm, bạn có thể giải thích thêm không?',createdAt:'18/06/2025',status:'pending',bannedUser:false},
+    {id:'cmt-006',blogId:'blog-002',blogTitle:'Top 20 cuốn sách không thể thiếu cho học sinh lớp 10',userId:'user-105',userName:'Hoàng Thị Lan',content:'Danh sách tuyệt vời! Mình đã đọc được 8/20 cuốn rồi.',createdAt:'11/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-007',blogId:'blog-002',blogTitle:'Top 20 cuốn sách không thể thiếu cho học sinh lớp 10',userId:'user-106',userName:'Ngô Tuấn Kiệt',content:'Sao không có sách khoa học vũ trụ nhỉ? Mình nghĩ sách của Neil DeGrasse Tyson cũng rất phù hợp.',createdAt:'12/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-008',blogId:'blog-002',blogTitle:'Top 20 cuốn sách không thể thiếu cho học sinh lớp 10',userId:'user-107',userName:'Vũ Thị Hoa',content:'Cảm ơn! Nhưng mình thấy thiếu mảng sách lịch sử. Mong bài viết tiếp theo có thêm.',createdAt:'13/06/2025',status:'pending',bannedUser:false},
+    {id:'cmt-009',blogId:'blog-003',blogTitle:'EduMart ra mắt tính năng gợi ý sách thông minh bằng AI',userId:'user-108',userName:'Đặng Quốc Bảo',content:'Tuyệt vời! Mong sớm ra mắt chính thức.',createdAt:'06/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-010',blogId:'blog-003',blogTitle:'EduMart ra mắt tính năng gợi ý sách thông minh bằng AI',userId:'user-109',userName:'Lý Thị Kim',content:'AI có thực sự hiểu sở thích của học sinh không? Mong team giải thích thêm.',createdAt:'07/06/2025',status:'pending',bannedUser:false},
+    {id:'cmt-011',blogId:'blog-004',blogTitle:'Hướng dẫn chọn văn phòng phẩm chất lượng cao cho năm học mới',userId:'user-110',userName:'Nguyễn Thị Mai',content:'Bài viết thiết thực quá! Mình đang cần tư vấn mua đồ cho con vào lớp 6.',createdAt:'02/06/2025',status:'approved',bannedUser:false},
+    {id:'cmt-012',blogId:'blog-008',blogTitle:'Chào mừng năm học mới 2025–2026',userId:'user-spam-02',userName:'QuảngCáoRẻ',content:'Quảng cáo sách lậu, đồ chơi giá rẻ tại... [NỘI DUNG VI PHẠM]',createdAt:'02/09/2025',status:'pending',bannedUser:false}
+  ];
+  LS.set('cmsComments',cmsComments);
+}
+function saveCmsComments(){LS.set('cmsComments',cmsComments);}
+
+let cmsBanners=LS.get('cmsBanners',null);
+if(!cmsBanners){
+  cmsBanners=[
+    {id:'ban-001',title:'Mùa Tựu Trường 2025 – Giảm 30% toàn bộ SGK',imageUrl:'',linkUrl:'/khuyen-mai/tuu-truong',alt:'Khuyến mãi tựu trường 2025',startDate:'15/08/2025',endDate:'15/09/2025',active:true,order:1},
+    {id:'ban-002',title:'Sách Mới Tháng 9 – Hàng Nghìn Đầu Sách Mới Về',imageUrl:'',linkUrl:'/sach-moi',alt:'Sách mới tháng 9',startDate:'01/09/2025',endDate:'30/09/2025',active:true,order:2},
+    {id:'ban-003',title:'Freeship Toàn Quốc cho đơn từ 99.000đ',imageUrl:'',linkUrl:'/',alt:'Freeship toàn quốc',startDate:'01/06/2025',endDate:'31/12/2025',active:false,order:3}
+  ];
+  LS.set('cmsBanners',cmsBanners);
+}
+function saveCmsBanners(){LS.set('cmsBanners',cmsBanners);}
+
+let cmsPopup=LS.get('cmsPopup',null);
+if(!cmsPopup){
+  cmsPopup={enabled:false,title:'Ưu đãi đặc biệt hôm nay!',content:'Nhập mã EDUMART10 để được giảm 10% cho đơn hàng đầu tiên. Áp dụng đến hết tháng 9/2025.',imageUrl:'',linkUrl:'/khuyen-mai',linkText:'Mua ngay',delaySeconds:3,showOnce:true,updatedAt:''};
+  LS.set('cmsPopup',cmsPopup);
+}
+function saveCmsPopup(){LS.set('cmsPopup',cmsPopup);}
+
+let cmsStaticPages=LS.get('cmsStaticPages',null);
+if(!cmsStaticPages){
+  cmsStaticPages={
+    about:{title:'Về chúng tôi',updatedAt:'01/06/2025',content:'<h2>EduMart – Người bạn đồng hành giáo dục</h2><p>EduMart là nền tảng thương mại điện tử chuyên biệt về sách, tài liệu học tập và đồ dùng giáo dục, ra đời với sứ mệnh <strong>kết nối tri thức đến mọi học sinh Việt Nam</strong>.</p><h2>Tầm nhìn</h2><p>Trở thành hệ sinh thái giáo dục số hàng đầu Việt Nam, nơi mỗi học sinh đều có thể tiếp cận nguồn tài liệu chất lượng cao với chi phí hợp lý nhất.</p><h2>Giá trị cốt lõi</h2><ul><li><strong>Chính xác:</strong> Chỉ cung cấp sách và tài liệu có nguồn gốc rõ ràng, được kiểm duyệt.</li><li><strong>Tiện lợi:</strong> Giao hàng nhanh, thanh toán đa dạng, hỗ trợ 24/7.</li><li><strong>Tin cậy:</strong> Hơn 500.000 học sinh và phụ huynh tin dùng.</li></ul><h2>Liên hệ</h2><p>Email: support@edumart.vn | Hotline: 1800 1234 (miễn phí)</p>'},
+    terms:{title:'Điều khoản sử dụng',updatedAt:'01/06/2025',content:'<h2>1. Chấp thuận điều khoản</h2><p>Bằng việc truy cập và sử dụng EduMart, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu dưới đây.</p><h2>2. Tài khoản người dùng</h2><p>Bạn có trách nhiệm bảo mật thông tin tài khoản. Mọi hoạt động phát sinh từ tài khoản của bạn là trách nhiệm của bạn.</p><h2>3. Quy định mua hàng</h2><p>Tất cả sản phẩm trên EduMart đều được kiểm duyệt về chất lượng và nguồn gốc xuất xứ trước khi được phép bán.</p><h2>4. Sở hữu trí tuệ</h2><p>Toàn bộ nội dung trên EduMart (logo, bài viết, hình ảnh) thuộc quyền sở hữu của EduMart hoặc được cấp phép hợp lệ.</p><h2>5. Giới hạn trách nhiệm</h2><p>EduMart không chịu trách nhiệm về thiệt hại gián tiếp phát sinh từ việc sử dụng dịch vụ.</p><h2>6. Thay đổi điều khoản</h2><p>EduMart có quyền cập nhật điều khoản này bất cứ lúc nào. Người dùng sẽ được thông báo qua email.</p>'},
+    privacy:{title:'Chính sách bảo mật',updatedAt:'01/06/2025',content:'<h2>1. Thông tin chúng tôi thu thập</h2><p>EduMart thu thập thông tin bạn cung cấp khi đăng ký (họ tên, email, số điện thoại) và dữ liệu sử dụng dịch vụ.</p><h2>2. Mục đích sử dụng thông tin</h2><ul><li>Xử lý đơn hàng và thanh toán</li><li>Gửi thông báo về đơn hàng và khuyến mãi</li><li>Cải thiện chất lượng dịch vụ</li><li>Tuân thủ quy định pháp luật</li></ul><h2>3. Bảo vệ thông tin</h2><p>Chúng tôi sử dụng mã hóa SSL và các biện pháp bảo mật tiêu chuẩn ngành để bảo vệ dữ liệu của bạn.</p><h2>4. Chia sẻ thông tin</h2><p>EduMart không bán hoặc cho thuê thông tin cá nhân của bạn cho bên thứ ba. Chúng tôi chỉ chia sẻ với đối tác vận chuyển khi cần thiết để giao hàng.</p><h2>5. Quyền của người dùng</h2><p>Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân bằng cách liên hệ privacy@edumart.vn.</p>'},
+    returns:{title:'Chính sách đổi/trả',updatedAt:'01/06/2025',content:'<h2>1. Điều kiện đổi/trả hàng</h2><p>EduMart chấp nhận đổi/trả trong vòng <strong>7 ngày</strong> kể từ ngày nhận hàng nếu sản phẩm có lỗi từ nhà sản xuất hoặc không đúng mô tả.</p><h2>2. Sản phẩm không được đổi/trả</h2><ul><li>Ebook và sản phẩm số (sau khi đã tải xuống)</li><li>Sách đã bị hư hỏng do người mua</li><li>Sản phẩm không có tem/nhãn hoặc đã bị tháo gỡ</li></ul><h2>3. Quy trình đổi/trả</h2><ol><li>Liên hệ hỗ trợ qua hotline 1800 1234 hoặc email support@edumart.vn</li><li>Cung cấp mã đơn hàng và ảnh chụp sản phẩm lỗi</li><li>Chờ xác nhận từ EduMart trong 24 giờ</li><li>Gửi hàng về kho EduMart (chi phí vận chuyển do EduMart chịu)</li></ol><h2>4. Hoàn tiền</h2><p>Sau khi nhận và kiểm tra hàng trả về, EduMart sẽ hoàn tiền trong vòng <strong>3–5 ngày làm việc</strong> qua phương thức thanh toán ban đầu.</p>'}
+  };
+  LS.set('cmsStaticPages',cmsStaticPages);
+}
+function saveCmsStaticPages(){LS.set('cmsStaticPages',cmsStaticPages);}
+
+// ===== Promotion: Vouchers =====
+let promoVouchers=LS.get('promoVouchers',null);
+if(!promoVouchers){
+  promoVouchers=[
+    {id:'VC-001',code:'EDUBACK25',name:'Khai giảng Back to School',type:'percent',value:25,minOrder:200000,maxDiscount:80000,categories:['all'],maxUsage:1000,usedCount:342,startDate:'01/06/2025',endDate:'30/06/2025',status:'active',desc:'Giảm 25% cho tất cả đơn hàng từ 200k',createdAt:'01/06/2025'},
+    {id:'VC-002',code:'SACHHE20',name:'Sách hè 20%',type:'percent',value:20,minOrder:150000,maxDiscount:60000,categories:['sach'],maxUsage:500,usedCount:198,startDate:'15/06/2025',endDate:'15/07/2025',status:'active',desc:'Giảm 20% danh mục Sách',createdAt:'10/06/2025'},
+    {id:'VC-003',code:'FLAT50K',name:'Giảm 50k đơn từ 300k',type:'fixed',value:50000,minOrder:300000,maxDiscount:50000,categories:['all'],maxUsage:200,usedCount:200,startDate:'01/06/2025',endDate:'20/06/2025',status:'active',desc:'Giảm thẳng 50.000đ',createdAt:'01/06/2025'},
+    {id:'VC-004',code:'NEWUSER30',name:'Chào người dùng mới',type:'percent',value:30,minOrder:0,maxDiscount:100000,categories:['all'],maxUsage:9999,usedCount:1024,startDate:'01/01/2025',endDate:'31/12/2025',status:'inactive',desc:'Voucher tặng cho user mới đăng ký',createdAt:'01/01/2025'},
+    {id:'VC-005',code:'VPPFREE15',name:'VPP giảm 15%',type:'percent',value:15,minOrder:100000,maxDiscount:30000,categories:['vpp'],maxUsage:300,usedCount:87,startDate:'01/06/2025',endDate:'30/06/2025',status:'active',desc:'Giảm 15% văn phòng phẩm',createdAt:'01/06/2025'},
+    {id:'VC-006',code:'GIAOVIEN40',name:'Ưu đãi giáo viên 40%',type:'percent',value:40,minOrder:200000,maxDiscount:120000,categories:['sach','tbgd'],maxUsage:100,usedCount:34,startDate:'15/11/2025',endDate:'25/11/2025',status:'active',desc:'Dành riêng cho giáo viên dịp 20/11',createdAt:'10/11/2025'},
+    {id:'VC-007',code:'SUMMER25',name:'Hè rực rỡ 25%',type:'percent',value:25,minOrder:100000,maxDiscount:50000,categories:['all'],maxUsage:1000,usedCount:956,startDate:'01/05/2025',endDate:'31/05/2025',status:'expired',desc:'Voucher mùa hè 2025',createdAt:'01/05/2025'},
+    {id:'VC-008',code:'EBOOK10',name:'Ebook & Sách nói giảm 10%',type:'percent',value:10,minOrder:50000,maxDiscount:30000,categories:['ebook','audiobook'],maxUsage:2000,usedCount:445,startDate:'01/06/2025',endDate:'31/07/2025',status:'active',desc:'Giảm 10% ebook và sách nói',createdAt:'01/06/2025'}
+  ];
+  LS.set('promoVouchers',promoVouchers);
+}
+function savePromoVouchers(){LS.set('promoVouchers',promoVouchers);}
+
+// ===== Promotion: Flash Sales =====
+let promoFlashSales=LS.get('promoFlashSales',null);
+if(!promoFlashSales){
+  promoFlashSales=[
+    {id:'FS-001',name:'Flash Sale Khai Giảng 2025',startTime:'2025-06-01T08:00',endTime:'2025-06-01T22:00',status:'ended',desc:'Flash Sale mừng khai giảng năm học mới',totalRevenue:48600000,totalSold:312,endedEarlyAt:null,createdAt:'28/05/2025',
+      products:[
+        {productId:1,productName:'Bộ SGK lớp 6 - Kết nối tri thức',sellerName:'NXB Giáo Dục',originalPrice:187000,salePrice:130000,saleQty:80,soldQty:80,status:'approved'},
+        {productId:2,productName:'Dế Mèn phiêu lưu ký',sellerName:'NXB Kim Đồng',originalPrice:45000,salePrice:30000,saleQty:100,soldQty:97,status:'approved'},
+        {productId:5,productName:'Atomic Habits - Thay đổi tí hon',sellerName:'NXB Thế Giới',originalPrice:145000,salePrice:99000,saleQty:50,soldQty:50,status:'approved'},
+        {productId:7,productName:'Combo bút bi Thiên Long 20 cây',sellerName:'Thiên Long',originalPrice:48000,salePrice:35000,saleQty:150,soldQty:85,status:'approved'}
+      ]
+    },
+    {id:'FS-002',name:'Flash Sale Giữa Tuần',startTime:'2025-06-18T12:00',endTime:'2025-06-18T18:00',status:'ended',desc:'Flash Sale mid-week giảm sốc',totalRevenue:21700000,totalSold:180,endedEarlyAt:null,createdAt:'16/06/2025',
+      products:[
+        {productId:3,productName:'Tư duy nhanh và chậm',sellerName:'NXB Trẻ',originalPrice:169000,salePrice:120000,saleQty:60,soldQty:60,status:'approved'},
+        {productId:6,productName:'Luyện thi THPT QG môn Toán',sellerName:'NXB ĐHQG',originalPrice:95000,salePrice:70000,saleQty:100,soldQty:72,status:'approved'},
+        {productId:8,productName:'Vở Campus 200 trang (lốc 10)',sellerName:'Campus',originalPrice:102000,salePrice:75000,saleQty:80,soldQty:48,status:'approved'}
+      ]
+    },
+    {id:'FS-003',name:'Flash Sale 20/11 Tri Ân Giáo Viên',startTime:'2025-11-20T07:00',endTime:'2025-11-20T23:59',status:'upcoming',desc:'Tri ân thầy cô nhân ngày Nhà giáo Việt Nam',totalRevenue:0,totalSold:0,endedEarlyAt:null,createdAt:'18/11/2025',
+      products:[
+        {productId:4,productName:'Mắt biếc',sellerName:'NXB Trẻ',originalPrice:88000,salePrice:65000,saleQty:200,soldQty:0,status:'approved'},
+        {productId:9,productName:'Bộ bút màu Colokit 24 màu',sellerName:'Colokit',originalPrice:65000,salePrice:45000,saleQty:100,soldQty:0,status:'pending'},
+        {productId:10,productName:'Balo chống gù Hami',sellerName:'Hami',originalPrice:320000,salePrice:249000,saleQty:50,soldQty:0,status:'pending'},
+        {productId:1,productName:'Bộ SGK lớp 6 - Kết nối tri thức',sellerName:'NXB Giáo Dục',originalPrice:187000,salePrice:150000,saleQty:100,soldQty:0,status:'rejected'}
+      ]
+    }
+  ];
+  LS.set('promoFlashSales',promoFlashSales);
+}
+function savePromoFlashSales(){LS.set('promoFlashSales',promoFlashSales);}
+
+// ===== Promotion: Points Config =====
+let promoPoints=LS.get('promoPoints',null);
+if(!promoPoints){
+  promoPoints={
+    earnRate:10000,
+    redeemThreshold:100,
+    redeemPoints:100,
+    redeemVoucherPct:5,
+    redeemMinOrder:100000,
+    pointExpireDays:365,
+    tiers:[
+      {name:'Đồng',minPoints:0,badge:'🥉',multiplier:1,perks:'Tích điểm x1'},
+      {name:'Bạc',minPoints:500,badge:'🥈',multiplier:1.2,perks:'Tích điểm x1.2, Miễn phí ship đơn từ 200k'},
+      {name:'Vàng',minPoints:2000,badge:'🥇',multiplier:1.5,perks:'Tích điểm x1.5, Voucher sinh nhật 10%, Hoàn tiền 2%'},
+      {name:'Kim Cương',minPoints:5000,badge:'💎',multiplier:2,perks:'Tích điểm x2, Miễn phí ship mọi đơn, Ưu tiên CSKH'}
+    ],
+    stats:{totalIssued:1248540,totalRedeemed:432100,totalExpired:87420,totalActiveUsers:8420,totalVouchersGenerated:4321,avgPointsPerUser:148},
+    updatedAt:'01/06/2025'
+  };
+  LS.set('promoPoints',promoPoints);
+}
+function savePromoPoints(){LS.set('promoPoints',promoPoints);}
+
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _admLevelLbl(l){return {super:'Toàn quyền',readonly:'Chỉ xem',content:'Nội dung'}[l]||l;}
 function fmtMil(n){if(n>=1e9)return (n/1e9).toFixed(1).replace('.',',')+'B';if(n>=1e6)return Math.round(n/1e6)+'M';return n.toLocaleString('vi-VN');}
@@ -2408,9 +2962,12 @@ function admGrowth(g){const up=g>=0;return '<span class="adm-growth '+(up?'up':'
 
 function adminContent(){
   if(acctTab==='adm-users')   return adminUsers();
-  if(acctTab==='adm-products')return '<div class="acct-card"><h3>Quản lý sản phẩm</h3><p class="wip-note">Đang phát triển — sẽ ra mắt trong phiên bản tới</p></div>';
-  if(acctTab==='adm-orders')  return '<div class="acct-card"><h3>Quản lý đơn hàng</h3><p class="wip-note">Đang phát triển — sẽ ra mắt trong phiên bản tới</p></div>';
-  if(acctTab==='adm-shops')   return '<div class="acct-card"><h3>Quản lý Shop / NCC</h3><p class="wip-note">Đang phát triển — sẽ ra mắt trong phiên bản tới</p></div>';
+  if(acctTab==='adm-products')return adminProducts();
+  if(acctTab==='adm-orders')  return adminOrdersMgmt();
+  if(acctTab==='adm-finance') return adminFinance();
+  if(acctTab==='adm-cms')     return adminCms();
+  if(acctTab==='adm-promo')   return adminPromo();
+  if(acctTab==='adm-shops')   return adminShops();
   return adminOverview();
 }
 function adminOverview(){
@@ -2774,9 +3331,2654 @@ function doCreateAdmin(){
   toast('Đã tạo Admin: '+name);admUsersView='list';renderAccount();
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ADMIN — QUẢN LÝ SẢN PHẨM
+══════════════════════════════════════════════════════════════ */
+const PROD_STATUS_BADGE={
+  pending:'<span class="adm-badge adm-badge-orange">Chờ duyệt</span>',
+  'needs-edit':'<span class="adm-badge adm-badge-blue">Cần chỉnh sửa</span>',
+  approved:'<span class="adm-badge green">Đã duyệt</span>',
+  rejected:'<span class="adm-badge gray">Từ chối</span>'
+};
+const RP_STATUS_BADGE={
+  active:'<span class="adm-badge adm-badge-orange">Đang hiển thị</span>',
+  hidden:'<span class="adm-badge gray">Đã ẩn</span>',
+  deleted:'<span class="adm-badge red">Đã xóa</span>'
+};
+const RP_REVIEW_BADGE={
+  pending:'<span class="adm-badge red">Chưa xử lý</span>',
+  resolved:'<span class="adm-badge green">Đã xử lý</span>'
+};
+
+function adminProducts(){
+  if(admProductsView==='pending-detail'&&admProductsSelectedId)return adminProductPendingDetail(admProductsSelectedId);
+  return adminProductsMain();
+}
+
+function adminProductsMain(){
+  const pendingCount=pendingProds.filter(p=>p.status==='pending').length;
+  const reportedCount=reportedProds.filter(r=>r.reviewStatus==='pending').length;
+  const tabs=[['pending','Duyệt sản phẩm mới'],['reported','Kiểm duyệt nội dung'],['categories','Quản lý danh mục']];
+  const tabHtml=tabs.map(([k,l])=>
+    '<button class="adm-shops-tab'+(admProductsTab===k?' on':'')+'" onclick="admProductsTab=\''+k+'\';renderAccount()">'+l+
+    (k==='pending'&&pendingCount>0?' <span class="adm-tab-badge">'+pendingCount+'</span>':'')+
+    (k==='reported'&&reportedCount>0?' <span class="adm-tab-badge">'+reportedCount+'</span>':'')+
+    '</button>'
+  ).join('');
+  let content='';
+  if(admProductsTab==='pending')content=adminProductsPendingList();
+  else if(admProductsTab==='reported')content=adminProductsReportedList();
+  else content=adminProductsCategories();
+  return '<div class="adm-shops-tabs">'+tabHtml+'</div>'+content;
+}
+
+/* ── TAB 1: DUYỆT SẢN PHẨM MỚI ─────────── */
+function adminProductsPendingList(){
+  const q=(admPendingSearch||'').toLowerCase().trim();
+  const statusOrder={pending:0,'needs-edit':1,approved:2,rejected:3};
+  const list=pendingProds
+    .filter(p=>!q||(p.name||'').toLowerCase().includes(q)||(p.sellerName||'').toLowerCase().includes(q))
+    .sort((a,b)=>(statusOrder[a.status]||9)-(statusOrder[b.status]||9));
+  const PER=8,pages=Math.max(1,Math.ceil(list.length/PER));
+  if(admPendingPage>=pages)admPendingPage=pages-1;
+  const slice=list.slice(admPendingPage*PER,(admPendingPage+1)*PER);
+  const stats=[
+    {lbl:'Chờ duyệt',val:pendingProds.filter(p=>p.status==='pending').length,clr:'#e67e22'},
+    {lbl:'Cần chỉnh sửa',val:pendingProds.filter(p=>p.status==='needs-edit').length,clr:'#2980b9'},
+    {lbl:'Đã duyệt',val:pendingProds.filter(p=>p.status==='approved').length,clr:'#27ae60'},
+    {lbl:'Từ chối',val:pendingProds.filter(p=>p.status==='rejected').length,clr:'#c0392b'}
+  ].map(s=>'<div class="adm-kpi" style="padding:14px 18px">'+
+    '<div class="adm-kpi-val" style="color:'+s.clr+';font-size:24px">'+s.val+'</div>'+
+    '<div class="adm-kpi-lbl">'+s.lbl+'</div>'+
+  '</div>').join('');
+  const rows=slice.map(p=>{
+    const clr=NCC_CAT_CLR[p.cat]||'#888';
+    const av=(p.name||'?').charAt(0).toUpperCase();
+    return '<tr class="adm-usr-row" onclick="admProductsSelectedId=\''+p.id+'\';admProductsView=\'pending-detail\';renderAccount()">'+
+      '<td><div class="adm-usr-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div></td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(p.name)+'</div><div class="adm-usr-em">'+escHtml(p.by)+'</div></td>'+
+      '<td class="adm-usr-em">'+escHtml(p.sellerName)+'</td>'+
+      '<td><span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[p.cat]||p.cat)+'</span></td>'+
+      '<td style="font-weight:500">'+fmt(p.price)+'</td>'+
+      '<td class="adm-usr-date">'+escHtml(p.submittedAt)+'</td>'+
+      '<td>'+(PROD_STATUS_BADGE[p.status]||p.status)+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        '<button class="adm-row-btn" onclick="admProductsSelectedId=\''+p.id+'\';admProductsView=\'pending-detail\';renderAccount()">Xem</button>'+
+        (p.status==='pending'||p.status==='needs-edit'?'<button class="adm-row-btn adm-unlock-btn" onclick="event.stopPropagation();doApproveProd(\''+p.id+'\')">Duyệt</button>':'')+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  const pager='<div class="adm-pager">'+
+    '<button class="adm-pager-btn" '+(admPendingPage===0?'disabled':'')+' onclick="admPendingPage--;renderAccount()">← Trước</button>'+
+    '<span>Trang '+(admPendingPage+1)+'/'+pages+' · <b>'+list.length+'</b> sản phẩm</span>'+
+    '<button class="adm-pager-btn" '+(admPendingPage>=pages-1?'disabled':'')+' onclick="admPendingPage++;renderAccount()">Tiếp →</button>'+
+  '</div>';
+  return '<div class="adm-kpi-grid" style="margin-bottom:16px">'+stats+'</div>'+
+    '<div class="adm-sec-hd" style="margin-bottom:12px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Sản phẩm chờ duyệt</h3>'+
+    '</div>'+
+    '<div class="adm-usr-toolbar" style="margin-bottom:12px">'+
+      '<input class="adm-usr-search" placeholder="Tìm theo tên sản phẩm hoặc tên seller..." value="'+escHtml(admPendingSearch)+'" oninput="admPendingSearch=this.value;admPendingPage=0;renderAccount()">'+
+      '<button class="adm-row-btn" onclick="admPendingSearch=\'\';admPendingPage=0;renderAccount()">Xóa lọc</button>'+
+    '</div>'+
+    '<div class="adm-table-wrap"><table class="adm-usr-table">'+
+      '<thead><tr><th></th><th>Sản phẩm</th><th>Seller</th><th>Danh mục</th><th>Giá</th><th>Ngày nộp</th><th>Trạng thái</th><th></th></tr></thead>'+
+      '<tbody>'+(rows||'<tr><td colspan="8" style="text-align:center;color:var(--text-soft);padding:20px">Không có sản phẩm nào</td></tr>')+'</tbody>'+
+    '</table></div>'+pager;
+}
+
+function adminProductPendingDetail(id){
+  const p=pendingProds.find(x=>x.id===id);
+  if(!p)return '<p>Không tìm thấy sản phẩm.</p>';
+  const clr=NCC_CAT_CLR[p.cat]||'#888';
+  const av=(p.name||'?').charAt(0).toUpperCase();
+  const isDone=p.status==='approved'||p.status==='rejected';
+  const noteBanner=p.reviewNote
+    ?'<div class="adm-ncc-note '+(p.status==='rejected'?'red':'blue')+'">'+
+        '<div class="adm-ncc-note-label">'+(p.status==='rejected'?'Lý do từ chối':'Yêu cầu chỉnh sửa')+'</div>'+
+        '<div>'+escHtml(p.reviewNote)+'</div>'+
+        (p.reviewedBy?'<div style="margin-top:8px;font-size:12px;color:var(--text-soft)">— '+escHtml(p.reviewedBy)+' · '+escHtml(p.reviewedAt)+'</div>':'')+
+      '</div>'
+    :'';
+  const audBadges=(p.aud||[]).map(a=>'<span class="adm-badge gray" style="margin-right:4px">'+escHtml(AUD[a]||a)+'</span>').join('');
+  const actionBtns=isDone?'':
+    '<div class="adm-detail-actions">'+
+      '<button class="adm-act-btn green" onclick="doApproveProd(\''+id+'\')">✓ Duyệt sản phẩm</button>'+
+      '<button class="adm-act-btn" style="color:#2980b9;border-color:#2980b9" onclick="doRequestEditProd(\''+id+'\')">✏ Yêu cầu chỉnh sửa</button>'+
+      '<button class="adm-act-btn red" onclick="doRejectProd(\''+id+'\')">✕ Từ chối</button>'+
+    '</div>';
+  return '<button class="adm-back-btn" onclick="admProductsView=\'list\';admProductsSelectedId=null;renderAccount()">← Danh sách sản phẩm</button>'+
+    noteBanner+
+    '<div class="adm-detail-card">'+
+      '<div class="adm-detail-head">'+
+        '<div class="adm-detail-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="adm-detail-name">'+escHtml(p.name)+'</div>'+
+          '<div class="adm-detail-email">'+escHtml(p.by)+'</div>'+
+          '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+
+            '<span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[p.cat]||p.cat)+'</span>'+
+            (p.genre?'<span class="adm-badge gray">'+escHtml(p.genre)+'</span>':'')+
+            (PROD_STATUS_BADGE[p.status]||'')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-detail-grid">'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Giá bán</div><div class="adm-detail-val" style="color:var(--ink);font-size:16px">'+fmt(p.price)+(p.oldPrice?'<span style="font-size:12px;color:var(--text-soft);text-decoration:line-through;margin-left:8px">'+fmt(p.oldPrice)+'</span>':'')+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Đối tượng</div><div class="adm-detail-val">'+audBadges+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Số ảnh nộp</div><div class="adm-detail-val">'+(p.imageCount||0)+' ảnh</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Ngày nộp</div><div class="adm-detail-val">'+escHtml(p.submittedAt)+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Seller</div><div class="adm-detail-val">'+escHtml(p.sellerName)+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Mã Seller</div><div class="adm-detail-val" style="font-size:12px;color:var(--text-soft)">'+escHtml(p.sellerId)+'</div></div>'+
+      '</div>'+
+      '<div class="adm-ncc-doc-section">'+
+        '<div class="adm-ncc-doc-title">Mô tả sản phẩm</div>'+
+        '<div class="adm-prod-desc">'+escHtml(p.desc||'—')+'</div>'+
+      '</div>'+
+      actionBtns+
+    '</div>';
+}
+
+/* ── TAB 2: KIỂM DUYỆT NỘI DUNG ─────────── */
+function adminProductsReportedList(){
+  const q=(admReportedSearch||'').toLowerCase().trim();
+  const list=reportedProds
+    .filter(r=>!q||(r.productName||'').toLowerCase().includes(q)||(r.sellerName||'').toLowerCase().includes(q))
+    .sort((a,b)=>(a.reviewStatus==='pending'?0:1)-(b.reviewStatus==='pending'?0:1));
+  const statCards=[
+    {lbl:'Chưa xử lý',val:reportedProds.filter(r=>r.reviewStatus==='pending').length,clr:'#c0392b'},
+    {lbl:'Đã xử lý',val:reportedProds.filter(r=>r.reviewStatus==='resolved').length,clr:'#27ae60'},
+    {lbl:'Đang ẩn',val:reportedProds.filter(r=>r.status==='hidden').length,clr:'#e67e22'},
+    {lbl:'Đã xóa',val:reportedProds.filter(r=>r.status==='deleted').length,clr:'var(--text-soft)'}
+  ].map(s=>'<div class="adm-kpi" style="padding:14px 18px">'+
+    '<div class="adm-kpi-val" style="color:'+s.clr+';font-size:24px">'+s.val+'</div>'+
+    '<div class="adm-kpi-lbl">'+s.lbl+'</div>'+
+  '</div>').join('');
+  const rows=list.map(r=>{
+    const clr=NCC_CAT_CLR[r.cat]||'#888';
+    const av=(r.productName||'?').charAt(0).toUpperCase();
+    const topReasons=r.reports.slice(0,2).map(rpt=>
+      '<div style="font-size:11.5px;color:var(--text-soft)">• '+escHtml(rpt.reason)+' ('+rpt.count+')</div>'
+    ).join('');
+    return '<tr class="adm-usr-row">'+
+      '<td><div class="adm-usr-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div></td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(r.productName)+'</div><div class="adm-usr-em">'+escHtml(r.sellerName)+'</div></td>'+
+      '<td>'+
+        '<div style="font-weight:700;color:#c0392b;font-size:15px">'+r.reportCount+' báo cáo</div>'+
+        topReasons+
+      '</td>'+
+      '<td>'+(RP_STATUS_BADGE[r.status]||r.status)+'</td>'+
+      '<td>'+(RP_REVIEW_BADGE[r.reviewStatus]||r.reviewStatus)+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        (r.status==='active'?'<button class="adm-row-btn" style="color:#e67e22;border-color:#f5c881" onclick="doHideReportedProd(\''+r.id+'\')">Ẩn</button>':'')+
+        (r.status==='hidden'?'<button class="adm-row-btn adm-unlock-btn" onclick="doUnhideReportedProd(\''+r.id+'\')">Hiện lại</button>':'')+
+        (r.status!=='deleted'?'<button class="adm-row-btn" onclick="doWarnSellerFromReport(\''+r.id+'\')">Cảnh báo Seller</button>':'')+
+        (r.status!=='deleted'?'<button class="adm-row-btn adm-lock-btn" onclick="doDeleteReportedProd(\''+r.id+'\')">Xóa SP</button>':'')+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  return '<div class="adm-kpi-grid" style="margin-bottom:16px">'+statCards+'</div>'+
+    '<div class="adm-sec-hd" style="margin-bottom:12px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Sản phẩm bị báo cáo</h3>'+
+    '</div>'+
+    '<div class="adm-usr-toolbar" style="margin-bottom:12px">'+
+      '<input class="adm-usr-search" placeholder="Tìm theo tên sản phẩm hoặc tên seller..." value="'+escHtml(admReportedSearch)+'" oninput="admReportedSearch=this.value;renderAccount()">'+
+      '<button class="adm-row-btn" onclick="admReportedSearch=\'\';renderAccount()">Xóa lọc</button>'+
+    '</div>'+
+    '<div class="adm-table-wrap"><table class="adm-usr-table">'+
+      '<thead><tr><th></th><th>Sản phẩm</th><th>Báo cáo</th><th>Trạng thái SP</th><th>Xử lý</th><th></th></tr></thead>'+
+      '<tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px">Không có sản phẩm bị báo cáo</td></tr>')+'</tbody>'+
+    '</table></div>';
+}
+
+/* ── TAB 3: QUẢN LÝ DANH MỤC ─────────── */
+function adminProductsCategories(){
+  const showAdd=admCatView==='add';
+  const editId=admCatView.startsWith('edit-')?admCatView.slice(5):null;
+  const mainCats=adminCats.filter(c=>c.type==='main').sort((a,b)=>a.order-b.order);
+  const genres=adminCats.filter(c=>c.type==='genre').sort((a,b)=>a.order-b.order);
+  const addFormHtml=showAdd?adminCatAddForm():'';
+  const mainHtml='<div class="adm-ncc-doc-section" style="margin-top:0">'+
+    '<div class="adm-ncc-doc-title" style="margin-bottom:12px">Danh mục chính</div>'+
+    '<div class="adm-cat-grid">'+mainCats.map(c=>adminCatCard(c,mainCats,editId)).join('')+'</div>'+
+  '</div>';
+  const genreHtml='<div class="adm-ncc-doc-section">'+
+    '<div class="adm-ncc-doc-title" style="margin-bottom:12px">Thể loại (dưới Sách)</div>'+
+    '<div class="adm-cat-grid">'+genres.map(c=>adminCatCard(c,genres,editId)).join('')+'</div>'+
+  '</div>';
+  return '<div class="adm-sec-hd" style="margin-bottom:14px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Quản lý danh mục</h3>'+
+      '<button class="btn-primary" style="padding:8px 16px;font-size:13px" onclick="admCatView=\'add\';renderAccount()">+ Thêm danh mục</button>'+
+    '</div>'+
+    addFormHtml+
+    '<div class="acct-card">'+mainHtml+genreHtml+'</div>';
+}
+
+function adminCatCard(c,sameTypeList,editId){
+  const pos=sameTypeList.indexOf(c);
+  const isFirst=pos===0, isLast=pos===sameTypeList.length-1;
+  const productCount=P.filter(p=>p.cat===c.key||(typeof GENRE_MAP!=='undefined'&&GENRE_MAP[p.id]===c.key)).length;
+  const isEditing=editId===c.id;
+  const editHtml=isEditing?adminCatEditForm(c):'';
+  return '<div class="adm-cat-card'+(c.visible?'':' adm-cat-hidden')+'">'+
+    '<div class="adm-cat-icon">'+escHtml(c.icon||'📦')+'</div>'+
+    '<div class="adm-cat-name">'+escHtml(c.name)+'</div>'+
+    '<div class="adm-cat-desc">'+escHtml(c.desc)+'</div>'+
+    '<div class="adm-cat-meta">'+
+      '<span class="adm-badge '+(c.type==='main'?'adm-badge-blue':'gray')+'">'+
+        (c.type==='main'?'Danh mục chính':'Thể loại')+
+      '</span>'+
+      '<span class="adm-badge gray">'+productCount+' SP</span>'+
+      (!c.visible?'<span class="adm-badge gray">Đang ẩn</span>':'')+
+    '</div>'+
+    '<div class="adm-cat-card-actions">'+
+      '<button class="adm-row-btn" onclick="admCatView=\'edit-'+c.id+'\';renderAccount()">Sửa</button>'+
+      '<button class="adm-row-btn '+(c.visible?'adm-vis-btn-on':'adm-vis-btn-off')+'" onclick="doToggleCatVisibility(\''+c.id+'\')">'+
+        (c.visible?'Ẩn':'Hiện')+
+      '</button>'+
+      '<div class="adm-cat-order-btns">'+
+        '<button class="adm-cat-order-btn" '+(isFirst?'disabled':'')+' onclick="doMoveCatUp(\''+c.id+'\')">↑</button>'+
+        '<button class="adm-cat-order-btn" '+(isLast?'disabled':'')+' onclick="doMoveCatDown(\''+c.id+'\')">↓</button>'+
+      '</div>'+
+      '<button class="adm-row-btn adm-lock-btn" onclick="doDeleteCat(\''+c.id+'\','+productCount+')">Xóa</button>'+
+    '</div>'+
+    editHtml+
+  '</div>';
+}
+
+function adminCatAddForm(){
+  return '<div class="adm-cat-add-form">'+
+    '<h4 style="margin:0 0 14px;font-family:\'Lora\',serif;color:var(--ink-deep);font-size:15px">Thêm danh mục / thể loại mới</h4>'+
+    '<div class="form-row" style="margin-bottom:10px">'+
+      '<div class="form-field"><label>Tên hiển thị</label><input id="catName" placeholder="VD: Khoa học, Nghệ thuật..."></div>'+
+      '<div class="form-field"><label>Key (không dấu, không khoảng trắng)</label><input id="catKey" placeholder="VD: khoahoc"></div>'+
+    '</div>'+
+    '<div class="form-row" style="margin-bottom:10px">'+
+      '<div class="form-field"><label>Icon (emoji)</label><input id="catIcon" placeholder="📦" maxlength="4"></div>'+
+      '<div class="form-field"><label>Loại danh mục</label>'+
+        '<select id="catType" style="width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:13px;background:var(--paper)">'+
+          '<option value="main">Danh mục chính</option>'+
+          '<option value="genre">Thể loại (dưới Sách)</option>'+
+        '</select>'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-field" style="margin-bottom:12px"><label>Mô tả ngắn</label><input id="catDesc" placeholder="Mô tả ngắn về danh mục..."></div>'+
+    '<div id="catAddErr" class="field-error" style="display:none;margin-bottom:8px"></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn-primary" style="padding:9px 18px;font-size:13px" onclick="doAddCat()">Thêm danh mục</button>'+
+      '<button class="btn-ghost" style="padding:9px 18px;font-size:13px" onclick="admCatView=\'list\';renderAccount()">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function adminCatEditForm(c){
+  return '<div class="adm-cat-edit-form">'+
+    '<div class="form-row" style="margin-bottom:8px">'+
+      '<div class="form-field"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft)">Tên hiển thị</label><input id="editCatName-'+c.id+'" value="'+escHtml(c.name)+'"></div>'+
+      '<div class="form-field"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft)">Icon (emoji)</label><input id="editCatIcon-'+c.id+'" value="'+escHtml(c.icon||'')+'" maxlength="4"></div>'+
+    '</div>'+
+    '<div class="form-field" style="margin-bottom:10px"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft)">Mô tả</label><input id="editCatDesc-'+c.id+'" value="'+escHtml(c.desc)+'"></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="adm-act-btn green" style="font-size:12px;padding:7px 14px" onclick="doSaveCatEdit(\''+c.id+'\')">Lưu thay đổi</button>'+
+      '<button class="adm-row-btn" onclick="admCatView=\'list\';renderAccount()">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── PRODUCT ACTION FUNCTIONS ─────────── */
+function doApproveProd(id){
+  const idx=pendingProds.findIndex(p=>p.id===id);if(idx===-1)return;
+  if(!confirm('Duyệt sản phẩm "'+pendingProds[idx].name+'"?\nSản phẩm sẽ xuất hiện trên sàn ngay sau khi duyệt.'))return;
+  pendingProds[idx].status='approved';pendingProds[idx].reviewedBy='Admin EduMart';
+  pendingProds[idx].reviewedAt=todayStr();pendingProds[idx].reviewNote='';
+  savePendingProds();
+  toast('✓ Đã duyệt: '+pendingProds[idx].name);
+  admProductsView='list';admProductsSelectedId=null;renderAccount();
+}
+function doRequestEditProd(id){
+  const msg=prompt('Nội dung yêu cầu chỉnh sửa gửi tới seller:','');
+  if(msg===null)return;
+  if(!msg.trim()){toast('Vui lòng nhập nội dung yêu cầu');return;}
+  const idx=pendingProds.findIndex(p=>p.id===id);if(idx===-1)return;
+  pendingProds[idx].status='needs-edit';pendingProds[idx].reviewNote=msg.trim();
+  pendingProds[idx].reviewedBy='Admin EduMart';pendingProds[idx].reviewedAt=todayStr();
+  savePendingProds();
+  toast('Đã gửi yêu cầu chỉnh sửa tới seller: '+pendingProds[idx].sellerName);
+  admProductsView='list';admProductsSelectedId=null;renderAccount();
+}
+function doRejectProd(id){
+  const reason=prompt('Lý do từ chối (bắt buộc):','');
+  if(reason===null)return;
+  if(!reason.trim()){toast('Vui lòng nhập lý do từ chối');return;}
+  const idx=pendingProds.findIndex(p=>p.id===id);if(idx===-1)return;
+  pendingProds[idx].status='rejected';pendingProds[idx].reviewNote=reason.trim();
+  pendingProds[idx].reviewedBy='Admin EduMart';pendingProds[idx].reviewedAt=todayStr();
+  savePendingProds();
+  toast('Đã từ chối sản phẩm: '+pendingProds[idx].name);
+  admProductsView='list';admProductsSelectedId=null;renderAccount();
+}
+function doHideReportedProd(id){
+  const r=reportedProds.find(x=>x.id===id);if(!r)return;
+  if(!confirm('Ẩn sản phẩm "'+r.productName+'"?\nSản phẩm sẽ không hiển thị với khách hàng cho đến khi được mở lại.'))return;
+  const idx=reportedProds.findIndex(x=>x.id===id);
+  reportedProds[idx].status='hidden';saveReportedProds();
+  toast('Đã ẩn sản phẩm: '+r.productName);renderAccount();
+}
+function doUnhideReportedProd(id){
+  const idx=reportedProds.findIndex(x=>x.id===id);if(idx===-1)return;
+  reportedProds[idx].status='active';reportedProds[idx].reviewStatus='resolved';
+  reportedProds[idx].resolvedAt=todayStr();reportedProds[idx].resolvedBy='Admin EduMart';
+  saveReportedProds();toast('Đã hiện lại sản phẩm: '+reportedProds[idx].productName);renderAccount();
+}
+function doDeleteReportedProd(id){
+  const r=reportedProds.find(x=>x.id===id);if(!r)return;
+  if(!confirm('XÓA sản phẩm "'+r.productName+'"?\n\nHành động này không thể hoàn tác.'))return;
+  const idx=reportedProds.findIndex(x=>x.id===id);
+  reportedProds[idx].status='deleted';reportedProds[idx].reviewStatus='resolved';
+  reportedProds[idx].resolvedAt=todayStr();reportedProds[idx].resolvedBy='Admin EduMart';
+  saveReportedProds();toast('Đã xóa sản phẩm: '+r.productName);renderAccount();
+}
+function doWarnSellerFromReport(id){
+  const r=reportedProds.find(x=>x.id===id);if(!r)return;
+  const defMsg='Sản phẩm "'+r.productName+'" nhận '+r.reportCount+' báo cáo vi phạm từ người dùng.';
+  const msg=prompt('Nội dung cảnh báo gửi tới seller "'+r.sellerName+'":',defMsg);
+  if(msg===null)return;
+  if(!msg.trim()){toast('Vui lòng nhập nội dung cảnh báo');return;}
+  const sidx=activeSellers.findIndex(s=>s.id===r.sellerId);
+  if(sidx!==-1){
+    activeSellers[sidx].warnings=(activeSellers[sidx].warnings||0)+1;
+    if(activeSellers[sidx].status==='active')activeSellers[sidx].status='warning';
+    activeSellers[sidx].violations.push({id:'v-rp-'+id+'-'+Date.now().toString(36),
+      type:'description',desc:'Sản phẩm "'+r.productName+'" nhận '+r.reportCount+' báo cáo từ người dùng',
+      date:todayStr(),severity:'medium',action:'warning',note:msg.trim()});
+    saveActiveSellers();
+  }
+  const idx=reportedProds.findIndex(x=>x.id===id);
+  reportedProds[idx].reviewStatus='resolved';reportedProds[idx].resolvedAt=todayStr();
+  reportedProds[idx].resolvedBy='Admin EduMart';reportedProds[idx].adminNote=msg.trim();
+  saveReportedProds();
+  toast('Đã gửi cảnh báo tới seller: '+r.sellerName);renderAccount();
+}
+
+/* ── CATEGORY ACTION FUNCTIONS ─────────── */
+function doAddCat(){
+  const name=val('catName'),key=val('catKey').toLowerCase().replace(/\s+/g,'').replace(/[^a-z0-9]/g,'');
+  const icon=val('catIcon')||'📦';
+  const type=document.getElementById('catType')?.value||'main';
+  const desc=val('catDesc');
+  if(!name){showAuthErr('catAddErr','Vui lòng nhập tên danh mục');return;}
+  if(!key){showAuthErr('catAddErr','Vui lòng nhập key danh mục (chỉ chữ thường và số)');return;}
+  if(adminCats.find(c=>c.key===key)){showAuthErr('catAddErr','Key "'+key+'" đã tồn tại, vui lòng chọn key khác');return;}
+  const sameType=adminCats.filter(c=>c.type===type);
+  const maxOrd=sameType.length>0?Math.max(...sameType.map(c=>c.order)):0;
+  adminCats.push({id:'c-'+key+'-'+Date.now().toString(36),key,name,icon,desc,order:maxOrd+1,visible:true,type,
+    parentKey:type==='genre'?'sach':undefined});
+  saveAdminCats();toast('Đã thêm danh mục: '+name);admCatView='list';renderAccount();
+}
+function doSaveCatEdit(id){
+  const idx=adminCats.findIndex(c=>c.id===id);if(idx===-1)return;
+  const nameEl=document.getElementById('editCatName-'+id);
+  const iconEl=document.getElementById('editCatIcon-'+id);
+  const descEl=document.getElementById('editCatDesc-'+id);
+  const name=nameEl?nameEl.value.trim():'';
+  if(!name){toast('Vui lòng nhập tên danh mục');return;}
+  adminCats[idx].name=name;
+  if(iconEl&&iconEl.value.trim())adminCats[idx].icon=iconEl.value.trim();
+  if(descEl&&descEl.value.trim())adminCats[idx].desc=descEl.value.trim();
+  saveAdminCats();toast('Đã cập nhật danh mục: '+name);admCatView='list';renderAccount();
+}
+function doToggleCatVisibility(id){
+  const idx=adminCats.findIndex(c=>c.id===id);if(idx===-1)return;
+  adminCats[idx].visible=!adminCats[idx].visible;saveAdminCats();
+  toast((adminCats[idx].visible?'Đã hiện':'Đã ẩn')+' danh mục: '+adminCats[idx].name);renderAccount();
+}
+function doMoveCatUp(id){
+  const cat=adminCats.find(c=>c.id===id);if(!cat)return;
+  const same=adminCats.filter(c=>c.type===cat.type).sort((a,b)=>a.order-b.order);
+  const pos=same.indexOf(cat);if(pos<=0)return;
+  const prev=same[pos-1];
+  const ci=adminCats.findIndex(c=>c.id===id),pi=adminCats.findIndex(c=>c.id===prev.id);
+  const tmp=adminCats[ci].order;adminCats[ci].order=adminCats[pi].order;adminCats[pi].order=tmp;
+  saveAdminCats();renderAccount();
+}
+function doMoveCatDown(id){
+  const cat=adminCats.find(c=>c.id===id);if(!cat)return;
+  const same=adminCats.filter(c=>c.type===cat.type).sort((a,b)=>a.order-b.order);
+  const pos=same.indexOf(cat);if(pos>=same.length-1)return;
+  const next=same[pos+1];
+  const ci=adminCats.findIndex(c=>c.id===id),ni=adminCats.findIndex(c=>c.id===next.id);
+  const tmp=adminCats[ci].order;adminCats[ci].order=adminCats[ni].order;adminCats[ni].order=tmp;
+  saveAdminCats();renderAccount();
+}
+function doDeleteCat(id,productCount){
+  const cat=adminCats.find(c=>c.id===id);if(!cat)return;
+  if(productCount>0){
+    alert('Không thể xóa danh mục "'+cat.name+'" vì đang có '+productCount+' sản phẩm thuộc danh mục này.\nHãy chuyển sản phẩm sang danh mục khác trước khi xóa.');return;
+  }
+  if(!confirm('Xóa danh mục "'+cat.name+'"?\nHành động này không thể hoàn tác.'))return;
+  const idx=adminCats.findIndex(c=>c.id===id);
+  adminCats.splice(idx,1);saveAdminCats();
+  toast('Đã xóa danh mục: '+cat.name);admCatView='list';renderAccount();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN — QUẢN LÝ NHÀ CUNG CẤP / SHOP
+══════════════════════════════════════════════════════════════ */
+const NCC_CAT_LBL={sach:'Sách',vpp:'Văn phòng phẩm',tbgd:'Thiết bị GD',ebook:'Ebook',audiobook:'Sách nói'};
+const NCC_CAT_CLR={sach:'#c0392b',vpp:'#e67e22',tbgd:'#2980b9',ebook:'#27ae60',audiobook:'#8e44ad'};
+const APP_STATUS_BADGE={
+  pending:'<span class="adm-badge adm-badge-orange">Chờ duyệt</span>',
+  'more-info':'<span class="adm-badge adm-badge-blue">Cần bổ sung</span>',
+  rejected:'<span class="adm-badge gray">Đã từ chối</span>',
+  approved:'<span class="adm-badge green">Đã duyệt</span>'
+};
+const SELLER_STATUS_BADGE={
+  active:'<span class="adm-badge green">Hoạt động</span>',
+  warning:'<span class="adm-badge adm-badge-orange">Cảnh báo</span>',
+  suspended:'<span class="adm-badge red">Đình chỉ</span>',
+  locked:'<span class="adm-badge gray">Đã khóa</span>'
+};
+const VIOL_SEV={
+  low:'<span class="adm-badge adm-badge-blue">Nhẹ</span>',
+  medium:'<span class="adm-badge adm-badge-orange">Trung bình</span>',
+  high:'<span class="adm-badge red">Nghiêm trọng</span>'
+};
+const VIOL_TYPE={fake:'Hàng giả/nhái',description:'Mô tả sai lệch',return:'Tỷ lệ hoàn cao',fraud:'Gian lận',other:'Vi phạm khác'};
+
+function adminShops(){
+  if(admShopsView==='pending-detail'&&admShopsSelectedId)return adminShopsPendingDetail(admShopsSelectedId);
+  if(admShopsView==='active-detail'&&admShopsSelectedId)return adminShopsActiveDetail(admShopsSelectedId);
+  return adminShopsMain();
+}
+
+function adminShopsMain(){
+  const pendingCount=sellerApps.filter(a=>a.status==='pending').length;
+  const tabs=[['pending','Chờ duyệt'],['active','Đang hoạt động'],['commission','Cài đặt hoa hồng']];
+  const tabHtml=tabs.map(([k,l])=>
+    '<button class="adm-shops-tab'+(admShopsTab===k?' on':'')+'" onclick="admShopsTab=\''+k+'\';renderAccount()">'+l+
+    (k==='pending'&&pendingCount>0?' <span class="adm-tab-badge">'+pendingCount+'</span>':'')+
+    '</button>'
+  ).join('');
+  let content='';
+  if(admShopsTab==='pending')content=adminShopsPendingList();
+  else if(admShopsTab==='active')content=adminShopsActiveList();
+  else content=adminShopsCommission();
+  return '<div class="adm-shops-tabs">'+tabHtml+'</div>'+content;
+}
+
+/* ── PENDING APPLICATIONS ─────────── */
+function adminShopsPendingList(){
+  const q=(admShopsPendingSearch||'').toLowerCase().trim();
+  const order={pending:0,'more-info':1,approved:2,rejected:3};
+  const list=sellerApps
+    .filter(a=>!q||(a.shopName||'').toLowerCase().includes(q)||(a.ownerName||'').toLowerCase().includes(q)||(a.email||'').toLowerCase().includes(q))
+    .sort((a,b)=>(order[a.status]||9)-(order[b.status]||9));
+  const PER=8,pages=Math.max(1,Math.ceil(list.length/PER));
+  if(admShopsPendingPage>=pages)admShopsPendingPage=pages-1;
+  const slice=list.slice(admShopsPendingPage*PER,(admShopsPendingPage+1)*PER);
+  const rows=slice.map(a=>{
+    const clr=NCC_CAT_CLR[a.category]||'#888';
+    const av=(a.shopName||'?').charAt(0).toUpperCase();
+    return '<tr class="adm-usr-row" onclick="admShopsSelectedId=\''+a.id+'\';admShopsView=\'pending-detail\';renderAccount()">'+
+      '<td><div class="adm-usr-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div></td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(a.shopName)+'</div><div class="adm-usr-em">'+escHtml(a.ownerName)+' · '+escHtml(a.email)+'</div></td>'+
+      '<td><span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[a.category]||a.category)+'</span></td>'+
+      '<td class="adm-usr-date">'+escHtml(a.submittedAt)+'</td>'+
+      '<td>'+(APP_STATUS_BADGE[a.status]||a.status)+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        '<button class="adm-row-btn" onclick="admShopsSelectedId=\''+a.id+'\';admShopsView=\'pending-detail\';renderAccount()">Xem hồ sơ</button>'+
+        (a.status==='pending'?'<button class="adm-row-btn adm-unlock-btn" onclick="event.stopPropagation();doApproveSellerApp(\''+a.id+'\')">Duyệt</button>':'')+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  const statCards=[
+    {lbl:'Chờ duyệt',val:sellerApps.filter(a=>a.status==='pending').length,clr:'#e67e22'},
+    {lbl:'Cần bổ sung',val:sellerApps.filter(a=>a.status==='more-info').length,clr:'#2980b9'},
+    {lbl:'Đã duyệt',val:sellerApps.filter(a=>a.status==='approved').length,clr:'#27ae60'},
+    {lbl:'Từ chối',val:sellerApps.filter(a=>a.status==='rejected').length,clr:'#c0392b'}
+  ].map(s=>'<div class="adm-kpi" style="padding:14px 18px">'+
+    '<div class="adm-kpi-val" style="color:'+s.clr+';font-size:24px">'+s.val+'</div>'+
+    '<div class="adm-kpi-lbl">'+s.lbl+'</div>'+
+  '</div>').join('');
+  const pager='<div class="adm-pager">'+
+    '<button class="adm-pager-btn" '+(admShopsPendingPage===0?'disabled':'')+' onclick="admShopsPendingPage--;renderAccount()">← Trước</button>'+
+    '<span>Trang '+(admShopsPendingPage+1)+'/'+pages+' · <b>'+list.length+'</b> hồ sơ</span>'+
+    '<button class="adm-pager-btn" '+(admShopsPendingPage>=pages-1?'disabled':'')+' onclick="admShopsPendingPage++;renderAccount()">Tiếp →</button>'+
+  '</div>';
+  return '<div class="adm-kpi-grid" style="margin-bottom:16px">'+statCards+'</div>'+
+    '<div class="adm-sec-hd" style="margin-bottom:12px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Hồ sơ đăng ký Seller</h3>'+
+    '</div>'+
+    '<div class="adm-usr-toolbar" style="margin-bottom:12px">'+
+      '<input class="adm-usr-search" placeholder="Tìm theo tên shop, chủ sở hữu, email..." value="'+escHtml(admShopsPendingSearch)+'" oninput="admShopsPendingSearch=this.value;admShopsPendingPage=0;renderAccount()">'+
+      '<button class="adm-row-btn" onclick="admShopsPendingSearch=\'\';admShopsPendingPage=0;renderAccount()">Xóa lọc</button>'+
+    '</div>'+
+    '<div class="adm-table-wrap"><table class="adm-usr-table">'+
+      '<thead><tr><th></th><th>Thông tin shop</th><th>Danh mục</th><th>Ngày nộp</th><th>Trạng thái</th><th></th></tr></thead>'+
+      '<tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px">Không có hồ sơ nào</td></tr>')+'</tbody>'+
+    '</table></div>'+pager;
+}
+
+function adminShopsPendingDetail(id){
+  const app=sellerApps.find(a=>a.id===id);
+  if(!app)return '<p>Không tìm thấy hồ sơ.</p>';
+  const clr=NCC_CAT_CLR[app.category]||'#888';
+  const av=(app.shopName||'?').charAt(0).toUpperCase();
+  const st=app.status;
+  const isPending=st==='pending', isMoreInfo=st==='more-info';
+  const isDone=st==='approved'||st==='rejected';
+  const reviewNote=app.reviewNote
+    ?'<div class="adm-ncc-note '+(st==='rejected'?'red':st==='more-info'?'blue':'')+'">'+
+        '<div class="adm-ncc-note-label">'+(st==='rejected'?'Lý do từ chối':'Yêu cầu bổ sung thông tin')+'</div>'+
+        '<div>'+escHtml(app.reviewNote)+'</div>'+
+        (app.reviewedBy?'<div style="margin-top:8px;font-size:12px;color:var(--text-soft)">— '+escHtml(app.reviewedBy)+' · '+escHtml(app.reviewedAt)+'</div>':'')+
+      '</div>'
+    :'';
+  const actionBtns=isDone?'':
+    '<div class="adm-detail-actions">'+
+      '<button class="adm-act-btn green" onclick="doApproveSellerApp(\''+id+'\')">✓ Duyệt hồ sơ</button>'+
+      '<button class="adm-act-btn" style="color:#e67e22;border-color:#e67e22" onclick="doMoreInfoSellerApp(\''+id+'\')">⚠ Yêu cầu bổ sung</button>'+
+      '<button class="adm-act-btn red" onclick="doRejectSellerApp(\''+id+'\')">✕ Từ chối</button>'+
+    '</div>';
+  return '<button class="adm-back-btn" onclick="admShopsView=\'list\';admShopsSelectedId=null;renderAccount()">← Danh sách hồ sơ</button>'+
+    reviewNote+
+    '<div class="adm-detail-card">'+
+      '<div class="adm-detail-head">'+
+        '<div class="adm-detail-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="adm-detail-name">'+escHtml(app.shopName)+'</div>'+
+          '<div class="adm-detail-email">'+escHtml(app.ownerName)+' · '+escHtml(app.email)+'</div>'+
+          '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+
+            '<span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[app.category]||app.category)+'</span>'+
+            (APP_STATUS_BADGE[app.status]||'')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-detail-grid">'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Số điện thoại</div><div class="adm-detail-val">'+escHtml(app.phone||'—')+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Email</div><div class="adm-detail-val">'+escHtml(app.email||'—')+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Ngày nộp hồ sơ</div><div class="adm-detail-val">'+escHtml(app.submittedAt||'—')+'</div></div>'+
+      '</div>'+
+      '<div class="adm-ncc-doc-section">'+
+        '<div class="adm-ncc-doc-title">Giấy phép kinh doanh (GPKD)</div>'+
+        '<div class="adm-detail-grid">'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Số đăng ký</div><div class="adm-detail-val">'+escHtml(app.gpkd.number)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Loại hình</div><div class="adm-detail-val">'+escHtml(app.gpkd.type)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Ngày cấp</div><div class="adm-detail-val">'+escHtml(app.gpkd.issued)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Nơi cấp</div><div class="adm-detail-val">'+escHtml(app.gpkd.place)+'</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-ncc-doc-section">'+
+        '<div class="adm-ncc-doc-title">Căn cước công dân (CCCD)</div>'+
+        '<div class="adm-detail-grid">'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Số CCCD</div><div class="adm-detail-val">'+escHtml(app.cccd.number)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Họ và tên</div><div class="adm-detail-val">'+escHtml(app.cccd.name)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Ngày cấp</div><div class="adm-detail-val">'+escHtml(app.cccd.issued)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Nơi cấp</div><div class="adm-detail-val">'+escHtml(app.cccd.place)+'</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-ncc-doc-section">'+
+        '<div class="adm-ncc-doc-title">Thông tin Shop</div>'+
+        '<div class="adm-detail-grid">'+
+          '<div class="adm-detail-item" style="grid-column:1/-1"><div class="adm-detail-label">Mô tả shop</div><div class="adm-detail-val" style="line-height:1.5">'+escHtml(app.shopInfo.desc)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Địa chỉ kho hàng</div><div class="adm-detail-val">'+escHtml(app.shopInfo.address)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Tài khoản ngân hàng</div><div class="adm-detail-val">'+escHtml(app.shopInfo.bank)+'</div></div>'+
+          '<div class="adm-detail-item"><div class="adm-detail-label">Sản phẩm chính</div><div class="adm-detail-val">'+app.shopInfo.mainCats.map(c=>'<span class="adm-badge gray" style="margin-right:4px">'+escHtml(c)+'</span>').join('')+'</div></div>'+
+        '</div>'+
+      '</div>'+
+      actionBtns+
+    '</div>';
+}
+
+/* ── ACTIVE SELLERS ─────────── */
+function adminShopsActiveList(){
+  const q=(admShopsActiveSearch||'').toLowerCase().trim();
+  const list=activeSellers.filter(s=>{
+    if(admShopsActiveFilter!=='all'&&s.status!==admShopsActiveFilter)return false;
+    if(q&&!(s.shopName||'').toLowerCase().includes(q)&&!(s.ownerName||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const PER=8,pages=Math.max(1,Math.ceil(list.length/PER));
+  if(admShopsActivePage>=pages)admShopsActivePage=pages-1;
+  const slice=list.slice(admShopsActivePage*PER,(admShopsActivePage+1)*PER);
+  const rows=slice.map(s=>{
+    const clr=NCC_CAT_CLR[s.category]||'#888';
+    const av=(s.shopName||'?').charAt(0).toUpperCase();
+    const stars='★'.repeat(Math.round(s.rating||0))+'☆'.repeat(5-Math.round(s.rating||0));
+    return '<tr class="adm-usr-row" onclick="admShopsSelectedId=\''+s.id+'\';admShopsView=\'active-detail\';renderAccount()">'+
+      '<td><div class="adm-usr-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div></td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(s.shopName)+'</div><div class="adm-usr-em">'+escHtml(s.ownerName)+'</div></td>'+
+      '<td><span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[s.category]||s.category)+'</span></td>'+
+      '<td><span style="color:var(--marigold);font-size:12px;letter-spacing:-1px">'+stars+'</span> <span style="font-size:12.5px">'+s.rating+'</span></td>'+
+      '<td><div style="font-weight:500">'+fmtMil(s.stats.totalRevenue)+'đ</div><div class="adm-usr-em">'+fmtBig(s.stats.totalOrders)+' đơn</div></td>'+
+      '<td>'+(SELLER_STATUS_BADGE[s.status]||s.status)+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        '<button class="adm-row-btn" onclick="admShopsSelectedId=\''+s.id+'\';admShopsView=\'active-detail\';renderAccount()">Xem</button>'+
+        (s.status==='active'||s.status==='warning'?'<button class="adm-row-btn" style="color:#e67e22;border-color:#f5c881" onclick="event.stopPropagation();doWarnSeller(\''+s.id+'\')">Cảnh báo</button>':'')+
+        (s.status==='suspended'?'<button class="adm-row-btn adm-unlock-btn" onclick="event.stopPropagation();doReactivateSeller(\''+s.id+'\')">Mở lại</button>':'')+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  const filterBtns=[
+    ['all','Tất cả'],['active','Hoạt động'],['warning','Cảnh báo'],['suspended','Đình chỉ'],['locked','Đã khóa']
+  ].map(([k,l])=>{
+    const cnt=k==='all'?activeSellers.length:activeSellers.filter(s=>s.status===k).length;
+    return '<button class="adm-row-btn'+(admShopsActiveFilter===k?' adm-filter-on':'')+'" onclick="admShopsActiveFilter=\''+k+'\';admShopsActivePage=0;renderAccount()">'+l+' ('+cnt+')</button>';
+  }).join('');
+  const pager='<div class="adm-pager">'+
+    '<button class="adm-pager-btn" '+(admShopsActivePage===0?'disabled':'')+' onclick="admShopsActivePage--;renderAccount()">← Trước</button>'+
+    '<span>Trang '+(admShopsActivePage+1)+'/'+pages+' · <b>'+list.length+'</b> seller</span>'+
+    '<button class="adm-pager-btn" '+(admShopsActivePage>=pages-1?'disabled':'')+' onclick="admShopsActivePage++;renderAccount()">Tiếp →</button>'+
+  '</div>';
+  return '<div class="adm-sec-hd" style="margin-bottom:12px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Seller đang hoạt động</h3>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+filterBtns+'</div>'+
+    '<div class="adm-usr-toolbar" style="margin-bottom:12px">'+
+      '<input class="adm-usr-search" placeholder="Tìm theo tên shop hoặc chủ sở hữu..." value="'+escHtml(admShopsActiveSearch)+'" oninput="admShopsActiveSearch=this.value;admShopsActivePage=0;renderAccount()">'+
+      '<button class="adm-row-btn" onclick="admShopsActiveSearch=\'\';admShopsActiveFilter=\'all\';admShopsActivePage=0;renderAccount()">Xóa lọc</button>'+
+    '</div>'+
+    '<div class="adm-table-wrap"><table class="adm-usr-table">'+
+      '<thead><tr><th></th><th>Shop</th><th>Danh mục</th><th>Đánh giá</th><th>Doanh thu</th><th>Trạng thái</th><th></th></tr></thead>'+
+      '<tbody>'+(rows||'<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px">Không có seller nào</td></tr>')+'</tbody>'+
+    '</table></div>'+pager;
+}
+
+function adminShopsActiveDetail(id){
+  const s=activeSellers.find(x=>x.id===id);
+  if(!s)return '<p>Không tìm thấy seller.</p>';
+  const clr=NCC_CAT_CLR[s.category]||'#888';
+  const av=(s.shopName||'?').charAt(0).toUpperCase();
+  const st=s.status;
+  const commLabel=s.commissionOverride!=null
+    ?s.commissionOverride+'% <span style="font-size:11px;color:#e67e22">(đặc biệt)</span>'
+    :(commissionCfg.byCategory[s.category]||'—')+'% <span style="font-size:11px;color:var(--text-soft)">(danh mục)</span>';
+  const violRows=s.violations.length===0
+    ?'<tr><td colspan="5" style="text-align:center;color:var(--text-soft);padding:16px">Chưa có vi phạm nào được ghi nhận</td></tr>'
+    :s.violations.slice().reverse().map(v=>
+      '<tr>'+
+        '<td class="adm-usr-date">'+escHtml(v.date)+'</td>'+
+        '<td>'+escHtml(VIOL_TYPE[v.type]||v.type)+'</td>'+
+        '<td style="font-size:12.5px">'+escHtml(v.desc)+'</td>'+
+        '<td>'+(VIOL_SEV[v.severity]||v.severity)+'</td>'+
+        '<td style="font-size:12px;color:var(--text-soft)">'+escHtml(v.note||'—')+'</td>'+
+      '</tr>'
+    ).join('');
+  const suspendInfo=st==='suspended'&&s.suspendedUntil
+    ?'<div class="adm-ncc-note red"><div class="adm-ncc-note-label">Đang đình chỉ đến '+escHtml(s.suspendedUntil)+'</div><div>'+escHtml(s.suspendedReason||'—')+'</div></div>'
+    :'';
+  const actionBtns='<div class="adm-detail-actions">'+
+    (st==='active'||st==='warning'?'<button class="adm-act-btn" style="color:#e67e22;border-color:#e67e22" onclick="doWarnSeller(\''+id+'\')">⚠ Cảnh báo</button>':'')+
+    (st==='active'||st==='warning'?'<button class="adm-act-btn red" onclick="doSuspendSeller(\''+id+'\')">⏸ Đình chỉ</button>':'')+
+    (st!=='locked'?'<button class="adm-act-btn red-outline" onclick="doLockSeller(\''+id+'\')">🔒 Khóa tài khoản</button>':'')+
+    (st==='suspended'||st==='locked'?'<button class="adm-act-btn green" onclick="doReactivateSeller(\''+id+'\')">✓ Mở lại</button>':'')+
+    '<button class="adm-act-btn" onclick="doSetSellerCommission(\''+id+'\')">💰 Đặt hoa hồng</button>'+
+  '</div>';
+  return '<button class="adm-back-btn" onclick="admShopsView=\'list\';admShopsSelectedId=null;renderAccount()">← Danh sách seller</button>'+
+    suspendInfo+
+    '<div class="adm-detail-card">'+
+      '<div class="adm-detail-head">'+
+        '<div class="adm-detail-av" style="background:'+clr+'18;color:'+clr+'">'+av+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="adm-detail-name">'+escHtml(s.shopName)+'</div>'+
+          '<div class="adm-detail-email">'+escHtml(s.ownerName)+' · '+escHtml(s.email)+'</div>'+
+          '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+
+            '<span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[s.category]||s.category)+'</span>'+
+            (SELLER_STATUS_BADGE[s.status]||'')+
+            (s.warnings>0?'<span class="adm-badge adm-badge-orange">'+s.warnings+' cảnh báo</span>':'')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-ncc-stat-grid">'+
+        [
+          {lbl:'Tổng đơn hàng',val:fmtBig(s.stats.totalOrders)},
+          {lbl:'Tổng doanh thu',val:fmtMil(s.stats.totalRevenue)+'đ'},
+          {lbl:'Số sản phẩm',val:fmtBig(s.totalProducts)},
+          {lbl:'Tỷ lệ hoàn hàng',val:s.stats.returnRate+'%'},
+          {lbl:'Đơn tháng này',val:fmtBig(s.stats.thisMonthOrders)+' '+admGrowth(s.stats.growth)},
+          {lbl:'Doanh thu tháng',val:fmtMil(s.stats.thisMonthRev)+'đ'}
+        ].map(it=>'<div class="adm-detail-item"><div class="adm-detail-label">'+it.lbl+'</div><div class="adm-detail-val">'+it.val+'</div></div>').join('')+
+      '</div>'+
+      '<div class="adm-detail-grid" style="margin-top:12px">'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Tham gia từ</div><div class="adm-detail-val">'+escHtml(s.joinedAt)+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Số điện thoại</div><div class="adm-detail-val">'+escHtml(s.phone||'—')+'</div></div>'+
+        '<div class="adm-detail-item"><div class="adm-detail-label">Hoa hồng áp dụng</div><div class="adm-detail-val">'+commLabel+'</div></div>'+
+      '</div>'+
+      '<div class="adm-ncc-doc-section">'+
+        '<div class="adm-ncc-doc-title">Lịch sử vi phạm ('+s.violations.length+')</div>'+
+        '<div class="adm-table-wrap" style="margin-top:10px"><table class="adm-usr-table">'+
+          '<thead><tr><th>Ngày</th><th>Loại</th><th>Mô tả</th><th>Mức độ</th><th>Ghi chú xử lý</th></tr></thead>'+
+          '<tbody>'+violRows+'</tbody>'+
+        '</table></div>'+
+      '</div>'+
+      actionBtns+
+    '</div>';
+}
+
+/* ── COMMISSION ─────────── */
+function adminShopsCommission(){
+  const cats=[
+    {key:'sach',lbl:'Sách'},{key:'vpp',lbl:'Văn phòng phẩm'},
+    {key:'tbgd',lbl:'Thiết bị GD'},{key:'ebook',lbl:'Ebook'},{key:'audiobook',lbl:'Sách nói'}
+  ];
+  const catCards=cats.map(c=>{
+    const rate=commissionCfg.byCategory[c.key]||0;
+    const clr=NCC_CAT_CLR[c.key]||'#888';
+    const cnt=activeSellers.filter(s=>s.status!=='locked'&&s.category===c.key&&s.commissionOverride==null).length;
+    return '<div class="adm-comm-card">'+
+      '<div class="adm-comm-cat-head">'+
+        '<span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+c.lbl+'</span>'+
+        '<div class="adm-comm-rate">'+rate+'%</div>'+
+      '</div>'+
+      '<div class="adm-comm-sellers">'+cnt+' seller đang dùng mức này</div>'+
+      '<button class="adm-row-btn" style="width:100%;margin-top:10px;justify-content:center" onclick="doSetCategoryCommission(\''+c.key+'\',\''+c.lbl+'\')">Chỉnh sửa</button>'+
+    '</div>';
+  }).join('');
+  const specialRows=activeSellers.filter(s=>s.commissionOverride!=null).map(s=>{
+    const clr=NCC_CAT_CLR[s.category]||'#888';
+    const defRate=commissionCfg.byCategory[s.category]||0;
+    return '<tr>'+
+      '<td><div class="adm-usr-nm">'+escHtml(s.shopName)+'</div><div class="adm-usr-em">'+escHtml(s.ownerName)+'</div></td>'+
+      '<td><span class="adm-badge" style="background:'+clr+'15;color:'+clr+'">'+escHtml(NCC_CAT_LBL[s.category]||s.category)+'</span></td>'+
+      '<td><span style="color:var(--text-soft);text-decoration:line-through">'+defRate+'%</span> → <b>'+s.commissionOverride+'%</b></td>'+
+      '<td class="adm-row-actions">'+
+        '<button class="adm-row-btn" onclick="doSetSellerCommission(\''+s.id+'\')">Đổi</button>'+
+        '<button class="adm-row-btn adm-lock-btn" onclick="doRemoveSellerCommission(\''+s.id+'\')">Xóa ưu đãi</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  const histRows=commissionCfg.history.slice().reverse().map(h=>{
+    let fld='';
+    if(h.field.startsWith('cat:')) fld='Danh mục: '+(NCC_CAT_LBL[h.field.slice(4)]||h.field.slice(4));
+    else if(h.field.startsWith('seller:')){const sl=activeSellers.find(x=>x.id===h.field.slice(7));fld='Seller: '+(sl?sl.shopName:h.field.slice(7));}
+    else fld=h.field;
+    return '<tr>'+
+      '<td class="adm-usr-date">'+escHtml(h.date)+'</td>'+
+      '<td>'+escHtml(fld)+'</td>'+
+      '<td><span style="color:var(--text-soft);text-decoration:line-through">'+h.oldVal+'%</span> → <b>'+h.newVal+'%</b></td>'+
+      '<td style="font-size:12px;color:var(--text-soft)">'+escHtml(h.reason||'—')+'</td>'+
+      '<td class="adm-usr-date">'+escHtml(h.by||'—')+'</td>'+
+    '</tr>';
+  }).join('');
+  return '<div class="adm-sec-hd" style="margin-bottom:16px">'+
+      '<h3 style="margin:0;font-size:16px;font-family:\'Lora\',serif;color:var(--ink-deep)">Cài đặt hoa hồng</h3>'+
+    '</div>'+
+    '<div class="acct-card" style="margin-bottom:14px">'+
+      '<div class="adm-ncc-doc-title" style="margin-bottom:14px">Hoa hồng theo danh mục</div>'+
+      '<div class="adm-comm-grid">'+catCards+'</div>'+
+    '</div>'+
+    '<div class="acct-card" style="margin-bottom:14px">'+
+      '<div class="adm-sec-hd">'+
+        '<div class="adm-ncc-doc-title">Hoa hồng đặc biệt theo Seller</div>'+
+        '<button class="adm-row-btn" onclick="doSetSellerCommissionCustom()">+ Thêm ưu đãi</button>'+
+      '</div>'+
+      '<div class="adm-table-wrap" style="margin-top:12px"><table class="adm-usr-table">'+
+        '<thead><tr><th>Seller</th><th>Danh mục</th><th>Mức hoa hồng</th><th></th></tr></thead>'+
+        '<tbody>'+(specialRows||'<tr><td colspan="4" style="text-align:center;color:var(--text-soft);padding:20px">Chưa có mức hoa hồng đặc biệt nào</td></tr>')+'</tbody>'+
+      '</table></div>'+
+    '</div>'+
+    '<div class="acct-card">'+
+      '<div class="adm-ncc-doc-title" style="margin-bottom:12px">Lịch sử thay đổi hoa hồng</div>'+
+      '<div class="adm-table-wrap"><table class="adm-usr-table">'+
+        '<thead><tr><th>Ngày</th><th>Đối tượng</th><th>Thay đổi</th><th>Lý do</th><th>Người thực hiện</th></tr></thead>'+
+        '<tbody>'+(histRows||'<tr><td colspan="5" style="text-align:center;color:var(--text-soft);padding:20px">Chưa có lịch sử thay đổi</td></tr>')+'</tbody>'+
+      '</table></div>'+
+    '</div>';
+}
+
+/* ── NCC ACTION FUNCTIONS ─────────── */
+function doApproveSellerApp(id){
+  if(!confirm('Xác nhận duyệt hồ sơ đăng ký Seller này?\nShop sẽ được kích hoạt ngay sau khi duyệt.'))return;
+  const idx=sellerApps.findIndex(a=>a.id===id);if(idx===-1)return;
+  sellerApps[idx].status='approved';sellerApps[idx].reviewedBy='Admin EduMart';sellerApps[idx].reviewedAt=todayStr();
+  saveSellerApps();
+  const app=sellerApps[idx];
+  const newId='as-'+id;
+  if(!activeSellers.find(s=>s.id===newId)){
+    activeSellers.unshift({id:newId,shopName:app.shopName,ownerName:app.ownerName,email:app.email,phone:app.phone,joinedAt:todayStr(),
+      status:'active',category:app.category,rating:0,totalProducts:0,
+      stats:{totalOrders:0,totalRevenue:0,returnRate:0,thisMonthOrders:0,thisMonthRev:0,growth:0},
+      violations:[],commissionOverride:null,warnings:0});
+    saveActiveSellers();
+  }
+  toast('✓ Đã duyệt: '+app.shopName+' — Shop đã được kích hoạt');
+  admShopsView='list';admShopsSelectedId=null;admShopsTab='pending';renderAccount();
+}
+function doRejectSellerApp(id){
+  const reason=prompt('Lý do từ chối hồ sơ (bắt buộc):','');
+  if(reason===null)return;
+  if(!reason.trim()){toast('Vui lòng nhập lý do từ chối');return;}
+  const idx=sellerApps.findIndex(a=>a.id===id);if(idx===-1)return;
+  sellerApps[idx].status='rejected';sellerApps[idx].reviewNote=reason.trim();
+  sellerApps[idx].reviewedBy='Admin EduMart';sellerApps[idx].reviewedAt=todayStr();
+  saveSellerApps();
+  toast('Đã từ chối hồ sơ: '+sellerApps[idx].shopName);
+  admShopsView='list';admShopsSelectedId=null;renderAccount();
+}
+function doMoreInfoSellerApp(id){
+  const msg=prompt('Nội dung yêu cầu bổ sung thông tin:','');
+  if(msg===null)return;
+  if(!msg.trim()){toast('Vui lòng nhập nội dung yêu cầu');return;}
+  const idx=sellerApps.findIndex(a=>a.id===id);if(idx===-1)return;
+  sellerApps[idx].status='more-info';sellerApps[idx].reviewNote=msg.trim();
+  sellerApps[idx].reviewedBy='Admin EduMart';sellerApps[idx].reviewedAt=todayStr();
+  saveSellerApps();
+  toast('Đã gửi yêu cầu bổ sung tới: '+sellerApps[idx].shopName);
+  admShopsView='list';admShopsSelectedId=null;renderAccount();
+}
+function doWarnSeller(id){
+  const reason=prompt('Nội dung cảnh báo gửi tới seller:','');
+  if(reason===null)return;
+  if(!reason.trim()){toast('Vui lòng nhập nội dung cảnh báo');return;}
+  const idx=activeSellers.findIndex(s=>s.id===id);if(idx===-1)return;
+  activeSellers[idx].warnings=(activeSellers[idx].warnings||0)+1;
+  activeSellers[idx].status='warning';
+  activeSellers[idx].violations.push({id:'v-'+id+'-w'+activeSellers[idx].warnings,type:'other',desc:reason.trim(),
+    date:todayStr(),severity:'low',action:'warning',note:'Cảnh báo lần '+activeSellers[idx].warnings+'. Ghi nhận bởi Admin EduMart.'});
+  saveActiveSellers();
+  toast('Đã gửi cảnh báo tới: '+activeSellers[idx].shopName);renderAccount();
+}
+function doSuspendSeller(id){
+  const reason=prompt('Lý do đình chỉ (bắt buộc):','');
+  if(reason===null)return;
+  if(!reason.trim()){toast('Vui lòng nhập lý do đình chỉ');return;}
+  const daysStr=prompt('Số ngày đình chỉ:','30');
+  if(daysStr===null)return;
+  const days=Math.max(1,parseInt(daysStr)||30);
+  const idx=activeSellers.findIndex(s=>s.id===id);if(idx===-1)return;
+  activeSellers[idx].status='suspended';activeSellers[idx].suspendedReason=reason.trim();
+  const end=new Date();end.setDate(end.getDate()+days);
+  activeSellers[idx].suspendedUntil=end.getDate()+'/'+(end.getMonth()+1)+'/'+end.getFullYear();
+  activeSellers[idx].violations.push({id:'v-'+id+'-s'+Date.now().toString(36),type:'other',desc:reason.trim(),
+    date:todayStr(),severity:'high',action:'suspended',note:'Đình chỉ '+days+' ngày (đến '+activeSellers[idx].suspendedUntil+'). Thực hiện bởi Admin EduMart.'});
+  saveActiveSellers();
+  toast('Đã đình chỉ seller: '+activeSellers[idx].shopName+' ('+days+' ngày)');renderAccount();
+}
+function doLockSeller(id){
+  const reason=prompt('Lý do khóa vĩnh viễn tài khoản seller:','');
+  if(reason===null)return;
+  if(!reason.trim()){toast('Vui lòng nhập lý do');return;}
+  if(!confirm('Xác nhận KHÓA VĨNH VIỄN seller này?\n\nHành động sẽ vô hiệu hóa toàn bộ shop, sản phẩm và ngừng thanh toán cho seller.'))return;
+  const idx=activeSellers.findIndex(s=>s.id===id);if(idx===-1)return;
+  activeSellers[idx].status='locked';
+  activeSellers[idx].violations.push({id:'v-'+id+'-lk'+Date.now().toString(36),type:'other',desc:reason.trim(),
+    date:todayStr(),severity:'high',action:'locked',note:'Khóa vĩnh viễn. Thực hiện bởi Admin EduMart.'});
+  saveActiveSellers();
+  toast('Đã khóa tài khoản seller: '+activeSellers[idx].shopName);renderAccount();
+}
+function doReactivateSeller(id){
+  const s=activeSellers.find(x=>x.id===id);if(!s)return;
+  if(!confirm('Mở lại tài khoản seller "'+s.shopName+'"?\nSeller sẽ được hoạt động bình thường trở lại.'))return;
+  const idx=activeSellers.findIndex(x=>x.id===id);
+  activeSellers[idx].status='active';delete activeSellers[idx].suspendedReason;delete activeSellers[idx].suspendedUntil;
+  saveActiveSellers();
+  toast('Đã mở lại seller: '+s.shopName);renderAccount();
+}
+function doSetCategoryCommission(catKey,catLbl){
+  const cur=commissionCfg.byCategory[catKey]||0;
+  const input=prompt('Mức hoa hồng mới cho danh mục "'+catLbl+'" (%):\nHiện tại: '+cur+'%',''+cur);
+  if(input===null)return;
+  const newRate=parseFloat(input);
+  if(isNaN(newRate)||newRate<0||newRate>100){toast('Mức hoa hồng không hợp lệ (0 – 100%)');return;}
+  const reason=prompt('Lý do thay đổi (không bắt buộc):','');
+  if(reason===null)return;
+  commissionCfg.byCategory[catKey]=newRate;
+  commissionCfg.history.push({id:'ch-'+Date.now().toString(36),date:todayStr(),
+    field:'cat:'+catKey,oldVal:cur,newVal:newRate,by:'Admin EduMart',reason:(reason||'').trim()});
+  saveCommissionCfg();
+  toast('Đã cập nhật hoa hồng danh mục '+catLbl+': '+newRate+'%');renderAccount();
+}
+function doSetSellerCommission(sellerId){
+  const s=activeSellers.find(x=>x.id===sellerId);if(!s)return;
+  const cur=s.commissionOverride!=null?s.commissionOverride:(commissionCfg.byCategory[s.category]||0);
+  const input=prompt('Mức hoa hồng đặc biệt cho "'+s.shopName+'" (%):\nMức danh mục hiện tại: '+(commissionCfg.byCategory[s.category]||0)+'%',''+cur);
+  if(input===null)return;
+  const newRate=parseFloat(input);
+  if(isNaN(newRate)||newRate<0||newRate>100){toast('Mức hoa hồng không hợp lệ');return;}
+  const reason=prompt('Lý do (không bắt buộc):','');
+  if(reason===null)return;
+  const old=s.commissionOverride!=null?s.commissionOverride:(commissionCfg.byCategory[s.category]||0);
+  const idx=activeSellers.findIndex(x=>x.id===sellerId);
+  activeSellers[idx].commissionOverride=newRate;
+  commissionCfg.history.push({id:'ch-'+Date.now().toString(36),date:todayStr(),
+    field:'seller:'+sellerId,oldVal:old,newVal:newRate,by:'Admin EduMart',reason:(reason||'').trim()});
+  saveActiveSellers();saveCommissionCfg();
+  toast('Đã đặt hoa hồng đặc biệt cho '+s.shopName+': '+newRate+'%');renderAccount();
+}
+function doSetSellerCommissionCustom(){
+  const list=activeSellers.filter(s=>s.status!=='locked');
+  if(!list.length){toast('Không có seller nào đang hoạt động');return;}
+  const names=list.map((s,i)=>(i+1)+'. '+s.shopName).join('\n');
+  const pick=parseInt(prompt('Chọn seller theo số thứ tự:\n'+names,'1'));
+  if(isNaN(pick)||pick<1||pick>list.length)return;
+  doSetSellerCommission(list[pick-1].id);
+}
+function doRemoveSellerCommission(sellerId){
+  const s=activeSellers.find(x=>x.id===sellerId);if(!s)return;
+  const defRate=commissionCfg.byCategory[s.category]||0;
+  if(!confirm('Xóa mức hoa hồng đặc biệt của "'+s.shopName+'"?\nSeller sẽ về lại mức danh mục: '+defRate+'%'))return;
+  const old=s.commissionOverride;
+  const idx=activeSellers.findIndex(x=>x.id===sellerId);
+  activeSellers[idx].commissionOverride=null;
+  commissionCfg.history.push({id:'ch-'+Date.now().toString(36),date:todayStr(),
+    field:'seller:'+sellerId,oldVal:old,newVal:defRate,by:'Admin EduMart',reason:'Xóa ưu đãi đặc biệt, về lại mức danh mục'});
+  saveActiveSellers();saveCommissionCfg();
+  toast('Đã xóa hoa hồng đặc biệt của '+s.shopName);renderAccount();
+}
+
+/* ══════════════════════════════════════════
+   QUẢN LÝ ĐƠN HÀNG — ADMIN
+   ══════════════════════════════════════════ */
+const ORD_STATUS={
+  pending:'Chờ xác nhận',confirmed:'Đã xác nhận',processing:'Đang xử lý',
+  shipping:'Đang giao',delivered:'Đã giao',completed:'Hoàn thành',
+  cancelled:'Đã hủy',refunded:'Đã hoàn tiền'
+};
+const ORD_STATUS_BADGE={
+  pending:'<span class="adm-badge adm-badge-orange">Chờ xác nhận</span>',
+  confirmed:'<span class="adm-badge adm-badge-blue">Đã xác nhận</span>',
+  processing:'<span class="adm-badge adm-badge-blue">Đang xử lý</span>',
+  shipping:'<span class="adm-badge adm-badge-blue">Đang giao</span>',
+  delivered:'<span class="adm-badge green">Đã giao</span>',
+  completed:'<span class="adm-badge green">Hoàn thành</span>',
+  cancelled:'<span class="adm-badge gray">Đã hủy</span>',
+  refunded:'<span class="adm-badge red">Đã hoàn tiền</span>'
+};
+const COMPLAINT_STATUS_BADGE={
+  open:'<span class="adm-badge red">Mới mở</span>',
+  investigating:'<span class="adm-badge adm-badge-orange">Đang xem xét</span>',
+  resolved:'<span class="adm-badge green">Đã giải quyết</span>',
+  rejected:'<span class="adm-badge gray">Đã từ chối</span>'
+};
+const REFUND_STATUS_BADGE={
+  requested:'<span class="adm-badge adm-badge-orange">Yêu cầu hoàn</span>',
+  processing:'<span class="adm-badge adm-badge-blue">Đang xử lý</span>',
+  completed:'<span class="adm-badge green">Đã hoàn tiền</span>',
+  rejected:'<span class="adm-badge gray">Từ chối hoàn</span>'
+};
+const PAY_LBL={momo:'Ví MoMo',cod:'Tiền mặt (COD)',bank:'Chuyển khoản',card:'Thẻ ngân hàng'};
+
+function adminOrdersMgmt(){
+  if(admOrdersView==='detail'&&admOrdersSelectedId)return adminOrderDetail(admOrdersSelectedId);
+  return adminOrdersMain();
+}
+
+function adminOrdersMain(){
+  const pendingCnt=sysOrders.filter(o=>o.status==='pending').length;
+  const openComplaint=sysOrders.filter(o=>o.complaint&&o.complaint.status==='open').length;
+  const tabs=[['all','Tất cả đơn hàng'],['complaints','Khiếu nại'],['log','Nhật ký can thiệp']];
+  const tabHtml=tabs.map(([k,l])=>
+    '<button class="adm-shops-tab'+(admOrdersTab===k?' on':'')+'" onclick="admOrdersTab=\''+k+'\';renderAccount()">'+l+
+    (k==='all'&&pendingCnt>0?' <span class="adm-tab-badge">'+pendingCnt+'</span>':'')+
+    (k==='complaints'&&openComplaint>0?' <span class="adm-tab-badge">'+openComplaint+'</span>':'')+
+    '</button>'
+  ).join('');
+  let content='';
+  if(admOrdersTab==='all')content=adminOrdersAllList();
+  else if(admOrdersTab==='complaints')content=adminOrdersComplaints();
+  else content=adminOrdersInterventionLog();
+  return '<div class="adm-shops-tabs">'+tabHtml+'</div>'+content;
+}
+
+/* ── TAB 1: TẤT CẢ ĐƠN HÀNG ──────────────────── */
+function adminOrdersAllList(){
+  const q=(admOrdersSearch||'').toLowerCase().trim();
+  const statusF=admOrdersStatusFilter;
+  const sellerF=admOrdersSellerFilter;
+  let list=sysOrders.filter(o=>{
+    if(statusF!=='all'&&o.status!==statusF)return false;
+    if(sellerF!=='all'&&o.sellerId!==sellerF)return false;
+    if(q){
+      const m=(o.id||'').toLowerCase().includes(q)||(o.buyerName||'').toLowerCase().includes(q)||(o.buyerEmail||'').toLowerCase().includes(q)||(o.sellerName||'').toLowerCase().includes(q);
+      if(!m)return false;
+    }
+    return true;
+  }).sort((a,b)=>b.id.localeCompare(a.id));
+
+  const stats=[
+    {lbl:'Tổng đơn',val:sysOrders.length,clr:'#7a4a8c'},
+    {lbl:'Chờ xác nhận',val:sysOrders.filter(o=>o.status==='pending').length,clr:'#e67e22'},
+    {lbl:'Đang giao',val:sysOrders.filter(o=>o.status==='shipping').length,clr:'#2980b9'},
+    {lbl:'Hoàn thành',val:sysOrders.filter(o=>o.status==='completed'||o.status==='delivered').length,clr:'#27ae60'},
+    {lbl:'Hủy / Hoàn',val:sysOrders.filter(o=>o.status==='cancelled'||o.status==='refunded').length,clr:'#c0392b'}
+  ].map(s=>'<div class="adm-kpi" style="padding:14px 18px">'+
+    '<div class="adm-kpi-val" style="color:'+s.clr+';font-size:24px">'+s.val+'</div>'+
+    '<div class="adm-kpi-lbl">'+s.lbl+'</div></div>').join('');
+
+  const statusOpts=['all','pending','confirmed','processing','shipping','delivered','completed','cancelled','refunded'].map(v=>
+    '<option value="'+v+'"'+(statusF===v?' selected':'')+'>'+(v==='all'?'Tất cả trạng thái':ORD_STATUS[v]||v)+'</option>').join('');
+  const sellerOpts='<option value="all"'+(sellerF==='all'?' selected':'')+'>Tất cả seller</option>'+
+    activeSellers.map(s=>'<option value="'+s.id+'"'+(sellerF===s.id?' selected':'')+'>'+escHtml(s.shopName)+'</option>').join('');
+
+  const PER=8,pages=Math.max(1,Math.ceil(list.length/PER));
+  if(admOrdersPage>=pages)admOrdersPage=0;
+  const slice=list.slice(admOrdersPage*PER,(admOrdersPage+1)*PER);
+  const rows=slice.map(o=>{
+    const flags=(o.complaint?'<span class="adm-ord-flag complaint" title="Có khiếu nại"> ⚑</span>':'')+
+                (o.refund?'<span class="adm-ord-flag refund" title="Có hoàn tiền"> ↩</span>':'');
+    return '<tr class="adm-usr-row" onclick="admOrdersSelectedId=\''+o.id+'\';admOrdersView=\'detail\';renderAccount()">'+
+      '<td style="font-weight:600;font-family:monospace;white-space:nowrap">#'+escHtml(o.id)+'</td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(o.buyerName)+'</div><div class="adm-usr-em">'+escHtml(o.buyerEmail)+'</div></td>'+
+      '<td class="adm-usr-em">'+escHtml(o.sellerName)+'</td>'+
+      '<td style="text-align:center">'+o.items.length+'</td>'+
+      '<td style="font-weight:500;white-space:nowrap">'+fmt(o.total)+'</td>'+
+      '<td class="adm-usr-date">'+escHtml(o.orderDate)+'</td>'+
+      '<td>'+(ORD_STATUS_BADGE[o.status]||o.status)+flags+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        '<button class="adm-row-btn" onclick="admOrdersSelectedId=\''+o.id+'\';admOrdersView=\'detail\';renderAccount()">Chi tiết</button>'+
+      '</td></tr>';
+  }).join('');
+  const hasFilter=q||statusF!=='all'||sellerF!=='all';
+  const pager='<div class="adm-pager">'+
+    '<button class="adm-pager-btn" '+(admOrdersPage===0?'disabled':'')+' onclick="admOrdersPage--;renderAccount()">← Trước</button>'+
+    '<span>Trang '+(admOrdersPage+1)+'/'+pages+' · <b>'+list.length+'</b> đơn</span>'+
+    '<button class="adm-pager-btn" '+(admOrdersPage>=pages-1?'disabled':'')+' onclick="admOrdersPage++;renderAccount()">Tiếp →</button>'+
+  '</div>';
+  return '<div class="adm-kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px">'+stats+'</div>'+
+    '<div class="adm-usr-toolbar" style="margin-bottom:12px"><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<input class="adm-usr-search" placeholder="Tìm mã đơn, người mua, seller..." value="'+escHtml(admOrdersSearch)+'" oninput="admOrdersSearch=this.value;admOrdersPage=0;renderAccount()" style="max-width:300px">'+
+      '<select class="adm-filter-sel" onchange="admOrdersStatusFilter=this.value;admOrdersPage=0;renderAccount()">'+statusOpts+'</select>'+
+      '<select class="adm-filter-sel" onchange="admOrdersSellerFilter=this.value;admOrdersPage=0;renderAccount()">'+sellerOpts+'</select>'+
+      (hasFilter?'<button class="adm-row-btn" onclick="admOrdersSearch=\'\';admOrdersStatusFilter=\'all\';admOrdersSellerFilter=\'all\';renderAccount()">Xóa lọc</button>':'')+
+    '</div></div>'+
+    '<div style="overflow-x:auto"><table class="adm-usr-table"><thead><tr>'+
+      '<th>Mã đơn</th><th>Người mua</th><th>Seller</th><th>SP</th><th>Tổng tiền</th><th>Ngày đặt</th><th>Trạng thái</th><th></th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager;
+}
+
+/* ── TAB 2: KHIẾU NẠI ──────────────────────────── */
+function adminOrdersComplaints(){
+  const list=sysOrders.filter(o=>!!o.complaint).sort((a,b)=>{
+    const ord={open:0,investigating:1,resolved:2,rejected:3};
+    return (ord[a.complaint.status]||9)-(ord[b.complaint.status]||9);
+  });
+  const stats=[
+    {lbl:'Mới mở',val:list.filter(o=>o.complaint.status==='open').length,clr:'#c0392b'},
+    {lbl:'Đang xem xét',val:list.filter(o=>o.complaint.status==='investigating').length,clr:'#e67e22'},
+    {lbl:'Đã giải quyết',val:list.filter(o=>o.complaint.status==='resolved').length,clr:'#27ae60'},
+    {lbl:'Đã từ chối',val:list.filter(o=>o.complaint.status==='rejected').length,clr:'#7a7a7a'}
+  ].map(s=>'<div class="adm-kpi" style="padding:14px 18px">'+
+    '<div class="adm-kpi-val" style="color:'+s.clr+';font-size:24px">'+s.val+'</div>'+
+    '<div class="adm-kpi-lbl">'+s.lbl+'</div></div>').join('');
+  const PER=8,pages=Math.max(1,Math.ceil(list.length/PER));
+  if(admComplaintsPage>=pages)admComplaintsPage=0;
+  const slice=list.slice(admComplaintsPage*PER,(admComplaintsPage+1)*PER);
+  const rows=slice.map(o=>{
+    const c=o.complaint;
+    return '<tr class="adm-usr-row" onclick="admOrdersSelectedId=\''+o.id+'\';admOrdersView=\'detail\';renderAccount()">'+
+      '<td style="font-weight:600;font-family:monospace;white-space:nowrap">#'+escHtml(o.id)+'</td>'+
+      '<td><div class="adm-usr-nm">'+escHtml(o.buyerName)+'</div><div class="adm-usr-em">'+escHtml(o.buyerEmail)+'</div></td>'+
+      '<td class="adm-usr-em">'+escHtml(o.sellerName)+'</td>'+
+      '<td>'+escHtml(c.reason)+'</td>'+
+      '<td class="adm-usr-date">'+escHtml(c.filedAt)+'</td>'+
+      '<td>'+(COMPLAINT_STATUS_BADGE[c.status]||c.status)+'</td>'+
+      '<td class="adm-row-actions" onclick="event.stopPropagation()">'+
+        '<button class="adm-row-btn" onclick="admOrdersSelectedId=\''+o.id+'\';admOrdersView=\'detail\';renderAccount()">Xử lý</button>'+
+        (c.status==='open'?'<button class="adm-row-btn adm-unlock-btn" onclick="event.stopPropagation();doResolveComplaint(\''+o.id+'\')">✓ Giải quyết</button>':'')+
+      '</td></tr>';
+  }).join('');
+  const pager='<div class="adm-pager">'+
+    '<button class="adm-pager-btn" '+(admComplaintsPage===0?'disabled':'')+' onclick="admComplaintsPage--;renderAccount()">← Trước</button>'+
+    '<span>Trang '+(admComplaintsPage+1)+'/'+pages+' · <b>'+list.length+'</b> khiếu nại</span>'+
+    '<button class="adm-pager-btn" '+(admComplaintsPage>=pages-1?'disabled':'')+' onclick="admComplaintsPage++;renderAccount()">Tiếp →</button>'+
+  '</div>';
+  return '<div class="adm-kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">'+stats+'</div>'+
+    '<div style="overflow-x:auto"><table class="adm-usr-table"><thead><tr>'+
+      '<th>Mã đơn</th><th>Người mua</th><th>Seller</th><th>Lý do khiếu nại</th><th>Ngày gửi</th><th>Trạng thái</th><th></th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager;
+}
+
+/* ── TAB 3: NHẬT KÝ CAN THIỆP ─────────────────── */
+function adminOrdersInterventionLog(){
+  const allLogs=[];
+  sysOrders.forEach(o=>{(o.adminLog||[]).forEach(l=>{allLogs.push({...l,orderId:o.id,buyerName:o.buyerName});});});
+  allLogs.sort((a,b)=>b.id.localeCompare(a.id));
+  if(!allLogs.length)return '<div class="acct-card" style="text-align:center;padding:32px"><p style="color:var(--text-soft)">Chưa có can thiệp nào được ghi nhận.</p></div>';
+  const rows=allLogs.map(l=>
+    '<tr>'+
+      '<td style="font-family:monospace;white-space:nowrap"><button class="adm-ord-link-btn" onclick="admOrdersSelectedId=\''+escHtml(l.orderId)+'\';admOrdersView=\'detail\';renderAccount()">#'+escHtml(l.orderId)+'</button></td>'+
+      '<td class="adm-usr-em">'+escHtml(l.buyerName)+'</td>'+
+      '<td style="font-weight:500">'+escHtml(l.action)+'</td>'+
+      '<td>'+escHtml(l.note||'—')+'</td>'+
+      '<td class="adm-usr-date">'+escHtml(l.date)+'</td>'+
+      '<td class="adm-usr-em">'+escHtml(l.by)+'</td>'+
+    '</tr>'
+  ).join('');
+  return '<div style="overflow-x:auto"><table class="adm-usr-table"><thead><tr>'+
+    '<th>Mã đơn</th><th>Người mua</th><th>Hành động</th><th>Ghi chú</th><th>Ngày</th><th>Admin</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+/* ── CHI TIẾT ĐƠN HÀNG ─────────────────────────── */
+function adminOrderDetail(id){
+  const o=sysOrders.find(x=>x.id===id);
+  if(!o)return '<div class="acct-card"><p>Không tìm thấy đơn hàng.</p></div>';
+  const back='<button class="adm-back-btn" onclick="admOrdersView=\'list\';admOrdersSelectedId=null;renderAccount()">← Danh sách đơn hàng</button>';
+
+  const itemsHtml=o.items.map(it=>
+    '<tr><td>'+escHtml(it.prodName)+'</td>'+
+    '<td style="text-align:center">'+it.qty+'</td>'+
+    '<td style="text-align:right;white-space:nowrap">'+fmt(it.unitPrice)+'</td>'+
+    '<td style="text-align:right;font-weight:500;white-space:nowrap">'+fmt(it.qty*it.unitPrice)+'</td></tr>'
+  ).join('');
+
+  const timelineHtml=(o.statusHistory||[]).map(h=>
+    '<div class="adm-ord-timeline-item">'+
+      '<div class="adm-ord-timeline-dot"></div>'+
+      '<div class="adm-ord-timeline-body">'+
+        '<div class="adm-ord-timeline-status">'+(ORD_STATUS[h.status]||h.status)+'</div>'+
+        '<div class="adm-ord-timeline-meta">'+escHtml(h.date)+' · '+escHtml(h.note)+(h.by&&h.by!=='system'?' · <em>'+escHtml(h.by)+'</em>':'')+'</div>'+
+      '</div></div>'
+  ).join('');
+
+  /* Complaint block */
+  let complaintHtml;
+  if(o.complaint){
+    const c=o.complaint;
+    complaintHtml='<div class="adm-ord-section">'+
+      '<div class="adm-ncc-doc-title">📩 Khiếu nại</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">'+
+        '<div><div class="adm-usr-em">Lý do</div><div style="font-weight:500">'+escHtml(c.reason)+'</div></div>'+
+        '<div><div class="adm-usr-em">Trạng thái</div>'+(COMPLAINT_STATUS_BADGE[c.status]||c.status)+'</div>'+
+        '<div><div class="adm-usr-em">Ngày gửi</div><div>'+escHtml(c.filedAt)+'</div></div>'+
+        (c.resolvedAt?'<div><div class="adm-usr-em">Ngày xử lý</div><div>'+escHtml(c.resolvedAt)+' · <em>'+escHtml(c.resolvedBy||'')+'</em></div></div>':'<div></div>')+
+      '</div>'+
+      '<div class="adm-ord-complaint-desc">'+escHtml(c.desc)+'</div>'+
+      (c.resolution?'<div class="adm-ncc-note blue" style="margin-top:10px"><div class="adm-ncc-note-label">Kết quả xử lý</div>'+escHtml(c.resolution)+'</div>':'')+
+      ((c.status==='open'||c.status==='investigating')
+        ?'<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'+
+            '<button class="adm-row-btn adm-unlock-btn" onclick="doResolveComplaint(\''+id+'\')">✓ Giải quyết</button>'+
+            (c.status==='open'?'<button class="adm-row-btn" onclick="doInvestigateComplaint(\''+id+'\')">🔍 Đang xem xét</button>':'')+
+            '<button class="adm-row-btn adm-lock-btn" onclick="doRejectComplaint(\''+id+'\')">✕ Từ chối</button>'+
+          '</div>'
+        :'')+
+    '</div>';
+  } else {
+    complaintHtml='<div class="adm-ord-section">'+
+      '<div class="adm-ncc-doc-title">📩 Khiếu nại</div>'+
+      '<p style="color:var(--text-soft);font-size:13px;margin:8px 0">Không có khiếu nại.</p>'+
+      '<button class="adm-row-btn" onclick="doOpenComplaint(\''+id+'\')">+ Mở khiếu nại thay mặt người mua</button>'+
+    '</div>';
+  }
+
+  /* Refund block */
+  let refundHtml;
+  if(o.refund){
+    const r=o.refund;
+    refundHtml='<div class="adm-ord-section">'+
+      '<div class="adm-ncc-doc-title">💰 Hoàn tiền</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">'+
+        '<div><div class="adm-usr-em">Số tiền hoàn</div><div style="font-size:18px;font-weight:700;color:#c0392b">'+fmt(r.amount)+'</div></div>'+
+        '<div><div class="adm-usr-em">Trạng thái</div>'+(REFUND_STATUS_BADGE[r.status]||r.status)+'</div>'+
+        '<div><div class="adm-usr-em">Lý do</div><div>'+escHtml(r.reason)+'</div></div>'+
+        '<div><div class="adm-usr-em">Yêu cầu lúc</div><div>'+escHtml(r.requestedAt)+'</div></div>'+
+      '</div>'+
+      (r.note?'<div class="adm-ncc-note" style="margin-bottom:10px"><div class="adm-ncc-note-label">Ghi chú</div>'+escHtml(r.note)+'</div>':'')+
+      (r.status==='requested'
+        ?'<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<button class="adm-row-btn adm-unlock-btn" onclick="doProcessRefund(\''+id+'\')">✓ Xử lý hoàn tiền</button>'+
+            '<button class="adm-row-btn adm-lock-btn" onclick="doRejectRefund(\''+id+'\')">✕ Từ chối hoàn</button>'+
+          '</div>'
+        :r.status==='processing'?'<button class="adm-row-btn adm-unlock-btn" onclick="doCompleteRefund(\''+id+'\')">✓ Xác nhận đã hoàn tiền</button>'
+        :'')+
+    '</div>';
+  } else {
+    const canRefund=o.status==='delivered'||o.status==='completed'||o.status==='shipping';
+    refundHtml='<div class="adm-ord-section">'+
+      '<div class="adm-ncc-doc-title">💰 Hoàn tiền</div>'+
+      '<p style="color:var(--text-soft);font-size:13px;margin:8px 0">Không có yêu cầu hoàn tiền.</p>'+
+      (canRefund?'<button class="adm-row-btn" onclick="doInitRefund(\''+id+'\')">↩ Khởi tạo hoàn tiền</button>':'')+
+    '</div>';
+  }
+
+  /* Admin intervention panel */
+  const statusOptions=Object.entries(ORD_STATUS).map(([k,v])=>
+    '<option value="'+k+'"'+(o.status===k?' selected':'')+'>'+v+'</option>').join('');
+  const actionHtml='<div class="adm-ord-section" style="margin-bottom:14px">'+
+    '<div class="adm-ncc-doc-title" style="margin-bottom:12px">⚙ Can thiệp thủ công</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'+
+      '<select id="ordStatusOverride" class="adm-filter-sel">'+statusOptions+'</select>'+
+      '<input id="ordStatusNote" class="adm-usr-search" placeholder="Lý do can thiệp (bắt buộc)" style="flex:1;min-width:180px">'+
+      '<button class="adm-row-btn adm-unlock-btn" onclick="doUpdateOrderStatus(\''+id+'\')">Cập nhật trạng thái</button>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<input id="ordAdminNote" class="adm-usr-search" placeholder="Ghi chú vào nhật ký..." style="flex:1">'+
+      '<button class="adm-row-btn" onclick="doAddOrderNote(\''+id+'\')">Ghi chú</button>'+
+    '</div>'+
+  '</div>';
+
+  /* Intervention log */
+  const logHtml=(o.adminLog||[]).length>0
+    ?'<div style="overflow-x:auto"><table class="adm-usr-table"><thead><tr><th>Ngày</th><th>Hành động</th><th>Ghi chú</th><th>Admin</th></tr></thead><tbody>'+
+        [...(o.adminLog||[])].reverse().map(l=>
+          '<tr><td class="adm-usr-date">'+escHtml(l.date)+'</td><td style="font-weight:500">'+escHtml(l.action)+'</td><td>'+escHtml(l.note||'—')+'</td><td class="adm-usr-em">'+escHtml(l.by)+'</td></tr>'
+        ).join('')+
+      '</tbody></table></div>'
+    :'<p style="color:var(--text-soft);font-size:13px;padding:8px 0">Chưa có can thiệp nào.</p>';
+
+  return back+
+    '<div class="acct-card">'+
+    /* Header */
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">'+
+      '<div>'+
+        '<h3 style="margin:0 0 4px;font-size:17px;font-family:\'Lora\',serif;color:var(--ink-deep)">#'+escHtml(o.id)+'</h3>'+
+        '<div class="adm-usr-em">Ngày đặt: <b>'+escHtml(o.orderDate)+'</b> · Thanh toán: <b>'+escHtml(PAY_LBL[o.paymentMethod]||o.paymentMethod)+'</b></div>'+
+      '</div>'+
+      (ORD_STATUS_BADGE[o.status]||o.status)+
+    '</div>'+
+    /* Info grid */
+    '<div class="adm-ord-info-grid" style="margin-bottom:18px">'+
+      '<div class="adm-ord-info-box"><div class="adm-usr-em" style="margin-bottom:4px">Người mua</div><div style="font-weight:500">'+escHtml(o.buyerName)+'</div><div class="adm-usr-em">'+escHtml(o.buyerEmail)+'</div><div class="adm-usr-em">'+escHtml(o.buyerPhone)+'</div></div>'+
+      '<div class="adm-ord-info-box"><div class="adm-usr-em" style="margin-bottom:4px">Seller</div><div style="font-weight:500">'+escHtml(o.sellerName)+'</div></div>'+
+      '<div class="adm-ord-info-box"><div class="adm-usr-em" style="margin-bottom:4px">Địa chỉ giao</div><div style="font-size:13.5px">'+escHtml(o.shippingAddr)+'</div></div>'+
+    '</div>'+
+    /* Items */
+    '<div class="adm-ncc-doc-title" style="margin-bottom:8px">📦 Sản phẩm</div>'+
+    '<div style="overflow-x:auto;margin-bottom:4px"><table class="adm-usr-table"><thead><tr><th>Tên sản phẩm</th><th style="text-align:center">SL</th><th style="text-align:right">Đơn giá</th><th style="text-align:right">Thành tiền</th></tr></thead><tbody>'+itemsHtml+'</tbody></table></div>'+
+    /* Totals */
+    '<div style="text-align:right;margin-bottom:18px;padding:10px 8px 0">'+
+      '<div class="adm-usr-em">Tạm tính: <b>'+fmt(o.subtotal)+'</b></div>'+
+      '<div class="adm-usr-em">Phí vận chuyển: <b>'+fmt(o.shippingFee)+'</b></div>'+
+      (o.discount>0?'<div class="adm-usr-em" style="color:#1a7a4a">Giảm giá: <b>-'+fmt(o.discount)+'</b></div>':'')+
+      '<div style="font-size:17px;font-weight:700;color:var(--ink-deep);margin-top:6px">Tổng cộng: '+fmt(o.total)+'</div>'+
+    '</div>'+
+    /* Timeline */
+    '<div class="adm-ncc-doc-title" style="margin-bottom:10px">📋 Lịch sử trạng thái</div>'+
+    '<div class="adm-ord-timeline" style="margin-bottom:20px">'+timelineHtml+'</div>'+
+    /* Complaint + Refund side by side */
+    '<div class="adm-ord-dual-grid" style="margin-bottom:18px">'+complaintHtml+refundHtml+'</div>'+
+    /* Admin actions */
+    actionHtml+
+    /* Log */
+    '<div class="adm-ncc-doc-title" style="margin-bottom:8px">📝 Nhật ký can thiệp</div>'+
+    logHtml+
+  '</div>';
+}
+
+/* ── ACTION FUNCTIONS ──────────────────────────── */
+function doUpdateOrderStatus(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o)return;
+  const el=document.getElementById('ordStatusOverride');
+  const noteEl=document.getElementById('ordStatusNote');
+  if(!el||!noteEl)return;
+  const newStatus=el.value;
+  const note=(noteEl.value||'').trim();
+  if(!note){toast('Nhập lý do can thiệp');noteEl.focus();return;}
+  if(newStatus===o.status){toast('Trạng thái không thay đổi');return;}
+  const old=o.status;
+  o.status=newStatus;
+  o.statusHistory.push({status:newStatus,date:todayStr(),note:'[Admin] '+note,by:'Admin EduMart'});
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Cập nhật trạng thái: '+(ORD_STATUS[old]||old)+' → '+(ORD_STATUS[newStatus]||newStatus),note,date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();
+  toast('Đã cập nhật: #'+ordId+' → '+(ORD_STATUS[newStatus]||newStatus));renderAccount();
+}
+
+function doAddOrderNote(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o)return;
+  const el=document.getElementById('ordAdminNote');
+  const note=(el?el.value:'').trim();
+  if(!note){toast('Nhập nội dung ghi chú');return;}
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Ghi chú admin',note,date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã ghi chú vào đơn #'+ordId);renderAccount();
+}
+
+function doOpenComplaint(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||o.complaint)return;
+  const reason=prompt('Lý do khiếu nại:');if(!reason)return;
+  const desc=prompt('Mô tả chi tiết:');if(desc===null)return;
+  o.complaint={reason:reason.trim(),desc:(desc||'').trim(),filedAt:todayStr(),status:'open',resolution:'',resolvedAt:null,resolvedBy:null};
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Mở khiếu nại thay mặt người mua',note:reason.trim(),date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã mở khiếu nại cho đơn #'+ordId);renderAccount();
+}
+
+function doInvestigateComplaint(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.complaint)return;
+  o.complaint.status='investigating';
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Chuyển khiếu nại sang Đang xem xét',note:'',date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã chuyển sang Đang xem xét');renderAccount();
+}
+
+function doResolveComplaint(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.complaint)return;
+  const resolution=prompt('Kết quả giải quyết:');if(!resolution)return;
+  o.complaint.status='resolved';o.complaint.resolution=resolution.trim();
+  o.complaint.resolvedAt=todayStr();o.complaint.resolvedBy='Admin EduMart';
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Giải quyết khiếu nại',note:resolution.trim(),date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã giải quyết khiếu nại đơn #'+ordId);renderAccount();
+}
+
+function doRejectComplaint(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.complaint)return;
+  const reason=prompt('Lý do từ chối khiếu nại:');if(!reason)return;
+  o.complaint.status='rejected';o.complaint.resolution=reason.trim();
+  o.complaint.resolvedAt=todayStr();o.complaint.resolvedBy='Admin EduMart';
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Từ chối khiếu nại',note:reason.trim(),date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã từ chối khiếu nại');renderAccount();
+}
+
+function doInitRefund(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||o.refund)return;
+  const reason=prompt('Lý do hoàn tiền:');if(!reason)return;
+  const amtStr=prompt('Số tiền hoàn (đồng) — Tổng đơn: '+o.total.toLocaleString('vi-VN')+'đ:',String(o.total));
+  if(amtStr===null)return;
+  const amount=parseInt(String(amtStr).replace(/\D/g,''));
+  if(!amount||amount<=0){toast('Số tiền không hợp lệ');return;}
+  if(amount>o.total){toast('Số tiền hoàn không thể lớn hơn tổng đơn');return;}
+  o.refund={amount,reason:reason.trim(),status:'requested',requestedAt:todayStr(),processedAt:null,processedBy:null,note:''};
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Khởi tạo hoàn tiền: '+fmt(amount),note:reason.trim(),date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã khởi tạo yêu cầu hoàn tiền: '+fmt(amount));renderAccount();
+}
+
+function doProcessRefund(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.refund)return;
+  const note=prompt('Ghi chú xử lý (tùy chọn):')||'';
+  o.refund.status='processing';o.refund.note=note;
+  o.refund.processedAt=todayStr();o.refund.processedBy='Admin EduMart';
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Bắt đầu xử lý hoàn tiền: '+fmt(o.refund.amount),note,date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã chuyển sang Đang xử lý hoàn tiền');renderAccount();
+}
+
+function doCompleteRefund(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.refund)return;
+  if(!confirm('Xác nhận đã hoàn tiền '+fmt(o.refund.amount)+' cho khách hàng?'))return;
+  o.refund.status='completed';o.refund.processedAt=todayStr();
+  o.status='refunded';
+  o.statusHistory.push({status:'refunded',date:todayStr(),note:'Hoàn tiền thành công: '+fmt(o.refund.amount),by:'Admin EduMart'});
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Hoàn tiền hoàn tất: '+fmt(o.refund.amount),note:'',date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Hoàn tiền hoàn tất cho đơn #'+ordId);renderAccount();
+}
+
+function doRejectRefund(ordId){
+  const o=sysOrders.find(x=>x.id===ordId);if(!o||!o.refund)return;
+  const reason=prompt('Lý do từ chối hoàn tiền:');if(!reason)return;
+  o.refund.status='rejected';o.refund.note=reason.trim();
+  o.refund.processedAt=todayStr();o.refund.processedBy='Admin EduMart';
+  o.adminLog.push({id:'log-'+Date.now().toString(36),action:'Từ chối hoàn tiền',note:reason.trim(),date:todayStr(),by:'Admin EduMart'});
+  saveAdminOrders();toast('Đã từ chối yêu cầu hoàn tiền');renderAccount();
+}
+
+/* ═══════════════════════════════════════════════════
+   QUẢN LÝ TÀI CHÍNH
+═══════════════════════════════════════════════════ */
+const WD_STATUS_BADGE={
+  pending:'<span class="adm-badge adm-badge-orange">Chờ duyệt</span>',
+  processing:'<span class="adm-badge adm-badge-blue">Đang xử lý</span>',
+  paid:'<span class="adm-badge adm-badge-green">Đã thanh toán</span>',
+  rejected:'<span class="adm-badge red">Từ chối</span>'
+};
+
+function adminFinance(){
+  const tab=admFinTab;
+  const tabs=[['overview','Tổng quan tài chính'],['withdrawals','Thanh toán Seller'],['history','Lịch sử thanh toán']];
+  const pendingCnt=finWithdrawals.filter(w=>w.status==='pending').length;
+  const content=tab==='withdrawals'?adminFinWithdrawals():tab==='history'?adminFinPayHistory():adminFinOverview();
+  return `<div class="adm-ncc-doc-title">Quản lý Tài chính</div>
+  <div class="adm-shops-tab" style="margin-bottom:18px;">
+    ${tabs.map(([k,lbl])=>`<button class="adm-tab-btn${tab===k?' active':''}" onclick="admFinTab='${k}';renderAccount()">
+      ${escHtml(lbl)}${k==='withdrawals'&&pendingCnt>0?` <span class="adm-tab-badge">${pendingCnt}</span>`:''}
+    </button>`).join('')}
+  </div>
+  ${content}`;
+}
+
+function adminFinOverview(){
+  /* ── KPI row ── */
+  const totalGMV=FIN_GMV.reduce((a,b)=>a+b,0);
+  const totalComm=FIN_COMM.reduce((a,b)=>a+b,0);
+  const latestGMV=FIN_GMV[FIN_GMV.length-1];
+  const prevGMV=FIN_GMV[FIN_GMV.length-2];
+  const growthPct=Math.round((latestGMV-prevGMV)/prevGMV*100*10)/10;
+  const paidTotal=finPayments.reduce((a,p)=>a+p.amount,0);
+  const pendingPayout=finWithdrawals.filter(w=>w.status==='pending').reduce((a,w)=>a+w.amount,0);
+
+  /* ── Monthly bar chart ── */
+  const maxMon=Math.max(...FIN_GMV);
+  const maxComm=Math.max(...FIN_COMM);
+  const barChart=`<div class="fin-chart-wrap">
+    <div class="fin-chart-title">Doanh thu theo tháng (triệu đồng)</div>
+    <div class="fin-chart-bars">
+      ${FIN_MONTHS.map((m,i)=>`<div class="fin-chart-col">
+        <div class="fin-bar-wrap">
+          <div class="fin-bar fin-bar-gmv" style="height:${Math.round(FIN_GMV[i]/maxMon*110)}px" title="GMV: ${FIN_GMV[i]}M"></div>
+          <div class="fin-bar fin-bar-comm" style="height:${Math.round(FIN_COMM[i]/maxComm*110)}px" title="Hoa hồng: ${FIN_COMM[i]}M"></div>
+        </div>
+        <div class="fin-chart-label">${m}</div>
+      </div>`).join('')}
+    </div>
+    <div class="fin-chart-legend">
+      <span class="fin-legend-dot" style="background:#c0392b;"></span>GMV
+      <span class="fin-legend-dot" style="background:#27ae60;margin-left:16px;"></span>Hoa hồng
+    </div>
+  </div>`;
+
+  /* ── Category breakdown ── */
+  const catRows=FIN_CATS.map(c=>`<div class="fin-cat-row">
+    <div class="fin-cat-name">${escHtml(c.name)}</div>
+    <div class="fin-cat-bar-bg"><div class="fin-cat-bar-fill" style="width:${c.pct}%;background:${c.clr};"></div></div>
+    <div class="fin-cat-pct">${c.pct}%</div>
+    <div class="fin-cat-val">${c.rate}% hoa hồng · ${c.commM}M</div>
+  </div>`).join('');
+
+  /* ── Top sellers ── */
+  const topSellers=[
+    {name:'NXB Giáo dục VN',gmv:238.3,comm:19.1},
+    {name:'Fahasa Official',gmv:137.9,comm:13.8},
+    {name:'Alphabooks',gmv:112.9,comm:13.5},
+    {name:'Đinh Tị Books',gmv:87.8,comm:10.5},
+    {name:'EduPro Thiết bị GD',gmv:62.4,comm:7.5}
+  ];
+  const topRows=topSellers.map((s,i)=>`<tr>
+    <td style="padding:8px 10px;text-align:center;">${i+1}</td>
+    <td style="padding:8px 10px;font-weight:600;">${escHtml(s.name)}</td>
+    <td style="padding:8px 10px;text-align:right;">${s.gmv}M</td>
+    <td style="padding:8px 10px;text-align:right;color:#27ae60;font-weight:600;">${s.comm}M</td>
+  </tr>`).join('');
+
+  return `<div class="adm-kpi-grid">
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Tổng GMV (6 tháng)</div><div class="adm-kpi-val">${totalGMV}M</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Tổng hoa hồng</div><div class="adm-kpi-val" style="color:#27ae60;">${totalComm.toFixed(1)}M</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Tăng trưởng tháng gần nhất</div><div class="adm-kpi-val">${admGrowth(growthPct)}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đã thanh toán Seller</div><div class="adm-kpi-val" style="color:#2980b9;">${fmtBig(paidTotal)}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đang chờ duyệt rút tiền</div><div class="adm-kpi-val" style="color:#e67e22;">${fmtBig(pendingPayout)}</div></div>
+  </div>
+  <div class="fin-dual-grid" style="margin-top:18px;">
+    <div>
+      ${barChart}
+    </div>
+    <div>
+      <div class="fin-chart-title" style="margin-bottom:10px;">Phân bổ doanh thu theo danh mục</div>
+      <div class="fin-cats">${catRows}</div>
+    </div>
+  </div>
+  <div style="margin-top:18px;">
+    <div class="fin-chart-title" style="margin-bottom:10px;">Top 5 Seller đóng góp doanh thu</div>
+    <table class="adm-usr-table" style="width:100%;">
+      <thead><tr style="background:var(--paper);">
+        <th style="padding:8px 10px;text-align:center;width:40px;">#</th>
+        <th style="padding:8px 10px;">Seller</th>
+        <th style="padding:8px 10px;text-align:right;">GMV (6T)</th>
+        <th style="padding:8px 10px;text-align:right;">Hoa hồng (6T)</th>
+      </tr></thead>
+      <tbody>${topRows}</tbody>
+    </table>
+  </div>`;
+}
+
+function adminFinWithdrawals(){
+  const subTab=admFinWithdrawTab;
+  const subTabs=[['pending','Chờ duyệt'],['processing','Đang xử lý'],['paid','Đã thanh toán'],['rejected','Từ chối']];
+  const tabCounts={};
+  subTabs.forEach(([k])=>{tabCounts[k]=finWithdrawals.filter(w=>w.status===k).length;});
+  const items=finWithdrawals.filter(w=>w.status===subTab);
+
+  const search=admFinWdSearch.toLowerCase();
+  const filtered=search?items.filter(w=>w.sellerName.toLowerCase().includes(search)||w.id.toLowerCase().includes(search)):items;
+
+  const cards=filtered.length===0?`<div style="padding:28px;text-align:center;color:var(--text-soft);">Không có yêu cầu nào.</div>`
+  :filtered.map(w=>`<div class="fin-wd-card">
+    <div class="fin-wd-header">
+      <span class="fin-wd-id">${escHtml(w.id)}</span>
+      ${WD_STATUS_BADGE[w.status]||''}
+    </div>
+    <div class="fin-wd-body">
+      <div><b>${escHtml(w.sellerName)}</b></div>
+      <div style="font-size:13px;color:var(--text-soft);margin-top:2px;">${escHtml(w.bank)}</div>
+      <div style="margin-top:6px;font-size:13px;">Số tiền yêu cầu: <b style="color:var(--ink);font-size:15px;">${fmtBig(w.amount)}</b></div>
+      <div style="font-size:12px;color:var(--text-soft);">Số dư khả dụng: ${fmtBig(w.availableBalance)}</div>
+      <div style="font-size:12px;color:var(--text-soft);margin-top:4px;">Yêu cầu lúc: ${escHtml(w.requestedAt)}</div>
+      ${w.processedAt?`<div style="font-size:12px;color:var(--text-soft);">Xử lý lúc: ${escHtml(w.processedAt)} bởi ${escHtml(w.processedBy)}</div>`:''}
+      ${w.rejectedReason?`<div style="font-size:12.5px;color:#c0392b;margin-top:4px;padding:8px;background:#fdf2f2;border-radius:6px;">Lý do từ chối: ${escHtml(w.rejectedReason)}</div>`:''}
+      ${w.note&&w.status==='processing'?`<div style="font-size:12.5px;color:#2980b9;margin-top:4px;">${escHtml(w.note)}</div>`:''}
+    </div>
+    ${subTab==='pending'?`<div class="fin-wd-actions">
+      <button class="adm-row-btn" onclick="doApproveWithdrawal('${escHtml(w.id)}')">✓ Duyệt xử lý</button>
+      <button class="adm-lock-btn" onclick="doRejectWithdrawal('${escHtml(w.id)}')">✗ Từ chối</button>
+    </div>`:''}
+    ${subTab==='processing'?`<div class="fin-wd-actions">
+      <button class="adm-row-btn" style="background:#27ae60;" onclick="doCompleteWithdrawal('${escHtml(w.id)}')">✓ Xác nhận đã thanh toán</button>
+    </div>`:''}
+  </div>`).join('');
+
+  return `<div class="adm-shops-tab" style="margin-bottom:14px;">
+    ${subTabs.map(([k,lbl])=>`<button class="adm-tab-btn${subTab===k?' active':''}" onclick="admFinWithdrawTab='${k}';renderAccount()">
+      ${escHtml(lbl)}${tabCounts[k]>0?' <span class="adm-tab-badge">'+tabCounts[k]+'</span>':''}
+    </button>`).join('')}
+  </div>
+  <div style="margin-bottom:12px;">
+    <input class="adm-search-inp" placeholder="Tìm theo tên seller / mã yêu cầu..." value="${escHtml(admFinWdSearch)}"
+      oninput="admFinWdSearch=this.value;renderAccount()" style="max-width:320px;">
+  </div>
+  <div class="fin-wd-grid">${cards}</div>`;
+}
+
+function adminFinPayHistory(){
+  const search=admFinPaySearch.toLowerCase();
+  const filtered=search?finPayments.filter(p=>p.sellerName.toLowerCase().includes(search)||p.id.toLowerCase().includes(search)||p.ref.toLowerCase().includes(search)):finPayments;
+
+  const PAGE=10, total=filtered.length, pages=Math.ceil(total/PAGE)||1;
+  admFinPayPage=Math.min(admFinPayPage,pages-1);
+  const slice=filtered.slice(admFinPayPage*PAGE,(admFinPayPage+1)*PAGE);
+
+  const rows=slice.length===0?`<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-soft);">Không có giao dịch.</td></tr>`
+  :slice.map(p=>`<tr class="adm-usr-row">
+    <td style="padding:9px 10px;font-family:monospace;font-size:13px;">${escHtml(p.id)}</td>
+    <td style="padding:9px 10px;font-weight:600;">${escHtml(p.sellerName)}</td>
+    <td style="padding:9px 10px;text-align:right;font-weight:700;color:var(--ink);">${fmtBig(p.amount)}</td>
+    <td style="padding:9px 10px;font-size:12px;color:var(--text-soft);">${escHtml(p.period)}</td>
+    <td style="padding:9px 10px;font-size:12.5px;">${escHtml(p.paidAt)}</td>
+    <td style="padding:9px 10px;font-family:monospace;font-size:12px;color:#2980b9;">${escHtml(p.ref)}</td>
+  </tr>`).join('');
+
+  const pager=pages>1?`<div class="adm-pager">
+    ${admFinPayPage>0?`<button class="adm-pager-btn" onclick="admFinPayPage--;renderAccount()">← Trước</button>`:''}
+    <span style="font-size:13px;">Trang ${admFinPayPage+1}/${pages}</span>
+    ${admFinPayPage<pages-1?`<button class="adm-pager-btn" onclick="admFinPayPage++;renderAccount()">Tiếp →</button>`:''}
+  </div>`:'';
+
+  const totalPaid=finPayments.reduce((a,p)=>a+p.amount,0);
+
+  return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+    <div>
+      <input class="adm-search-inp" placeholder="Tìm theo seller / mã giao dịch..." value="${escHtml(admFinPaySearch)}"
+        oninput="admFinPaySearch=this.value;admFinPayPage=0;renderAccount()" style="max-width:300px;">
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span style="font-size:13.5px;color:var(--text-soft);">Tổng đã thanh toán: <b style="color:#27ae60;">${fmtBig(totalPaid)}</b></span>
+      <button class="adm-row-btn" onclick="doExportFinReport()">⬇ Xuất báo cáo</button>
+    </div>
+  </div>
+  <table class="adm-usr-table" style="width:100%;">
+    <thead><tr style="background:var(--paper);">
+      <th style="padding:9px 10px;">Mã giao dịch</th>
+      <th style="padding:9px 10px;">Seller</th>
+      <th style="padding:9px 10px;text-align:right;">Số tiền</th>
+      <th style="padding:9px 10px;">Kỳ thanh toán</th>
+      <th style="padding:9px 10px;">Ngày thanh toán</th>
+      <th style="padding:9px 10px;">Mã tham chiếu</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  ${pager}`;
+}
+
+function doApproveWithdrawal(id){
+  const w=finWithdrawals.find(x=>x.id===id);if(!w)return;
+  const note=prompt(`Ghi chú xử lý cho ${w.id} – ${w.sellerName}:\n(Để trống nếu không có)`)??'';
+  w.status='processing';w.note=note.trim()||'Đang tiến hành chuyển khoản.';
+  w.processedAt=todayStr();w.processedBy='Admin EduMart';
+  saveFinWithdrawals();toast('Đã duyệt yêu cầu rút tiền '+id);renderAccount();
+}
+
+function doRejectWithdrawal(id){
+  const w=finWithdrawals.find(x=>x.id===id);if(!w)return;
+  const reason=prompt(`Lý do từ chối yêu cầu ${id} của ${w.sellerName}:`);
+  if(!reason||!reason.trim())return;
+  w.status='rejected';w.rejectedReason=reason.trim();
+  w.processedAt=todayStr();w.processedBy='Admin EduMart';
+  saveFinWithdrawals();toast('Đã từ chối yêu cầu rút tiền '+id);renderAccount();
+}
+
+function doCompleteWithdrawal(id){
+  const w=finWithdrawals.find(x=>x.id===id);if(!w)return;
+  const ref=prompt(`Mã tham chiếu giao dịch ngân hàng cho ${id}:`);
+  if(!ref||!ref.trim()){toast('Cần nhập mã tham chiếu giao dịch');return;}
+  if(!confirm(`Xác nhận đã chuyển ${fmtBig(w.amount)} cho ${w.sellerName}?\nMã tham chiếu: ${ref}`))return;
+  w.status='paid';w.processedAt=todayStr();w.processedBy='Admin EduMart';
+  saveFinWithdrawals();
+  /* Tạo bản ghi lịch sử thanh toán */
+  const payId='PAY-'+id;
+  const existing=finPayments.find(p=>p.id===payId);
+  if(!existing){
+    finPayments.unshift({id:payId,sellerId:w.sellerId,sellerName:w.sellerName,amount:w.amount,
+      period:w.requestedAt+' – '+todayStr(),paidAt:todayStr(),bank:w.bank,
+      ref:ref.trim(),by:'Admin EduMart'});
+    saveFinPayments();
+  }
+  toast('Đã hoàn tất thanh toán '+id);renderAccount();
+}
+
+function doExportFinReport(){
+  const lines=['BÁO CÁO TÀI CHÍNH EDUMART','='.repeat(50),''];
+  lines.push('TỔNG QUAN (6 THÁNG GẦN NHẤT)');
+  lines.push('-'.repeat(40));
+  FIN_MONTHS.forEach((m,i)=>{lines.push(`${m}: GMV ${FIN_GMV[i]}M – Hoa hồng ${FIN_COMM[i]}M`);});
+  const tGMV=FIN_GMV.reduce((a,b)=>a+b,0);
+  const tComm=FIN_COMM.reduce((a,b)=>a+b,0);
+  lines.push('',`Tổng GMV: ${tGMV}M | Tổng hoa hồng: ${tComm.toFixed(1)}M`,'');
+  lines.push('DOANH THU THEO DANH MỤC');
+  lines.push('-'.repeat(40));
+  FIN_CATS.forEach(c=>{lines.push(`${c.name}: ${c.pct}% tổng GMV – Hoa hồng ${c.rate}% – ${c.commM}M`);});
+  lines.push('','LỊCH SỬ THANH TOÁN SELLER');
+  lines.push('-'.repeat(40));
+  finPayments.forEach(p=>{lines.push(`${p.paidAt} | ${p.id} | ${p.sellerName} | ${fmtBig(p.amount)} | REF: ${p.ref}`);});
+  const totalPaid=finPayments.reduce((a,p)=>a+p.amount,0);
+  lines.push('',`Tổng đã thanh toán: ${fmtBig(totalPaid)}`,'');
+  lines.push('TRẠNG THÁI YÊU CẦU RÚT TIỀN');
+  lines.push('-'.repeat(40));
+  finWithdrawals.forEach(w=>{lines.push(`${w.id} | ${w.sellerName} | ${fmtBig(w.amount)} | ${w.status} | ${w.requestedAt}`);});
+  lines.push('','Xuất lúc: '+new Date().toLocaleString('vi-VN'));
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='bao-cao-tai-chinh-edumart.txt';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);toast('Đã xuất báo cáo tài chính');
+}
+
+/* ═══════════════════════════════════════════════════
+   QUẢN LÝ NỘI DUNG (CMS)
+═══════════════════════════════════════════════════ */
+const BLOG_CATS={
+  'hoc-tap':'Học tập & Kỹ năng',
+  'tin-tuc':'Tin tức giáo dục',
+  'thu-vien':'Thư viện sách',
+  'chia-se':'Chia sẻ kinh nghiệm',
+  'khuyen-mai':'Khuyến mãi & Ưu đãi'
+};
+
+function adminCms(){
+  const tabs=[['blog','Blog'],['comments','Bình luận'],['banners','Banner & Quảng cáo'],['static','Trang tĩnh']];
+  const pendingCmt=cmsComments.filter(c=>c.status==='pending').length;
+  const content=admCmsTab==='comments'?adminCmsComments():
+    admCmsTab==='banners'?adminCmsBanners():
+    admCmsTab==='static'?adminCmsStatic():
+    adminCmsBlogSection();
+  return `<div class="adm-ncc-doc-title">Quản lý Nội dung</div>
+  <div class="adm-shops-tab" style="margin-bottom:18px;">
+    ${tabs.map(([k,lbl])=>`<button class="adm-tab-btn${admCmsTab===k?' active':''}" onclick="admCmsTab='${k}';admBlogEditId=null;renderAccount()">
+      ${escHtml(lbl)}${k==='comments'&&pendingCmt>0?' <span class="adm-tab-badge">'+pendingCmt+'</span>':''}
+    </button>`).join('')}
+  </div>
+  ${content}`;
+}
+
+/* ── BLOG ── */
+function adminCmsBlogSection(){
+  if(admBlogEditId!==null)return adminBlogEditor(admBlogEditId);
+  return adminBlogList();
+}
+
+function adminBlogList(){
+  const total=cmsBlogs.length;
+  const publishedCnt=cmsBlogs.filter(b=>b.status==='published').length;
+  const draftCnt=cmsBlogs.filter(b=>b.status==='draft').length;
+  const hiddenCnt=cmsBlogs.filter(b=>b.status==='hidden').length;
+  let items=[...cmsBlogs];
+  if(admBlogStatusFilter!=='all')items=items.filter(b=>b.status===admBlogStatusFilter);
+  if(admBlogCatFilter!=='all')items=items.filter(b=>b.category===admBlogCatFilter);
+  if(admBlogSearch){const q=admBlogSearch.toLowerCase();items=items.filter(b=>b.title.toLowerCase().includes(q)||b.tags.join(' ').toLowerCase().includes(q));}
+  items.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||(b.createdAt>a.createdAt?1:-1));
+  const PAGE=8,pages=Math.ceil(items.length/PAGE)||1;
+  admBlogPage=Math.min(admBlogPage,pages-1);
+  const slice=items.slice(admBlogPage*PAGE,(admBlogPage+1)*PAGE);
+  const SBADGE={published:'<span class="adm-badge adm-badge-green">Đã xuất bản</span>',draft:'<span class="adm-badge adm-badge-orange">Nháp</span>',hidden:'<span class="adm-badge">Ẩn</span>'};
+  const rows=slice.length===0?`<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-soft);">Không có bài viết nào.</td></tr>`
+  :slice.map(b=>`<tr class="adm-usr-row">
+    <td style="padding:9px 10px;max-width:280px;">
+      <div style="font-weight:600;">${b.featured?'<span style="color:#e67e22;margin-right:4px;">📌</span>':''}${escHtml(b.title)}</div>
+      <div style="font-size:11.5px;color:var(--text-soft);margin-top:2px;">${escHtml(BLOG_CATS[b.category]||b.category)}${b.tags.length?' · '+escHtml(b.tags.slice(0,2).join(', ')):''}${b.authorName?' · '+escHtml(b.authorName):''}</div>
+    </td>
+    <td style="padding:9px 10px;">${SBADGE[b.status]||''}</td>
+    <td style="padding:9px 10px;text-align:center;font-size:13px;">${b.views.toLocaleString('vi')}</td>
+    <td style="padding:9px 10px;text-align:center;font-size:13px;">${b.commentCount}</td>
+    <td style="padding:9px 10px;font-size:12.5px;color:var(--text-soft);">${escHtml(b.publishedAt||b.createdAt)}</td>
+    <td style="padding:9px 10px;white-space:nowrap;">
+      <button class="adm-row-btn" onclick="admBlogEditId='${escHtml(b.id)}';renderAccount()">Sửa</button>
+      <button class="adm-row-btn" style="background:${b.featured?'#e67e22':'#7f8c8d'};" onclick="doToggleFeatured('${escHtml(b.id)}')">${b.featured?'Bỏ ghim':'📌 Ghim'}</button>
+      <button class="adm-lock-btn" onclick="doDeleteBlog('${escHtml(b.id)}')">Xóa</button>
+    </td>
+  </tr>`).join('');
+  const pager=pages>1?`<div class="adm-pager">${admBlogPage>0?`<button class="adm-pager-btn" onclick="admBlogPage--;renderAccount()">← Trước</button>`:''}<span style="font-size:13px;">Trang ${admBlogPage+1}/${pages}</span>${admBlogPage<pages-1?`<button class="adm-pager-btn" onclick="admBlogPage++;renderAccount()">Tiếp →</button>`:''}</div>`:'';
+  return `<div class="adm-kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Tổng bài viết</div><div class="adm-kpi-val">${total}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đã xuất bản</div><div class="adm-kpi-val" style="color:#27ae60;">${publishedCnt}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Bản nháp</div><div class="adm-kpi-val" style="color:#e67e22;">${draftCnt}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đang ẩn</div><div class="adm-kpi-val" style="color:#95a5a6;">${hiddenCnt}</div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <button class="adm-row-btn" style="background:#27ae60;font-size:13.5px;padding:8px 16px;" onclick="admBlogEditId='new';renderAccount()">+ Viết bài mới</button>
+    <input class="adm-search-inp" placeholder="Tìm bài viết, tag..." value="${escHtml(admBlogSearch)}" oninput="admBlogSearch=this.value;admBlogPage=0;renderAccount()" style="max-width:240px;">
+    <select class="adm-filter-sel" onchange="admBlogStatusFilter=this.value;admBlogPage=0;renderAccount()">
+      <option value="all"${admBlogStatusFilter==='all'?' selected':''}>Tất cả trạng thái</option>
+      <option value="published"${admBlogStatusFilter==='published'?' selected':''}>Đã xuất bản</option>
+      <option value="draft"${admBlogStatusFilter==='draft'?' selected':''}>Bản nháp</option>
+      <option value="hidden"${admBlogStatusFilter==='hidden'?' selected':''}>Đang ẩn</option>
+    </select>
+    <select class="adm-filter-sel" onchange="admBlogCatFilter=this.value;admBlogPage=0;renderAccount()">
+      <option value="all"${admBlogCatFilter==='all'?' selected':''}>Tất cả danh mục</option>
+      ${Object.entries(BLOG_CATS).map(([k,v])=>`<option value="${k}"${admBlogCatFilter===k?' selected':''}>${escHtml(v)}</option>`).join('')}
+    </select>
+  </div>
+  <table class="adm-usr-table" style="width:100%;">
+    <thead><tr style="background:var(--paper);">
+      <th style="padding:9px 10px;">Tiêu đề</th>
+      <th style="padding:9px 10px;">Trạng thái</th>
+      <th style="padding:9px 10px;text-align:center;">Lượt xem</th>
+      <th style="padding:9px 10px;text-align:center;">Bình luận</th>
+      <th style="padding:9px 10px;">Ngày đăng</th>
+      <th style="padding:9px 10px;">Thao tác</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>${pager}`;
+}
+
+function adminBlogEditor(id){
+  const isNew=id==='new';
+  const def={id:'',title:'',category:'hoc-tap',tags:[],status:'draft',featured:false,thumbnail:'',excerpt:'',content:'<p>Bắt đầu viết nội dung bài viết tại đây...</p>',publishedAt:'',createdAt:'',updatedAt:'',views:0,commentCount:0,authorName:'Admin EduMart',slug:''};
+  const b=isNew?def:cmsBlogs.find(x=>x.id===id);
+  if(!b)return `<div style="padding:20px;color:var(--text-soft);">Không tìm thấy bài viết.</div>`;
+  const catOpts=Object.entries(BLOG_CATS).map(([k,v])=>`<option value="${k}"${b.category===k?' selected':''}>${escHtml(v)}</option>`).join('');
+  return `<div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+    <button class="adm-back-btn" onclick="admBlogEditId=null;renderAccount()">← Danh sách bài viết</button>
+    <span style="font-size:16px;font-weight:700;color:var(--ink-deep);">${isNew?'Viết bài mới':'Chỉnh sửa bài viết'}</span>
+    ${!isNew?`<span style="font-size:12px;color:var(--text-soft);">ID: ${escHtml(b.id)}</span>`:''}
+  </div>
+  <div class="cms-editor-layout">
+    <div class="cms-editor-main">
+      <div class="cms-field-group">
+        <label class="cms-label">Tiêu đề bài viết <span style="color:#c0392b;">*</span></label>
+        <input id="blogTitleInp" class="cms-input" placeholder="Nhập tiêu đề hấp dẫn..." value="${escHtml(b.title)}">
+      </div>
+      <div class="cms-field-group">
+        <label class="cms-label">Tóm tắt (Excerpt)</label>
+        <textarea id="blogExcerptInp" class="cms-textarea" rows="2" placeholder="Mô tả ngắn hiển thị ở danh sách bài viết...">${escHtml(b.excerpt)}</textarea>
+      </div>
+      <div class="cms-field-group">
+        <label class="cms-label">Nội dung bài viết</label>
+        <div class="cms-toolbar">
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('bold')" title="Đậm (Ctrl+B)"><b>B</b></button>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('italic')" title="Nghiêng (Ctrl+I)"><i>I</i></button>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('underline')" title="Gạch chân"><u>U</u></button>
+          <span class="cms-tb-sep"></span>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('formatBlock','H2')" title="Tiêu đề H2">H2</button>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('formatBlock','H3')" title="Tiêu đề H3">H3</button>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('formatBlock','P')" title="Đoạn văn bản">¶</button>
+          <span class="cms-tb-sep"></span>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('insertUnorderedList')" title="Danh sách không thứ tự">≡</button>
+          <button type="button" class="cms-tb-btn" onclick="blogFmt('insertOrderedList')" title="Danh sách có số">1.</button>
+          <span class="cms-tb-sep"></span>
+          <button type="button" class="cms-tb-btn" onclick="blogInsertLink()" title="Chèn liên kết">🔗</button>
+          <button type="button" class="cms-tb-btn" onclick="blogInsertImgUrl()" title="Chèn hình ảnh">🖼</button>
+        </div>
+        <div id="blogEditor" class="cms-editor" contenteditable="true" spellcheck="false">${b.content}</div>
+      </div>
+    </div>
+    <div class="cms-editor-side">
+      <div class="cms-side-section">
+        <div class="cms-side-title">Xuất bản</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="adm-row-btn" style="background:#27ae60;width:100%;padding:9px;" onclick="doSaveBlog('${escHtml(id)}','published')">🌐 Xuất bản ngay</button>
+          <button class="adm-row-btn" style="background:#7f8c8d;width:100%;padding:9px;" onclick="doSaveBlog('${escHtml(id)}','draft')">💾 Lưu nháp</button>
+          <button class="adm-row-btn" style="background:#95a5a6;width:100%;padding:9px;" onclick="doSaveBlog('${escHtml(id)}','hidden')">🚫 Ẩn bài viết</button>
+          ${!isNew?`<hr style="border:none;border-top:1px solid var(--line);margin:4px 0;">
+          <button class="adm-lock-btn" style="width:100%;padding:9px;" onclick="doDeleteBlog('${escHtml(id)}')">🗑 Xóa bài viết</button>`:''}
+        </div>
+        ${!isNew?`<div style="margin-top:10px;font-size:12.5px;color:var(--text-soft);line-height:1.6;">Trạng thái: <b>${b.status==='published'?'Đã xuất bản':b.status==='draft'?'Bản nháp':'Đang ẩn'}</b><br>Đăng: ${b.publishedAt||'–'} · Cập nhật: ${b.updatedAt||'–'}</div>`:''}
+      </div>
+      <div class="cms-side-section">
+        <div class="cms-side-title">Danh mục & Tag</div>
+        <label class="cms-label">Danh mục</label>
+        <select id="blogCatInp" class="adm-filter-sel" style="width:100%;margin-bottom:10px;">${catOpts}</select>
+        <label class="cms-label">Tags <span style="font-size:11px;color:var(--text-soft);">(cách nhau bằng dấu phẩy)</span></label>
+        <input id="blogTagsInp" class="cms-input" placeholder="học tập, kỹ năng, THPT..." value="${escHtml(b.tags.join(', '))}">
+      </div>
+      <div class="cms-side-section">
+        <div class="cms-side-title">Ảnh bìa & Tùy chọn</div>
+        <label class="cms-label">URL ảnh bìa (thumbnail)</label>
+        <input id="blogThumbInp" class="cms-input" placeholder="https://..." value="${escHtml(b.thumbnail)}" style="margin-bottom:10px;">
+        <label class="cms-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="blogFeaturedInp" ${b.featured?'checked':''}> <span>Ghim bài viết lên đầu (Featured)</span>
+        </label>
+      </div>
+    </div>
+  </div>`;
+}
+
+function blogFmt(cmd,val){const el=document.getElementById('blogEditor');if(el){el.focus();document.execCommand(cmd,false,val||null);}}
+function blogInsertLink(){const url=prompt('Nhập URL liên kết:');if(url&&url.trim())blogFmt('createLink',url.trim());}
+function blogInsertImgUrl(){const url=prompt('Nhập URL hình ảnh:');if(url&&url.trim())blogFmt('insertImage',url.trim());}
+
+function doSaveBlog(id,status){
+  const title=(document.getElementById('blogTitleInp')||{}).value||'';
+  if(!title.trim()){toast('Vui lòng nhập tiêu đề bài viết');return;}
+  const excerpt=(document.getElementById('blogExcerptInp')||{}).value||'';
+  const content=(document.getElementById('blogEditor')||{}).innerHTML||'';
+  const category=(document.getElementById('blogCatInp')||{}).value||'hoc-tap';
+  const tagsRaw=(document.getElementById('blogTagsInp')||{}).value||'';
+  const tags=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
+  const thumbnail=(document.getElementById('blogThumbInp')||{}).value||'';
+  const featured=!!(document.getElementById('blogFeaturedInp')||{}).checked;
+  const today=todayStr();
+  const slug=title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,80);
+  if(id==='new'){
+    const newId='blog-'+Date.now().toString(36);
+    cmsBlogs.unshift({id:newId,title:title.trim(),slug,category,tags,status,featured,
+      authorName:'Admin EduMart',thumbnail,excerpt:excerpt.trim(),content,
+      publishedAt:status==='published'?today:'',createdAt:today,updatedAt:today,views:0,commentCount:0});
+    saveCmsBlogs();toast('Đã tạo bài viết mới');
+  } else {
+    const b=cmsBlogs.find(x=>x.id===id);if(!b)return;
+    b.title=title.trim();b.slug=slug;b.category=category;b.tags=tags;b.status=status;
+    b.featured=featured;b.thumbnail=thumbnail;b.excerpt=excerpt.trim();b.content=content;
+    b.updatedAt=today;if(status==='published'&&!b.publishedAt)b.publishedAt=today;
+    saveCmsBlogs();toast('Đã lưu bài viết');
+  }
+  admBlogEditId=null;renderAccount();
+}
+
+function doDeleteBlog(id){
+  const b=cmsBlogs.find(x=>x.id===id);if(!b)return;
+  if(!confirm('Xóa bài viết "'+b.title+'"?\nHành động này không thể hoàn tác.'))return;
+  cmsBlogs=cmsBlogs.filter(x=>x.id!==id);
+  cmsComments=cmsComments.filter(c=>c.blogId!==id);
+  saveCmsBlogs();saveCmsComments();admBlogEditId=null;toast('Đã xóa bài viết');renderAccount();
+}
+
+function doToggleFeatured(id){
+  const b=cmsBlogs.find(x=>x.id===id);if(!b)return;
+  const next=!b.featured;
+  if(next)cmsBlogs.forEach(x=>{x.featured=false;});
+  b.featured=next;
+  saveCmsBlogs();renderAccount();
+  toast(next?'Đã ghim bài viết lên đầu':'Đã bỏ ghim bài viết');
+}
+
+/* ── COMMENTS ── */
+function adminCmsComments(){
+  const total=cmsComments.length;
+  const pendingCnt=cmsComments.filter(c=>c.status==='pending').length;
+  const approvedCnt=cmsComments.filter(c=>c.status==='approved').length;
+  const deletedCnt=cmsComments.filter(c=>c.status==='deleted').length;
+  let items=[...cmsComments];
+  const q=admCmntSearch.toLowerCase();
+  if(q)items=items.filter(c=>c.userName.toLowerCase().includes(q)||c.content.toLowerCase().includes(q)||c.blogTitle.toLowerCase().includes(q));
+  if(admCmntStatusFilter!=='all')items=items.filter(c=>c.status===admCmntStatusFilter);
+  items.sort((a,b)=>b.id>a.id?1:-1);
+  const PAGE=12,pages=Math.ceil(items.length/PAGE)||1;
+  admCmntPage=Math.min(admCmntPage,pages-1);
+  const slice=items.slice(admCmntPage*PAGE,(admCmntPage+1)*PAGE);
+  const CBADGE={pending:'<span class="adm-badge adm-badge-orange">Chờ duyệt</span>',approved:'<span class="adm-badge adm-badge-green">Đã duyệt</span>',deleted:'<span class="adm-badge">Đã xóa</span>'};
+  const rows=slice.length===0?`<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-soft);">Không có bình luận nào.</td></tr>`
+  :slice.map(c=>`<tr class="adm-usr-row">
+    <td style="padding:9px 10px;">
+      <b>${escHtml(c.userName)}</b>
+      ${c.bannedUser?'<span style="font-size:11px;background:#fde;color:#c0392b;padding:1px 5px;border-radius:4px;margin-left:4px;">Đã cấm</span>':''}
+      <div style="font-size:11.5px;color:var(--text-soft);">${escHtml(c.createdAt)}</div>
+    </td>
+    <td style="padding:9px 10px;font-size:13px;max-width:260px;">${escHtml(c.content)}</td>
+    <td style="padding:9px 10px;font-size:12px;color:var(--text-soft);max-width:160px;">${escHtml(c.blogTitle)}</td>
+    <td style="padding:9px 10px;">${CBADGE[c.status]||''}</td>
+    <td style="padding:9px 10px;white-space:nowrap;">
+      ${c.status==='pending'?`<button class="adm-row-btn" onclick="doCmtApprove('${escHtml(c.id)}')">✓ Duyệt</button>`:''}
+      ${c.status!=='deleted'?`<button class="adm-lock-btn" onclick="doCmtDelete('${escHtml(c.id)}')">Xóa</button>`:''}
+      ${!c.bannedUser&&c.status!=='deleted'?`<button class="adm-row-btn" style="background:#8e44ad;" onclick="doCmtBanUser('${escHtml(c.id)}')">Cấm</button>`:''}
+    </td>
+  </tr>`).join('');
+  const pager=pages>1?`<div class="adm-pager">${admCmntPage>0?`<button class="adm-pager-btn" onclick="admCmntPage--;renderAccount()">← Trước</button>`:''}<span style="font-size:13px;">Trang ${admCmntPage+1}/${pages}</span>${admCmntPage<pages-1?`<button class="adm-pager-btn" onclick="admCmntPage++;renderAccount()">Tiếp →</button>`:''}</div>`:'';
+  return `<div class="adm-kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Tổng bình luận</div><div class="adm-kpi-val">${total}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Chờ duyệt</div><div class="adm-kpi-val" style="color:#e67e22;">${pendingCnt}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đã duyệt</div><div class="adm-kpi-val" style="color:#27ae60;">${approvedCnt}</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-lbl">Đã xóa</div><div class="adm-kpi-val" style="color:#95a5a6;">${deletedCnt}</div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+    <input class="adm-search-inp" placeholder="Tìm tên, nội dung, bài viết..." value="${escHtml(admCmntSearch)}" oninput="admCmntSearch=this.value;admCmntPage=0;renderAccount()" style="max-width:300px;">
+    <select class="adm-filter-sel" onchange="admCmntStatusFilter=this.value;admCmntPage=0;renderAccount()">
+      <option value="all"${admCmntStatusFilter==='all'?' selected':''}>Tất cả</option>
+      <option value="pending"${admCmntStatusFilter==='pending'?' selected':''}>Chờ duyệt</option>
+      <option value="approved"${admCmntStatusFilter==='approved'?' selected':''}>Đã duyệt</option>
+      <option value="deleted"${admCmntStatusFilter==='deleted'?' selected':''}>Đã xóa</option>
+    </select>
+  </div>
+  <table class="adm-usr-table" style="width:100%;">
+    <thead><tr style="background:var(--paper);">
+      <th style="padding:9px 10px;">Người dùng</th>
+      <th style="padding:9px 10px;">Nội dung</th>
+      <th style="padding:9px 10px;">Bài viết</th>
+      <th style="padding:9px 10px;">Trạng thái</th>
+      <th style="padding:9px 10px;">Thao tác</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>${pager}`;
+}
+
+function doCmtApprove(id){
+  const c=cmsComments.find(x=>x.id===id);if(!c)return;
+  const b=cmsBlogs.find(x=>x.id===c.blogId);
+  c.status='approved';
+  if(b&&c.status!=='approved')b.commentCount=Math.max(0,b.commentCount+1);
+  saveCmsComments();saveCmsBlogs();renderAccount();toast('Đã duyệt bình luận');
+}
+function doCmtDelete(id){
+  const c=cmsComments.find(x=>x.id===id);if(!c)return;
+  if(!confirm('Xóa bình luận này?'))return;
+  c.status='deleted';saveCmsComments();renderAccount();toast('Đã xóa bình luận');
+}
+function doCmtBanUser(id){
+  const c=cmsComments.find(x=>x.id===id);if(!c)return;
+  if(!confirm('Cấm người dùng "'+c.userName+'" bình luận trên toàn hệ thống?'))return;
+  cmsComments.filter(x=>x.userId===c.userId).forEach(x=>{x.bannedUser=true;});
+  saveCmsComments();renderAccount();toast('Đã cấm '+c.userName+' bình luận');
+}
+
+/* ── BANNERS ── */
+function adminCmsBanners(){
+  const subTabs=[['banners','Banner trang chủ'],['popup','Popup khuyến mãi']];
+  const content=admCmsBannerSubTab==='popup'?adminCmsPopupForm():adminCmsBannerList();
+  return `<div class="adm-shops-tab" style="margin-bottom:14px;">
+    ${subTabs.map(([k,lbl])=>`<button class="adm-tab-btn${admCmsBannerSubTab===k?' active':''}" onclick="admCmsBannerSubTab='${k}';renderAccount()">${escHtml(lbl)}</button>`).join('')}
+  </div>${content}`;
+}
+
+function adminCmsBannerList(){
+  const bannerRows=cmsBanners.length===0?`<div style="padding:28px;text-align:center;color:var(--text-soft);">Chưa có banner nào. Nhấn "+ Thêm banner" để bắt đầu.</div>`
+  :cmsBanners.map((b,i)=>`<div class="cms-banner-card${b.active?'':' cms-banner-inactive'}">
+    <div class="cms-banner-order">${i+1}</div>
+    <div class="cms-banner-info">
+      <div class="cms-banner-title">${escHtml(b.title)}</div>
+      <div class="cms-banner-meta">
+        ${b.imageUrl?`<a href="${escHtml(b.imageUrl)}" target="_blank" style="color:#2980b9;font-size:11.5px;">Xem ảnh</a> · `:''}
+        Link: <code style="font-size:11.5px;">${escHtml(b.linkUrl||'–')}</code> ·
+        ${escHtml(b.startDate)} → ${escHtml(b.endDate||'Không hạn')} ·
+        <b style="color:${b.active?'#27ae60':'#95a5a6'};">${b.active?'Đang hiển thị':'Tắt'}</b>
+      </div>
+    </div>
+    <div class="cms-banner-actions">
+      ${i>0?`<button class="adm-pager-btn" style="padding:4px 8px;" onclick="doBannerMove('${escHtml(b.id)}',-1)" title="Lên trên">▲</button>`:'<span style="width:32px;display:inline-block;"></span>'}
+      ${i<cmsBanners.length-1?`<button class="adm-pager-btn" style="padding:4px 8px;" onclick="doBannerMove('${escHtml(b.id)}',1)" title="Xuống dưới">▼</button>`:'<span style="width:32px;display:inline-block;"></span>'}
+      <button class="adm-row-btn" style="background:${b.active?'#7f8c8d':'#27ae60'};" onclick="doToggleBanner('${escHtml(b.id)}')">${b.active?'Tắt':'Bật'}</button>
+      <button class="adm-row-btn" onclick="admBannerEditId='${escHtml(b.id)}';renderAccount()">Sửa</button>
+      <button class="adm-lock-btn" onclick="doBannerDelete('${escHtml(b.id)}')">Xóa</button>
+    </div>
+  </div>`).join('');
+
+  const editId=admBannerEditId;
+  const isNewBanner=editId==='new';
+  const eb=isNewBanner?{title:'',imageUrl:'',linkUrl:'',alt:'',startDate:'',endDate:'',active:true}:(editId?cmsBanners.find(x=>x.id===editId):null);
+  const editForm=editId&&eb?`<div class="cms-side-section" style="margin-bottom:18px;max-width:680px;">
+    <div class="cms-side-title" style="margin-bottom:12px;">${isNewBanner?'Thêm banner mới':'Chỉnh sửa banner'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><label class="cms-label">Tiêu đề <span style="color:#c0392b;">*</span></label><input id="banTitleInp" class="cms-input" value="${escHtml(eb.title)}" placeholder="Tên banner..."></div>
+      <div><label class="cms-label">Alt text</label><input id="banAltInp" class="cms-input" value="${escHtml(eb.alt||'')}" placeholder="Mô tả ảnh..."></div>
+      <div style="grid-column:1/-1;"><label class="cms-label">URL hình ảnh</label><input id="banImgInp" class="cms-input" value="${escHtml(eb.imageUrl)}" placeholder="https://..."></div>
+      <div style="grid-column:1/-1;"><label class="cms-label">URL liên kết (khi click)</label><input id="banLinkInp" class="cms-input" value="${escHtml(eb.linkUrl)}" placeholder="/khuyen-mai hoặc https://..."></div>
+      <div><label class="cms-label">Ngày bắt đầu</label><input id="banStartInp" class="cms-input" type="date" value="${escHtml(eb.startDate?eb.startDate.split('/').reverse().join('-'):'')}"></div>
+      <div><label class="cms-label">Ngày kết thúc</label><input id="banEndInp" class="cms-input" type="date" value="${escHtml(eb.endDate?eb.endDate.split('/').reverse().join('-'):'')}" placeholder="Để trống = không hạn"></div>
+    </div>
+    <label class="cms-label" style="margin-top:10px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+      <input type="checkbox" id="banActiveInp" ${eb.active?'checked':''}> Hiển thị ngay sau khi lưu
+    </label>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="adm-row-btn" style="background:#27ae60;" onclick="doSaveBanner('${editId}')">💾 Lưu banner</button>
+      <button class="adm-row-btn" style="background:#7f8c8d;" onclick="admBannerEditId=null;renderAccount()">Hủy</button>
+    </div>
+  </div>`:editId?`<div style="padding:20px;color:var(--text-soft);">Không tìm thấy banner.</div>`:'';
+
+  return `${editForm}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <span style="font-size:14px;font-weight:600;color:var(--ink-deep);">${cmsBanners.length} banner · Kéo thả hoặc dùng ▲▼ để sắp xếp</span>
+    <button class="adm-row-btn" style="background:#27ae60;" onclick="admBannerEditId='new';renderAccount()">+ Thêm banner</button>
+  </div>
+  <div class="cms-banner-list">${bannerRows}</div>`;
+}
+
+function adminCmsPopupForm(){
+  const p=cmsPopup;
+  return `<div class="cms-side-section" style="max-width:600px;">
+    <div class="cms-side-title" style="margin-bottom:14px;">Cài đặt Popup khuyến mãi</div>
+    <label class="cms-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
+      <input type="checkbox" id="popupEnabledInp" ${p.enabled?'checked':''} style="width:16px;height:16px;">
+      <span style="font-size:14px;font-weight:600;">Bật popup khuyến mãi</span>
+      ${p.enabled?'<span class="adm-badge adm-badge-green">Đang bật</span>':'<span class="adm-badge">Đang tắt</span>'}
+    </label>
+    <label class="cms-label">Tiêu đề popup</label>
+    <input id="popupTitleInp" class="cms-input" value="${escHtml(p.title)}" placeholder="Ưu đãi đặc biệt hôm nay!" style="margin-bottom:10px;">
+    <label class="cms-label">Nội dung</label>
+    <textarea id="popupContentInp" class="cms-textarea" rows="3" placeholder="Nhập nội dung ngắn gọn...">${escHtml(p.content)}</textarea>
+    <label class="cms-label">URL hình ảnh (tùy chọn)</label>
+    <input id="popupImgInp" class="cms-input" value="${escHtml(p.imageUrl)}" placeholder="https://..." style="margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><label class="cms-label">URL liên kết</label><input id="popupLinkInp" class="cms-input" value="${escHtml(p.linkUrl)}" placeholder="/khuyen-mai"></div>
+      <div><label class="cms-label">Nhãn nút CTA</label><input id="popupBtnInp" class="cms-input" value="${escHtml(p.linkText)}" placeholder="Xem ngay"></div>
+      <div><label class="cms-label">Hiện sau (giây)</label><input id="popupDelayInp" class="cms-input" type="number" min="0" max="60" value="${p.delaySeconds}"></div>
+      <div><label class="cms-label" style="display:flex;align-items:center;gap:8px;margin-top:22px;cursor:pointer;"><input type="checkbox" id="popupOnceInp" ${p.showOnce?'checked':''}> Chỉ hiện 1 lần / người</label></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+      <button class="adm-row-btn" style="background:#27ae60;" onclick="doSavePopup()">💾 Lưu cài đặt popup</button>
+      ${p.updatedAt?`<span style="font-size:12px;color:var(--text-soft);">Cập nhật: ${escHtml(p.updatedAt)}</span>`:''}
+    </div>
+  </div>`;
+}
+
+function doToggleBanner(id){
+  const b=cmsBanners.find(x=>x.id===id);if(!b)return;
+  b.active=!b.active;saveCmsBanners();renderAccount();
+  toast(b.active?'Đã bật banner':'Đã tắt banner');
+}
+function doBannerMove(id,dir){
+  const i=cmsBanners.findIndex(x=>x.id===id);if(i<0)return;
+  const ni=i+dir;if(ni<0||ni>=cmsBanners.length)return;
+  [cmsBanners[i],cmsBanners[ni]]=[cmsBanners[ni],cmsBanners[i]];
+  saveCmsBanners();renderAccount();
+}
+function doBannerDelete(id){
+  const b=cmsBanners.find(x=>x.id===id);if(!b)return;
+  if(!confirm('Xóa banner "'+b.title+'"?'))return;
+  cmsBanners=cmsBanners.filter(x=>x.id!==id);
+  saveCmsBanners();admBannerEditId=null;renderAccount();toast('Đã xóa banner');
+}
+function doSaveBanner(editId){
+  const title=(document.getElementById('banTitleInp')||{}).value||'';
+  if(!title.trim()){toast('Vui lòng nhập tiêu đề banner');return;}
+  const imageUrl=(document.getElementById('banImgInp')||{}).value||'';
+  const linkUrl=(document.getElementById('banLinkInp')||{}).value||'';
+  const alt=(document.getElementById('banAltInp')||{}).value||'';
+  const startRaw=(document.getElementById('banStartInp')||{}).value||'';
+  const endRaw=(document.getElementById('banEndInp')||{}).value||'';
+  const startDate=startRaw?startRaw.split('-').reverse().join('/'):'';
+  const endDate=endRaw?endRaw.split('-').reverse().join('/'):'';
+  const active=!!(document.getElementById('banActiveInp')||{}).checked;
+  if(editId==='new'){
+    cmsBanners.push({id:'ban-'+Date.now().toString(36),title:title.trim(),imageUrl,linkUrl,alt,startDate,endDate,active});
+  } else {
+    const b=cmsBanners.find(x=>x.id===editId);if(!b)return;
+    Object.assign(b,{title:title.trim(),imageUrl,linkUrl,alt,startDate,endDate,active});
+  }
+  saveCmsBanners();admBannerEditId=null;renderAccount();toast('Đã lưu banner');
+}
+function doSavePopup(){
+  const enabled=!!(document.getElementById('popupEnabledInp')||{}).checked;
+  const title=(document.getElementById('popupTitleInp')||{}).value||'';
+  const content=(document.getElementById('popupContentInp')||{}).value||'';
+  const imageUrl=(document.getElementById('popupImgInp')||{}).value||'';
+  const linkUrl=(document.getElementById('popupLinkInp')||{}).value||'';
+  const linkText=(document.getElementById('popupBtnInp')||{}).value||'';
+  const delaySeconds=parseInt((document.getElementById('popupDelayInp')||{}).value||'3',10)||3;
+  const showOnce=!!(document.getElementById('popupOnceInp')||{}).checked;
+  Object.assign(cmsPopup,{enabled,title,content,imageUrl,linkUrl,linkText,delaySeconds,showOnce,updatedAt:todayStr()});
+  saveCmsPopup();renderAccount();toast('Đã lưu cài đặt popup');
+}
+
+/* ── STATIC PAGES ── */
+function adminCmsStatic(){
+  const pages=[['about','Về chúng tôi'],['terms','Điều khoản sử dụng'],['privacy','Chính sách bảo mật'],['returns','Chính sách đổi/trả']];
+  const cur=admStaticPage;
+  const pageData=cmsStaticPages[cur]||{title:'',content:'',updatedAt:''};
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    ${pages.map(([k,lbl])=>`<button class="adm-tab-btn${cur===k?' active':''}" onclick="admStaticPage='${k}';renderAccount()">${escHtml(lbl)}</button>`).join('')}
+  </div>
+  <div class="cms-side-section" style="max-width:860px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="cms-side-title" style="margin:0;">${escHtml(pageData.title)}</div>
+      ${pageData.updatedAt?`<span style="font-size:12px;color:var(--text-soft);">Cập nhật lần cuối: ${escHtml(pageData.updatedAt)}</span>`:''}
+    </div>
+    <div class="cms-toolbar" style="margin-bottom:4px;">
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('bold')"><b>B</b></button>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('italic')"><i>I</i></button>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('underline')"><u>U</u></button>
+      <span class="cms-tb-sep"></span>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('formatBlock','H2')">H2</button>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('formatBlock','H3')">H3</button>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('formatBlock','P')">¶</button>
+      <span class="cms-tb-sep"></span>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('insertUnorderedList')">≡</button>
+      <button type="button" class="cms-tb-btn" onclick="staticFmt('insertOrderedList')">1.</button>
+    </div>
+    <div id="staticPageEditor" class="cms-editor" contenteditable="true" spellcheck="false" style="min-height:380px;">${pageData.content}</div>
+    <div style="margin-top:12px;">
+      <button class="adm-row-btn" style="background:#27ae60;padding:9px 20px;" onclick="doSaveStaticPage('${cur}')">💾 Lưu trang "${escHtml(pageData.title)}"</button>
+    </div>
+  </div>`;
+}
+
+function staticFmt(cmd,val){const el=document.getElementById('staticPageEditor');if(el){el.focus();document.execCommand(cmd,false,val||null);}}
+function doSaveStaticPage(key){
+  const el=document.getElementById('staticPageEditor');if(!el)return;
+  if(!cmsStaticPages[key])return;
+  cmsStaticPages[key].content=el.innerHTML;
+  cmsStaticPages[key].updatedAt=todayStr();
+  saveCmsStaticPages();renderAccount();toast('Đã lưu trang "'+cmsStaticPages[key].title+'"');
+}
+
+// =====================================================================
+// QUẢN LÝ KHUYẾN MÃI
+// =====================================================================
+const PROMO_CATS={'all':'Tất cả danh mục','sach':'Sách','vpp':'Văn phòng phẩm','tbgd':'Thiết bị GD','ebook':'Ebook','audiobook':'Sách nói'};
+
+function adminPromo(){
+  const TABS=[['vouchers','Mã giảm giá'],['flashsale','Flash Sale'],['points','Điểm thưởng']];
+  const content=admPromoTab==='flashsale'?adminPromoFlashSales():
+    admPromoTab==='points'?adminPromoPoints():
+    adminPromoVouchers();
+  return `<div class="adm-section">
+    <h2 class="adm-section-title">Quản lý Khuyến mãi</h2>
+    <div class="adm-shops-tab" style="margin-bottom:18px;">
+      ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admPromoTab===k?' active':''}" onclick="admPromoTab='${k}';admVoucherEditId=null;admFlashSaleEditId=null;admFlashSaleDetailId=null;renderAccount()">${lbl}</button>`).join('')}
+    </div>
+    ${content}
+  </div>`;
+}
+
+/* ---------- VOUCHERS ---------- */
+function adminPromoVouchers(){
+  if(admVoucherEditId!==null) return adminPromoVoucherEditor(admVoucherEditId);
+  return adminPromoVoucherList();
+}
+
+function adminPromoVoucherList(){
+  const search=admVoucherSearch.toLowerCase();
+  const STATUS_LBL={active:'Hoạt động',inactive:'Đã tắt',expired:'Hết hạn'};
+  const STATUS_CLR={active:'#27ae60',inactive:'#888',expired:'#e74c3c'};
+  let list=promoVouchers.filter(v=>{
+    if(search&&!v.code.toLowerCase().includes(search)&&!v.name.toLowerCase().includes(search))return false;
+    if(admVoucherStatusFilter!=='all'&&v.status!==admVoucherStatusFilter)return false;
+    return true;
+  });
+  const total=list.length;
+  const PAGE=10,pages=Math.ceil(total/PAGE)||1;
+  if(admVoucherPage>=pages)admVoucherPage=Math.max(0,pages-1);
+  const page=list.slice(admVoucherPage*PAGE,(admVoucherPage+1)*PAGE);
+  const active=promoVouchers.filter(v=>v.status==='active').length;
+  const totalUsed=promoVouchers.reduce((s,v)=>s+v.usedCount,0);
+  const rows=page.map(v=>{
+    const usePct=v.maxUsage>0?Math.min(100,Math.round(v.usedCount/v.maxUsage*100)):0;
+    const catLbl=v.categories.includes('all')?'Tất cả':v.categories.map(c=>PROMO_CATS[c]||c).join(', ');
+    const valLbl=v.type==='percent'?v.value+'%':fmt(v.value);
+    return `<tr>
+      <td><strong style="font-family:monospace;font-size:13px;color:var(--ink)">${escHtml(v.code)}</strong><div style="font-size:12px;color:var(--text-soft)">${escHtml(v.name)}</div></td>
+      <td>${valLbl}${v.type==='percent'?`<br><small style="color:#aaa">tối đa ${fmt(v.maxDiscount)}</small>`:''}</td>
+      <td>${v.minOrder>0?fmt(v.minOrder):'—'}</td>
+      <td style="font-size:12.5px">${escHtml(catLbl)}</td>
+      <td><div style="font-size:13px">${v.usedCount.toLocaleString('vi-VN')} / ${v.maxUsage.toLocaleString('vi-VN')}</div><div style="background:#eee;border-radius:4px;height:5px;margin-top:4px"><div style="background:var(--ink);border-radius:4px;height:5px;width:${usePct}%"></div></div></td>
+      <td><div>${v.startDate}</div><div style="color:var(--text-soft);font-size:12px">→ ${v.endDate}</div></td>
+      <td><span style="color:${STATUS_CLR[v.status]||'#888'};font-weight:600;font-size:12.5px">${STATUS_LBL[v.status]||v.status}</span></td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${v.status!=='expired'?`<button class="adm-btn-sm" onclick="admVoucherEditId='${v.id}';renderAccount()">Sửa</button>`:''}
+        ${v.status==='active'?`<button class="adm-btn-sm" style="background:#f39c12;color:#fff" onclick="doToggleVoucher('${v.id}',false)">Tắt</button>`:''}
+        ${v.status==='inactive'?`<button class="adm-btn-sm" style="background:#27ae60;color:#fff" onclick="doToggleVoucher('${v.id}',true)">Bật</button>`:''}
+        <button class="adm-btn-sm danger" onclick="doDeleteVoucher('${v.id}')">Xóa</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const pageLinks=pages>1?`<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px">${Array.from({length:pages},(_,i)=>`<button class="adm-btn-sm${i===admVoucherPage?' active':''}" onclick="admVoucherPage=${i};renderAccount()">${i+1}</button>`).join('')}</div>`:'';
+  return `
+    <div class="adm-kpi-row" style="margin-bottom:18px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${active}</div><div class="adm-kpi-lbl">Đang hoạt động</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${totalUsed.toLocaleString('vi-VN')}</div><div class="adm-kpi-lbl">Tổng lượt sử dụng</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${promoVouchers.filter(v=>v.status==='expired').length}</div><div class="adm-kpi-lbl">Đã hết hạn</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${promoVouchers.filter(v=>v.status==='inactive').length}</div><div class="adm-kpi-lbl">Đã tắt</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input class="cms-input" placeholder="Tìm mã hoặc tên voucher..." value="${escHtml(admVoucherSearch)}" oninput="admVoucherSearch=this.value;admVoucherPage=0;renderAccount()" style="width:220px">
+        <select class="cms-input" onchange="admVoucherStatusFilter=this.value;admVoucherPage=0;renderAccount()">
+          <option value="all"${admVoucherStatusFilter==='all'?' selected':''}>Tất cả trạng thái</option>
+          <option value="active"${admVoucherStatusFilter==='active'?' selected':''}>Hoạt động</option>
+          <option value="inactive"${admVoucherStatusFilter==='inactive'?' selected':''}>Đã tắt</option>
+          <option value="expired"${admVoucherStatusFilter==='expired'?' selected':''}>Hết hạn</option>
+        </select>
+      </div>
+      <button class="adm-btn" onclick="admVoucherEditId='new';renderAccount()">+ Tạo voucher mới</button>
+    </div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Mã / Tên</th><th>Giá trị</th><th>Đơn tối thiểu</th><th>Danh mục</th><th>Sử dụng</th><th>Thời hạn</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="8" style="text-align:center;color:#888;padding:24px">Không tìm thấy voucher nào</td></tr>'}</tbody>
+      </table>
+    </div>${pageLinks}`;
+}
+
+function adminPromoVoucherEditor(editId){
+  const isNew=editId==='new';
+  const v=isNew?null:promoVouchers.find(x=>x.id===editId);
+  const toInputDate=s=>s?s.split('/').reverse().join('-'):'';
+  const catOptions=Object.entries(PROMO_CATS).map(([k,lbl])=>`<option value="${k}"${(!isNew&&v&&v.categories.includes(k))?' selected':''}>${lbl}</option>`).join('');
+  const usePct=!isNew&&v&&v.maxUsage>0?Math.min(100,Math.round(v.usedCount/v.maxUsage*100)):0;
+  return `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <button class="adm-btn-sm" onclick="admVoucherEditId=null;renderAccount()">← Quay lại</button>
+      <h3 style="margin:0">${isNew?'Tạo Voucher mới':'Chỉnh sửa: '+escHtml(v?v.code:'')}</h3>
+    </div>
+    <div class="promo-form-grid">
+      <div class="adm-form-card" style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="adm-form-lbl">Mã voucher <span style="color:red">*</span></label>
+          <input id="vcCode" class="cms-input" style="width:100%;text-transform:uppercase;font-family:monospace" placeholder="VD: SUMMER25" value="${isNew?'':escHtml(v.code)}" oninput="this.value=this.value.toUpperCase()"></div>
+        <div><label class="adm-form-lbl">Tên chương trình <span style="color:red">*</span></label>
+          <input id="vcName" class="cms-input" style="width:100%" placeholder="VD: Flash sale hè 2025" value="${isNew?'':escHtml(v.name)}"></div>
+        <div><label class="adm-form-lbl">Mô tả</label>
+          <textarea id="vcDesc" class="cms-input" style="width:100%;resize:vertical;min-height:56px" placeholder="Mô tả ngắn...">${isNew?'':escHtml(v.desc||'')}</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="adm-form-lbl">Loại giảm giá <span style="color:red">*</span></label>
+            <select id="vcType" class="cms-input" style="width:100%">
+              <option value="percent"${isNew||!v||v.type==='percent'?' selected':''}>Phần trăm (%)</option>
+              <option value="fixed"${!isNew&&v&&v.type==='fixed'?' selected':''}>Số tiền cố định (đ)</option>
+            </select></div>
+          <div><label class="adm-form-lbl">Giá trị <span style="color:red">*</span></label>
+            <input id="vcValue" type="number" class="cms-input" style="width:100%" placeholder="25 (%) hoặc 50000 (đ)" value="${isNew?'':v.value}"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="adm-form-lbl">Đơn tối thiểu (đ)</label>
+            <input id="vcMinOrder" type="number" class="cms-input" style="width:100%" placeholder="0 = không giới hạn" value="${isNew?'':v.minOrder}"></div>
+          <div><label class="adm-form-lbl">Giảm tối đa (đ)</label>
+            <input id="vcMaxDiscount" type="number" class="cms-input" style="width:100%" placeholder="Chỉ dùng với %" value="${isNew?'':v.maxDiscount}"></div>
+        </div>
+        <div><label class="adm-form-lbl">Danh mục áp dụng</label>
+          <select id="vcCats" class="cms-input" style="width:100%" multiple size="5">${catOptions}</select>
+          <small style="color:#999;display:block;margin-top:3px">Giữ Ctrl để chọn nhiều. "Tất cả" = áp dụng toàn bộ.</small></div>
+        <div><label class="adm-form-lbl">Số lần dùng tối đa</label>
+          <input id="vcMaxUsage" type="number" class="cms-input" style="width:160px" placeholder="9999 = không giới hạn" value="${isNew?'':v.maxUsage}"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="adm-form-lbl">Ngày bắt đầu <span style="color:red">*</span></label>
+            <input id="vcStart" type="date" class="cms-input" style="width:100%" value="${isNew?'':toInputDate(v.startDate)}"></div>
+          <div><label class="adm-form-lbl">Ngày kết thúc <span style="color:red">*</span></label>
+            <input id="vcEnd" type="date" class="cms-input" style="width:100%" value="${isNew?'':toInputDate(v.endDate)}"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button class="adm-btn" onclick="doSaveVoucher('${editId}')">💾 Lưu voucher</button>
+          <button class="adm-btn-sm" onclick="admVoucherEditId=null;renderAccount()">Hủy</button>
+        </div>
+      </div>
+      ${!isNew&&v?`<div class="adm-form-card">
+        <h4 style="margin:0 0 14px;font-size:14px">📊 Thống kê sử dụng</h4>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--paper);border-radius:8px;padding:12px"><div style="font-size:24px;font-weight:700;color:var(--ink)">${v.usedCount.toLocaleString('vi-VN')}</div><div style="font-size:12.5px;color:var(--text-soft)">Tổng lượt sử dụng</div></div>
+          <div style="background:var(--paper);border-radius:8px;padding:12px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--text-soft)">Đã dùng</span><span style="font-weight:700;color:var(--ink)">${usePct}%</span></div>
+            <div style="background:#e0e0e0;border-radius:4px;height:8px;margin-top:6px"><div style="background:var(--ink);border-radius:4px;height:8px;width:${usePct}%"></div></div>
+            <div style="font-size:12px;color:#aaa;margin-top:4px">${v.usedCount.toLocaleString('vi-VN')} / ${v.maxUsage.toLocaleString('vi-VN')} lượt</div>
+          </div>
+          <div style="background:var(--paper);border-radius:8px;padding:12px"><div style="font-size:14px;font-weight:700;color:var(--ink-deep)">${fmtBig(Math.round(v.usedCount*(v.type==='percent'?v.value/100*280000:v.value)))}đ</div><div style="font-size:12.5px;color:var(--text-soft)">Ước tính tổng chiết khấu</div></div>
+          <div style="background:var(--paper);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text-soft)">Trạng thái: <span style="font-weight:600;color:${v.status==='active'?'#27ae60':v.status==='expired'?'#e74c3c':'#888'}">${v.status==='active'?'Hoạt động':v.status==='expired'?'Hết hạn':'Đã tắt'}</span></div>
+        </div>
+      </div>`:'<div></div>'}
+    </div>`;
+}
+
+function doSaveVoucher(editId){
+  const code=((document.getElementById('vcCode')||{}).value||'').trim().toUpperCase();
+  const name=((document.getElementById('vcName')||{}).value||'').trim();
+  const type=(document.getElementById('vcType')||{}).value||'percent';
+  const value=parseFloat((document.getElementById('vcValue')||{}).value||0);
+  const minOrder=parseFloat((document.getElementById('vcMinOrder')||{}).value||0);
+  const maxDiscount=parseFloat((document.getElementById('vcMaxDiscount')||{}).value||0);
+  const maxUsage=parseFloat((document.getElementById('vcMaxUsage')||{}).value||9999);
+  const startInput=(document.getElementById('vcStart')||{}).value||'';
+  const endInput=(document.getElementById('vcEnd')||{}).value||'';
+  const catsEl=document.getElementById('vcCats');
+  const desc=((document.getElementById('vcDesc')||{}).value||'').trim();
+  if(!code){toast('Vui lòng nhập mã voucher');return;}
+  if(!name){toast('Vui lòng nhập tên chương trình');return;}
+  if(!value||value<=0){toast('Vui lòng nhập giá trị hợp lệ (>0)');return;}
+  if(!startInput||!endInput){toast('Vui lòng chọn thời hạn hiệu lực');return;}
+  const startDate=startInput.split('-').reverse().join('/');
+  const endDate=endInput.split('-').reverse().join('/');
+  const cats=catsEl?Array.from(catsEl.selectedOptions).map(o=>o.value):['all'];
+  const finalCats=cats.includes('all')?['all']:cats.length?cats:['all'];
+  if(editId==='new'){
+    if(promoVouchers.find(v=>v.code===code)){toast('Mã voucher đã tồn tại!');return;}
+    promoVouchers.unshift({id:'VC-'+String(Date.now()).slice(-5),code,name,type,value,minOrder,maxDiscount:maxDiscount||999999999,categories:finalCats,maxUsage,usedCount:0,startDate,endDate,status:'active',desc,createdAt:todayStr()});
+    toast('Đã tạo voucher '+code);
+  }else{
+    const v=promoVouchers.find(x=>x.id===editId);if(!v){toast('Không tìm thấy voucher');return;}
+    Object.assign(v,{code,name,type,value,minOrder,maxDiscount:maxDiscount||999999999,categories:finalCats,maxUsage,startDate,endDate,desc});
+    toast('Đã cập nhật voucher '+code);
+  }
+  savePromoVouchers();admVoucherEditId=null;renderAccount();
+}
+
+function doToggleVoucher(id,enable){
+  const v=promoVouchers.find(x=>x.id===id);if(!v)return;
+  v.status=enable?'active':'inactive';
+  savePromoVouchers();renderAccount();
+  toast(enable?'Đã bật voucher '+v.code:'Đã tắt voucher '+v.code);
+}
+
+function doDeleteVoucher(id){
+  const v=promoVouchers.find(x=>x.id===id);if(!v)return;
+  if(!confirm('Xóa voucher '+v.code+'?\nHành động không thể hoàn tác.'))return;
+  promoVouchers=promoVouchers.filter(x=>x.id!==id);
+  savePromoVouchers();renderAccount();toast('Đã xóa voucher');
+}
+
+/* ---------- FLASH SALE ---------- */
+function adminPromoFlashSales(){
+  if(admFlashSaleDetailId) return adminPromoFlashSaleDetail(admFlashSaleDetailId);
+  if(admFlashSaleEditId!==null) return adminPromoFlashSaleEditor(admFlashSaleEditId);
+  const STATUS_LBL={upcoming:'Sắp diễn ra',active:'Đang diễn ra',ended:'Đã kết thúc'};
+  const STATUS_CLR={upcoming:'#3498db',active:'#27ae60',ended:'#888'};
+  const list=promoFlashSales.filter(fs=>admFsFilter==='all'||fs.status===admFsFilter);
+  const active=promoFlashSales.filter(f=>f.status==='active').length;
+  const upcoming=promoFlashSales.filter(f=>f.status==='upcoming').length;
+  const totalRev=promoFlashSales.filter(f=>f.status==='ended').reduce((s,f)=>s+f.totalRevenue,0);
+  const totalSold=promoFlashSales.filter(f=>f.status==='ended').reduce((s,f)=>s+f.totalSold,0);
+  const cards=list.map(fs=>{
+    const pendingProds=fs.products.filter(p=>p.status==='pending').length;
+    const totalProds=fs.products.length;
+    const startFmt=fs.startTime.replace('T',' ');
+    const endFmt=fs.endTime.replace('T',' ');
+    return `<div class="promo-fs-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700;color:var(--ink-deep)">${escHtml(fs.name)}</div>
+          <div style="font-size:12.5px;color:var(--text-soft);margin-top:3px">⏰ ${startFmt} → ${endFmt}</div>
+        </div>
+        <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:${STATUS_CLR[fs.status]}22;color:${STATUS_CLR[fs.status]};white-space:nowrap">${STATUS_LBL[fs.status]||fs.status}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+        <div style="background:var(--paper);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:var(--ink-deep)">${totalProds}</div>
+          <div style="font-size:11.5px;color:var(--text-soft)">Sản phẩm${pendingProds>0?`<span style="color:#e67e22"> (${pendingProds} chờ)</span>`:''}</div>
+        </div>
+        <div style="background:var(--paper);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:var(--ink-deep)">${fs.totalSold.toLocaleString('vi-VN')}</div>
+          <div style="font-size:11.5px;color:var(--text-soft)">Đã bán</div>
+        </div>
+        <div style="background:var(--paper);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:16px;font-weight:700;color:var(--ink)">${fmtMil(fs.totalRevenue)}đ</div>
+          <div style="font-size:11.5px;color:var(--text-soft)">Doanh thu</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
+        <button class="adm-btn-sm" onclick="admFlashSaleDetailId='${fs.id}';renderAccount()">📋 Chi tiết / Duyệt SP</button>
+        ${fs.status!=='ended'?`<button class="adm-btn-sm" onclick="admFlashSaleEditId='${fs.id}';renderAccount()">Chỉnh sửa</button>`:''}
+        ${fs.status==='active'?`<button class="adm-btn-sm danger" onclick="doEndFlashSale('${fs.id}')">⏹ Kết thúc sớm</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="adm-kpi-row" style="margin-bottom:18px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${active}</div><div class="adm-kpi-lbl">Đang diễn ra</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${upcoming}</div><div class="adm-kpi-lbl">Sắp diễn ra</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${totalSold.toLocaleString('vi-VN')}</div><div class="adm-kpi-lbl">Tổng đã bán</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtMil(totalRev)}đ</div><div class="adm-kpi-lbl">Tổng doanh thu</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${['all','upcoming','active','ended'].map(s=>`<button class="adm-tab-btn${admFsFilter===s?' active':''}" onclick="admFsFilter='${s}';renderAccount()">${s==='all'?'Tất cả':STATUS_LBL[s]||s}</button>`).join('')}
+      </div>
+      <button class="adm-btn" onclick="admFlashSaleEditId='new';renderAccount()">+ Tạo Flash Sale</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px">
+      ${cards||'<div style="color:#888;padding:24px;text-align:center;grid-column:1/-1">Chưa có Flash Sale nào</div>'}
+    </div>`;
+}
+
+function adminPromoFlashSaleEditor(editId){
+  const isNew=editId==='new';
+  const fs=isNew?null:promoFlashSales.find(x=>x.id===editId);
+  return `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <button class="adm-btn-sm" onclick="admFlashSaleEditId=null;renderAccount()">← Quay lại</button>
+      <h3 style="margin:0">${isNew?'Tạo Flash Sale mới':'Chỉnh sửa: '+escHtml(fs?fs.name:'')}</h3>
+    </div>
+    <div class="adm-form-card" style="max-width:580px;display:flex;flex-direction:column;gap:14px">
+      <div><label class="adm-form-lbl">Tên chương trình <span style="color:red">*</span></label>
+        <input id="fsName" class="cms-input" style="width:100%" placeholder="VD: Flash Sale Khai Giảng 2025" value="${isNew?'':escHtml(fs.name)}"></div>
+      <div><label class="adm-form-lbl">Mô tả</label>
+        <textarea id="fsDesc" class="cms-input" style="width:100%;resize:vertical;min-height:64px" placeholder="Mô tả ngắn về chương trình...">${isNew?'':escHtml(fs.desc||'')}</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label class="adm-form-lbl">Thời gian bắt đầu <span style="color:red">*</span></label>
+          <input id="fsStart" type="datetime-local" class="cms-input" style="width:100%" value="${isNew?'':fs.startTime}"></div>
+        <div><label class="adm-form-lbl">Thời gian kết thúc <span style="color:red">*</span></label>
+          <input id="fsEnd" type="datetime-local" class="cms-input" style="width:100%" value="${isNew?'':fs.endTime}"></div>
+      </div>
+      <div class="promo-fs-hint">ℹ️ Seller đăng ký sản phẩm tham gia sau khi Flash Sale được tạo. Admin duyệt từng sản phẩm trong trang Chi tiết.</div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="adm-btn" onclick="doSaveFlashSale('${editId}')">💾 Lưu Flash Sale</button>
+        <button class="adm-btn-sm" onclick="admFlashSaleEditId=null;renderAccount()">Hủy</button>
+      </div>
+    </div>`;
+}
+
+function adminPromoFlashSaleDetail(fsId){
+  const fs=promoFlashSales.find(x=>x.id===fsId);
+  if(!fs)return '<p style="color:#888">Flash Sale không tồn tại.</p>';
+  const STATUS_LBL={upcoming:'Sắp diễn ra',active:'Đang diễn ra',ended:'Đã kết thúc'};
+  const PROD_CLR={pending:'#e67e22',approved:'#27ae60',rejected:'#e74c3c'};
+  const PROD_LBL={pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Từ chối'};
+  const approved=fs.products.filter(p=>p.status==='approved');
+  const pending=fs.products.filter(p=>p.status==='pending');
+  const totalSaleQty=approved.reduce((s,p)=>s+p.saleQty,0);
+  const totalSold=approved.reduce((s,p)=>s+p.soldQty,0);
+  const soldPct=totalSaleQty>0?Math.round(totalSold/totalSaleQty*100):0;
+  const rows=fs.products.map(p=>{
+    const disc=Math.round((p.originalPrice-p.salePrice)/p.originalPrice*100);
+    const pSoldPct=p.saleQty>0?Math.round(p.soldQty/p.saleQty*100):0;
+    return `<tr>
+      <td><div style="font-weight:600;color:var(--ink-deep)">${escHtml(p.productName)}</div><div style="font-size:12px;color:var(--text-soft)">${escHtml(p.sellerName)}</div></td>
+      <td><span style="text-decoration:line-through;color:#aaa;font-size:12px">${fmt(p.originalPrice)}</span><br><strong style="color:var(--ink)">${fmt(p.salePrice)}</strong></td>
+      <td><span style="background:#ffe5e5;color:var(--ink);padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700">-${disc}%</span></td>
+      <td>${p.soldQty} / ${p.saleQty}<div style="background:#eee;border-radius:4px;height:5px;margin-top:4px"><div style="background:var(--ink);border-radius:4px;height:5px;width:${pSoldPct}%"></div></div></td>
+      <td><span style="color:${PROD_CLR[p.status]||'#888'};font-weight:600;font-size:12.5px">${PROD_LBL[p.status]||p.status}</span></td>
+      <td>${p.status==='pending'?`<div style="display:flex;gap:5px">
+        <button class="adm-btn-sm" style="background:#27ae60;color:#fff" onclick="doApproveFlashSaleProduct('${fsId}',${p.productId})">Duyệt</button>
+        <button class="adm-btn-sm danger" onclick="doRejectFlashSaleProduct('${fsId}',${p.productId})">Từ chối</button>
+      </div>`:'—'}</td>
+    </tr>`;
+  }).join('');
+  return `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <button class="adm-btn-sm" onclick="admFlashSaleDetailId=null;renderAccount()">← Quay lại</button>
+      <h3 style="margin:0">${escHtml(fs.name)}</h3>
+      <span style="font-size:12px;padding:3px 10px;border-radius:20px;background:${fs.status==='active'?'#27ae6022':'#88888820'};color:${fs.status==='active'?'#27ae60':'#888'}">${STATUS_LBL[fs.status]||fs.status}</span>
+    </div>
+    <div class="adm-kpi-row" style="margin-bottom:16px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fs.products.length}</div><div class="adm-kpi-lbl">Tổng sản phẩm</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val" style="color:#e67e22">${pending.length}</div><div class="adm-kpi-lbl">Chờ duyệt</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${totalSold} / ${totalSaleQty} <small style="font-size:13px;color:#888">(${soldPct}%)</small></div><div class="adm-kpi-lbl">Đã bán / Tổng SL</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtMil(fs.totalRevenue)}đ</div><div class="adm-kpi-lbl">Doanh thu</div></div>
+    </div>
+    <div class="adm-form-card" style="margin-bottom:16px;padding:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13.5px">
+        <div>⏰ <strong>Bắt đầu:</strong> ${fs.startTime.replace('T',' ')}</div>
+        <div>⏰ <strong>Kết thúc:</strong> ${fs.endTime.replace('T',' ')}</div>
+        <div style="grid-column:1/-1">📝 ${escHtml(fs.desc||'Không có mô tả')}</div>
+        ${fs.endedEarlyAt?`<div style="grid-column:1/-1;color:#e74c3c">⏹ Kết thúc sớm lúc: ${fs.endedEarlyAt}</div>`:''}
+      </div>
+      ${fs.status==='active'?`<div style="margin-top:10px"><button class="adm-btn-sm danger" onclick="doEndFlashSale('${fs.id}')">⏹ Kết thúc sớm Flash Sale</button></div>`:''}
+    </div>
+    <h4 style="margin:0 0 10px;font-size:14px">Danh sách sản phẩm tham gia</h4>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Sản phẩm / Seller</th><th>Giá gốc → Sale</th><th>% giảm</th><th>Đã bán / SL</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#888;padding:24px">Chưa có sản phẩm đăng ký</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+function doSaveFlashSale(editId){
+  const name=((document.getElementById('fsName')||{}).value||'').trim();
+  const desc=((document.getElementById('fsDesc')||{}).value||'').trim();
+  const startTime=(document.getElementById('fsStart')||{}).value||'';
+  const endTime=(document.getElementById('fsEnd')||{}).value||'';
+  if(!name){toast('Vui lòng nhập tên chương trình');return;}
+  if(!startTime||!endTime){toast('Vui lòng chọn thời gian bắt đầu và kết thúc');return;}
+  if(startTime>=endTime){toast('Thời gian kết thúc phải sau thời gian bắt đầu');return;}
+  if(editId==='new'){
+    promoFlashSales.unshift({id:'FS-'+String(Date.now()).slice(-4),name,desc,startTime,endTime,status:'upcoming',products:[],totalRevenue:0,totalSold:0,endedEarlyAt:null,createdAt:todayStr()});
+    toast('Đã tạo Flash Sale: '+name);
+  }else{
+    const fs=promoFlashSales.find(x=>x.id===editId);if(!fs){toast('Không tìm thấy Flash Sale');return;}
+    Object.assign(fs,{name,desc,startTime,endTime});toast('Đã cập nhật Flash Sale');
+  }
+  savePromoFlashSales();admFlashSaleEditId=null;renderAccount();
+}
+
+function doEndFlashSale(id){
+  const fs=promoFlashSales.find(x=>x.id===id);if(!fs)return;
+  if(!confirm('Kết thúc sớm Flash Sale "'+fs.name+'"?\nSản phẩm sale sẽ trở về giá gốc ngay lập tức.'))return;
+  fs.status='ended';fs.endedEarlyAt=todayStr();
+  savePromoFlashSales();renderAccount();toast('Đã kết thúc sớm Flash Sale: '+fs.name);
+}
+
+function doApproveFlashSaleProduct(fsId,productId){
+  const fs=promoFlashSales.find(x=>x.id===fsId);if(!fs)return;
+  const p=fs.products.find(x=>x.productId===productId);if(!p)return;
+  p.status='approved';
+  savePromoFlashSales();renderAccount();toast('Đã duyệt sản phẩm tham gia Flash Sale');
+}
+
+function doRejectFlashSaleProduct(fsId,productId){
+  const fs=promoFlashSales.find(x=>x.id===fsId);if(!fs)return;
+  const p=fs.products.find(x=>x.productId===productId);if(!p)return;
+  const reason=prompt('Lý do từ chối sản phẩm "'+p.productName+'" tham gia Flash Sale:');
+  if(reason===null)return;
+  p.status='rejected';p.rejectReason=reason||'Không đạt yêu cầu';
+  savePromoFlashSales();renderAccount();toast('Đã từ chối: '+p.productName);
+}
+
+/* ---------- ĐIỂM THƯỞNG ---------- */
+function adminPromoPoints(){
+  const TABS=[['settings','Cài đặt tích điểm'],['tiers','Hạng thành viên'],['stats','Thống kê']];
+  const content=admPointsTab==='tiers'?adminPromoPointsTiers():
+    admPointsTab==='stats'?adminPromoPointsStats():
+    adminPromoPointsSettings();
+  return `<div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admPointsTab===k?' active':''}" onclick="admPointsTab='${k}';renderAccount()">${lbl}</button>`).join('')}
+    </div>${content}
+  </div>`;
+}
+
+function adminPromoPointsSettings(){
+  const cfg=promoPoints;
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+      <div class="adm-form-card" style="display:flex;flex-direction:column;gap:16px">
+        <h4 style="margin:0 0 4px;font-size:14px;color:var(--ink-deep)">⭐ Cài đặt tích điểm & quy đổi</h4>
+        <div><label class="adm-form-lbl">Tỷ lệ tích điểm: X đồng = 1 điểm</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="ptEarnRate" type="number" class="cms-input" style="width:140px" value="${cfg.earnRate}" min="1000" step="1000">
+            <span style="color:var(--text-soft);font-size:13.5px">đ = 1 điểm</span>
+          </div></div>
+        <div><label class="adm-form-lbl">Điểm tối thiểu để đổi thưởng</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="ptRedeemThreshold" type="number" class="cms-input" style="width:100px" value="${cfg.redeemThreshold}" min="1">
+            <span style="color:var(--text-soft);font-size:13.5px">điểm</span>
+          </div></div>
+        <div><label class="adm-form-lbl">Quy đổi: X điểm = 1 voucher giảm Y%</label>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input id="ptRedeemPts" type="number" class="cms-input" style="width:80px" value="${cfg.redeemPoints}" min="1">
+            <span style="color:var(--text-soft);font-size:13.5px">điểm =</span>
+            <input id="ptRedeemPct" type="number" class="cms-input" style="width:70px" value="${cfg.redeemVoucherPct}" min="1" max="100">
+            <span style="color:var(--text-soft);font-size:13.5px">%</span>
+          </div></div>
+        <div><label class="adm-form-lbl">Đơn tối thiểu để dùng voucher điểm (đ)</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="ptRedeemMinOrder" type="number" class="cms-input" style="width:140px" value="${cfg.redeemMinOrder}" min="0" step="10000">
+            <span style="color:var(--text-soft);font-size:13.5px">đ</span>
+          </div></div>
+        <div><label class="adm-form-lbl">Điểm hết hạn sau (ngày không hoạt động)</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="ptExpireDays" type="number" class="cms-input" style="width:100px" value="${cfg.pointExpireDays}" min="30" max="3650">
+            <span style="color:var(--text-soft);font-size:13.5px">ngày</span>
+          </div></div>
+        <button class="adm-btn" onclick="doSavePointsConfig()" style="align-self:flex-start">💾 Lưu cài đặt</button>
+      </div>
+      <div class="adm-form-card">
+        <h4 style="margin:0 0 12px;font-size:14px;color:var(--ink-deep)">📋 Tóm tắt cấu hình hiện tại</h4>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+          <div style="background:var(--paper);border-radius:8px;padding:11px 14px">🛒 Mua <strong>${fmt(cfg.earnRate)}</strong> → +1 điểm</div>
+          <div style="background:var(--paper);border-radius:8px;padding:11px 14px">🎟 <strong>${cfg.redeemPoints}</strong> điểm → voucher giảm <strong>${cfg.redeemVoucherPct}%</strong> (đơn từ ${fmt(cfg.redeemMinOrder)})</div>
+          <div style="background:var(--paper);border-radius:8px;padding:11px 14px">⚡ Đổi tối thiểu: <strong>${cfg.redeemThreshold} điểm</strong></div>
+          <div style="background:var(--paper);border-radius:8px;padding:11px 14px">🕐 Hết hạn sau <strong>${cfg.pointExpireDays} ngày</strong> không dùng</div>
+          <div style="font-size:12px;color:var(--text-soft);padding-left:4px">Cập nhật: ${cfg.updatedAt}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function adminPromoPointsTiers(){
+  const tiers=promoPoints.tiers;
+  const rows=tiers.map((t,i)=>`<tr>
+    <td style="font-size:20px;text-align:center">${t.badge}</td>
+    <td><strong>${escHtml(t.name)}</strong></td>
+    <td>${i===0?'0 (mặc định)':fmtBig(t.minPoints)+' điểm'}</td>
+    <td><span style="background:var(--ink)18;color:var(--ink);padding:2px 8px;border-radius:4px;font-weight:700">x${t.multiplier}</span></td>
+    <td style="font-size:13px;color:var(--text-soft)">${escHtml(t.perks)}</td>
+    <td><button class="adm-btn-sm" onclick="doEditTier(${i})">Sửa</button></td>
+  </tr>`).join('');
+  return `
+    <div class="adm-form-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h4 style="margin:0;font-size:14px;color:var(--ink-deep)">🏅 Hạng thành viên</h4>
+      </div>
+      <div class="adm-table-wrap">
+        <table class="adm-table">
+          <thead><tr><th></th><th>Hạng</th><th>Điểm tối thiểu</th><th>Hệ số x</th><th>Đặc quyền</th><th>Sửa</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px;padding:11px 14px;background:var(--paper);border-radius:8px;font-size:13px;color:var(--text-soft)">
+        ℹ️ Hạng thành viên tính theo tổng điểm tích lũy. Hệ số nhân áp dụng khi tích điểm (ví dụ x1.5 → đơn 30k tích 4,5 điểm thay vì 3).
+      </div>
+    </div>`;
+}
+
+function doEditTier(idx){
+  const t=promoPoints.tiers[idx];if(!t)return;
+  const newPerks=prompt('Đặc quyền hạng '+t.name+':',t.perks);
+  if(newPerks===null)return;
+  const newMult=prompt('Hệ số tích điểm (>=1):',''+t.multiplier);
+  if(newMult===null)return;
+  const mult=parseFloat(newMult);
+  if(isNaN(mult)||mult<1){toast('Hệ số phải >= 1');return;}
+  t.perks=newPerks||t.perks;t.multiplier=mult;
+  promoPoints.updatedAt=todayStr();
+  savePromoPoints();renderAccount();toast('Đã cập nhật hạng '+t.name);
+}
+
+function adminPromoPointsStats(){
+  const st=promoPoints.stats;
+  const balance=st.totalIssued-st.totalRedeemed-st.totalExpired;
+  const redeemPct=Math.round(st.totalRedeemed/st.totalIssued*100);
+  const expPct=Math.round(st.totalExpired/st.totalIssued*100);
+  const balPct=100-redeemPct-expPct;
+  return `
+    <div class="adm-kpi-row" style="margin-bottom:18px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtBig(st.totalIssued)}</div><div class="adm-kpi-lbl">Tổng điểm phát hành</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtBig(st.totalRedeemed)}</div><div class="adm-kpi-lbl">Đã quy đổi</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtBig(balance)}</div><div class="adm-kpi-lbl">Đang lưu hành</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtBig(st.totalActiveUsers)}</div><div class="adm-kpi-lbl">Người dùng có điểm</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="adm-form-card">
+        <h4 style="margin:0 0 14px;font-size:14px">Phân bổ điểm</h4>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${[['Đang lưu hành',balPct,'var(--ink)'],['Đã quy đổi',redeemPct,'#27ae60'],['Đã hết hạn',expPct,'#bbb']].map(([lbl,pct,clr])=>`
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${lbl}</span><span style="font-weight:600;color:${clr}">${pct}%</span></div>
+              <div style="background:#eee;border-radius:4px;height:8px"><div style="background:${clr};border-radius:4px;height:8px;width:${pct}%"></div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="adm-form-card">
+        <h4 style="margin:0 0 14px;font-size:14px">Số liệu khác</h4>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+          <div style="display:flex;justify-content:space-between;padding:10px;background:var(--paper);border-radius:8px"><span>Voucher đã tạo từ điểm</span><strong>${fmtBig(st.totalVouchersGenerated)}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px;background:var(--paper);border-radius:8px"><span>Điểm trung bình / người dùng</span><strong>${fmtBig(st.avgPointsPerUser)}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px;background:var(--paper);border-radius:8px"><span>Điểm đã hết hạn</span><strong style="color:#aaa">${fmtBig(st.totalExpired)}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px;background:var(--paper);border-radius:8px"><span>Tỷ lệ quy đổi</span><strong style="color:#27ae60">${redeemPct}%</strong></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function doSavePointsConfig(){
+  const earnRate=parseFloat((document.getElementById('ptEarnRate')||{}).value||0);
+  const redeemThreshold=parseFloat((document.getElementById('ptRedeemThreshold')||{}).value||0);
+  const redeemPoints=parseFloat((document.getElementById('ptRedeemPts')||{}).value||0);
+  const redeemVoucherPct=parseFloat((document.getElementById('ptRedeemPct')||{}).value||0);
+  const redeemMinOrder=parseFloat((document.getElementById('ptRedeemMinOrder')||{}).value||0);
+  const pointExpireDays=parseFloat((document.getElementById('ptExpireDays')||{}).value||0);
+  if(!earnRate||earnRate<1000){toast('Tỷ lệ tích điểm tối thiểu 1.000đ = 1 điểm');return;}
+  if(!redeemPoints||redeemPoints<1){toast('Số điểm quy đổi không hợp lệ');return;}
+  if(!redeemVoucherPct||redeemVoucherPct<1||redeemVoucherPct>100){toast('% voucher quy đổi phải từ 1–100');return;}
+  if(!pointExpireDays||pointExpireDays<30){toast('Điểm hết hạn tối thiểu sau 30 ngày');return;}
+  Object.assign(promoPoints,{earnRate,redeemThreshold,redeemPoints,redeemVoucherPct,redeemMinOrder,pointExpireDays,updatedAt:todayStr()});
+  savePromoPoints();renderAccount();toast('Đã lưu cài đặt điểm thưởng');
+}
+
 function navForRole(r){
   if(r==='admin'){
-    const adminTabs=[['dashboard','Tổng quan'],['adm-users','Người dùng'],['adm-products','Sản phẩm'],['adm-orders','Đơn hàng'],['adm-shops','Shop / NCC']];
+    const adminTabs=[['dashboard','Tổng quan'],['adm-users','Người dùng'],['adm-products','Sản phẩm'],['adm-orders','Đơn hàng'],['adm-finance','Tài chính'],['adm-cms','Nội dung'],['adm-promo','Khuyến mãi'],['adm-shops','Shop / NCC']];
     return adminTabs;
   }
   const nav=[['dashboard','Tổng quan'],['orders','Đơn hàng của tôi'],['returns','Đổi / Trả hàng']];
