@@ -265,8 +265,100 @@ function toast(msg){
 
 /* ---------------- Router ---------------- */
 let view='home', arg=null;
-function go(v,a){if(typeof audioTimer!=='undefined'){clearInterval(audioTimer);audioPlaying=false;}view=v;arg=a||null;window.scrollTo(0,0);render();}
-function doSearch(){const q=document.getElementById('searchInput').value.trim();go('listing',{q});}
+let srchHistory=LS.get('srchHistory',[]);
+
+function normVi(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d');}
+
+function go(v,a){if(typeof audioTimer!=='undefined'){clearInterval(audioTimer);audioPlaying=false;}view=v;arg=a||null;window.scrollTo(0,0);searchClose();render();}
+function doSearch(){const q=document.getElementById('searchInput')?.value.trim();if(q)searchExec(q);}
+
+function searchSuggest(){
+  const inp=document.getElementById('searchInput');
+  const drop=document.getElementById('searchDrop');
+  if(!inp||!drop)return;
+  const q=inp.value.trim();
+  const qn=normVi(q);
+  let html='';
+  if(!q){
+    const hist=LS.get('srchHistory',[]);
+    srchHistory=hist;
+    if(hist.length>0){
+      html+='<div class="sdrop-sec"><div class="sdrop-sh"><span>Tìm kiếm gần đây</span><button class="sdrop-clr" onclick="clearSrchHistory()">Xóa tất cả</button></div>';
+      hist.slice(0,5).forEach(h=>{
+        const he=h.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        html+='<div class="sdrop-item" onclick="searchExec(\''+he+'\')">'+
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
+          '<span>'+h+'</span>'+
+          '<button class="sdrop-del" onclick="event.stopPropagation();removeSrchHistory(\''+he+'\')" title="Xóa">×</button>'+
+        '</div>';
+      });
+      html+='</div>';
+    }
+    html+='<div class="sdrop-sec"><div class="sdrop-sh">Chuyên mục phổ biến</div>';
+    [{e:'📘',l:'Sách giáo khoa',c:'sgk'},{e:'📖',l:'Văn học',c:'vanhoc'},{e:'🌟',l:'Thiếu nhi',c:'thieunhi'},{e:'⚡',l:'Kỹ năng sống',c:'kynang'},{e:'🌐',l:'Ngoại ngữ',c:'ngoaingu'},{e:'🖊',l:'Văn phòng phẩm',c:'vpp'}].forEach(cat=>{
+      html+='<div class="sdrop-item sdrop-cat" onclick="go(\'listing\',\''+cat.c+'\');searchClose()">'+
+        '<span class="sdrop-cat-ic">'+cat.e+'</span><span>'+cat.l+'</span>'+
+      '</div>';
+    });
+    html+='</div>';
+  } else {
+    const matches=P.filter(p=>normVi(p.name).includes(qn)||normVi(p.by).includes(qn)||(p.nxb&&normVi(p.nxb).includes(qn))).slice(0,5);
+    if(matches.length>0){
+      html+='<div class="sdrop-sec"><div class="sdrop-sh">Sách &amp; sản phẩm</div>';
+      matches.forEach(p=>{
+        const hl=s=>{try{return String(s).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),m=>'<mark>'+m+'</mark>');}catch(e){return s;}};
+        const slug=HIMG[p.id];
+        const thumb=slug?'<img src="'+uimg(slug,60)+'" class="sdrop-thumb" loading="lazy">':'<div class="sdrop-thumb-ph" style="background:'+p.c+'"></div>';
+        html+='<div class="sdrop-item" onclick="go(\'product\','+p.id+');searchClose()">'+
+          thumb+
+          '<div class="sdrop-pinfo"><div class="sdrop-pname">'+hl(p.name)+'</div><div class="sdrop-pby">'+hl(p.by)+'</div></div>'+
+          '<div class="sdrop-pprice">'+fmt(p.price)+'</div>'+
+        '</div>';
+      });
+      html+='</div>';
+    }
+    const cats=[
+      {k:'sach giao khoa',l:'Sách giáo khoa',c:'sgk'},{k:'van hoc',l:'Văn học',c:'vanhoc'},
+      {k:'thieu nhi',l:'Thiếu nhi',c:'thieunhi'},{k:'ky nang',l:'Kỹ năng sống',c:'kynang'},
+      {k:'ngoai ngu',l:'Ngoại ngữ',c:'ngoaingu'},{k:'van phong pham',l:'Văn phòng phẩm',c:'vpp'},
+      {k:'thiet bi giao duc',l:'Thiết bị giáo dục',c:'tbgd'},{k:'ebook',l:'Ebook',c:'ebook'},
+      {k:'sach noi',l:'Sách nói',c:'audiobook'},{k:'tham khao',l:'Sách tham khảo',c:'thamkhao'},
+    ];
+    const catHits=cats.filter(x=>x.k.includes(qn)||normVi(x.l).includes(qn)).slice(0,3);
+    if(catHits.length>0){
+      html+='<div class="sdrop-sec"><div class="sdrop-sh">Danh mục</div>';
+      catHits.forEach(cat=>{
+        html+='<div class="sdrop-item" onclick="go(\'listing\',\''+cat.c+'\');searchClose()">'+
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'+
+          '<span>'+cat.l+'</span>'+
+        '</div>';
+      });
+      html+='</div>';
+    }
+    if(!matches.length&&!catHits.length){
+      html+='<div class="sdrop-empty">Không tìm thấy gợi ý cho "<strong>'+q+'</strong>"</div>';
+    }
+    html+='<div class="sdrop-all" onclick="doSearch()">Xem tất cả kết quả cho "<strong>'+q+'</strong>" →</div>';
+  }
+  drop.innerHTML=html;
+  drop.style.display='';
+}
+
+function searchClose(){
+  const drop=document.getElementById('searchDrop');
+  if(drop)drop.style.display='none';
+}
+
+function searchExec(q){
+  const inp=document.getElementById('searchInput');
+  if(inp)inp.value=q;
+  if(!srchHistory.includes(q)){srchHistory.unshift(q);srchHistory=srchHistory.slice(0,10);LS.set('srchHistory',srchHistory);}
+  searchClose();
+  go('listing',{q});
+}
+
+function clearSrchHistory(){srchHistory=[];LS.set('srchHistory',[]);searchSuggest();}
+function removeSrchHistory(q){srchHistory=srchHistory.filter(h=>h!==q);LS.set('srchHistory',srchHistory);searchSuggest();}
 
 function render(){
   if(view==='home')renderHome();
@@ -450,6 +542,16 @@ function bsRankCard(p,rank){
     '</div>'+
   '</div>';
 }
+function updateCatCircArr(){
+  const r=document.getElementById('catcircRow');
+  if(!r)return;
+  const l=document.querySelector('.catcirc-arr-l');
+  const rr=document.querySelector('.catcirc-arr-r');
+  const atStart=r.scrollLeft<=4;
+  const atEnd=r.scrollLeft+r.clientWidth>=r.scrollWidth-4;
+  if(l)l.classList.toggle('vis',!atStart);
+  if(rr)rr.classList.toggle('hidden',atEnd);
+}
 function updateShelfArrows(){
   const t=document.getElementById('shelfTrack');
   if(!t)return;
@@ -543,6 +645,39 @@ function renderHome(){
     '</div>'+
   '</section>'+
 
+  /* ── Danh mục (circle style) ── */
+  '<div class="catcirc-section">'+
+    '<h2 class="catcirc-title">Danh mục</h2>'+
+    '<div class="catcirc-wrap">'+
+      '<button class="catcirc-arr catcirc-arr-l" onclick="document.getElementById(\'catcircRow\').scrollBy({left:-340,behavior:\'smooth\'});setTimeout(updateCatCircArr,350)">‹</button>'+
+      '<div class="catcirc-row" id="catcircRow" onscroll="updateCatCircArr()">'+
+      (()=>{
+        const cats=[
+          {l:'Sách Văn học',c:'vanhoc',g:'#e8977a,#b8462a',id:4},
+          {l:'Sách Thiếu nhi',c:'thieunhi',g:'#6dcfa8,#206848',id:2},
+          {l:'Phát triển bản thân',c:'kynang',g:'#68c0d0,#1a6070',id:5},
+          {l:'Sách Giáo khoa',c:'sgk',g:'#6aaad8,#1a4888',id:1},
+          {l:'Luyện thi & Tham khảo',c:'thamkhao',g:'#8a9ad8,#202a7a',id:null},
+          {l:'Ngoại ngữ',c:'ngoaingu',g:'#60c8c0,#185858',id:3},
+          {l:'Văn phòng phẩm',c:'vpp',g:'#d888a8,#882040',id:7},
+          {l:'Thiết bị giáo dục',c:'tbgd',g:'#7aaac0,#1a3040',id:11},
+          {l:'Sách nói',c:'audiobook',g:'#a898d8,#3a1870',id:null},
+          {l:'Ebook',c:'ebook',g:'#68b098,#185038',id:null},
+        ];
+        return cats.map(n=>{
+          const slug=n.id?HIMG[n.id]:null;
+          const img=slug?'<img src="'+uimg(slug,220)+'" class="catcirc-book" loading="lazy">':'<span class="catcirc-ico">'+({'vanhoc':'📖','thieunhi':'🌟','kynang':'⚡','sgk':'📘','thamkhao':'📚','ngoaingu':'🌐','vpp':'🖊','tbgd':'🔬','audiobook':'🎧','ebook':'💻'}[n.c]||'📦')+'</span>';
+          return '<div class="catcirc-item" onclick="go(\'listing\',\''+n.c+'\')">'+
+            '<div class="catcirc-circle" style="background:linear-gradient(150deg,'+n.g+')">'+img+'</div>'+
+            '<div class="catcirc-lbl">'+n.l+'</div>'+
+          '</div>';
+        }).join('');
+      })()+
+      '</div>'+
+      '<button class="catcirc-arr catcirc-arr-r" onclick="document.getElementById(\'catcircRow\').scrollBy({left:340,behavior:\'smooth\'});setTimeout(updateCatCircArr,350)">›</button>'+
+    '</div>'+
+  '</div>'+
+
   /* Collections */
   hmHead('Bộ sưu tập tuyển chọn','Biên tập viên gợi ý','sach')+
   '<div class="hm-colls">'+
@@ -550,10 +685,6 @@ function renderHome(){
     hmColl(COLLS[1])+hmColl(COLLS[2])+
     '<div class="coll-row">'+hmColl(COLLS[3])+hmColl(COLLS[4])+hmColl(COLLS[5])+'</div>'+
   '</div>'+
-
-  /* Khám phá theo thể loại */
-  hmHead('Khám phá theo thể loại','Sàn sách EduMart')+
-  '<div class="gen-grid">'+GENT.map(g=>{const n=P.filter(p=>p.genre===g[0]).length;return '<div class="gen-card" style="background:'+g[2]+'" onclick="go(\'listing\',\''+g[0]+'\')"><div class="gic" style="color:'+g[3]+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">'+g[4]+'</svg></div><div class="gtx"><div class="gn" style="color:'+g[3]+'">'+g[1]+'</div><div class="gc">'+n+' sản phẩm</div></div></div>';}).join('')+'</div>'+
 
   /* Flash sale */
   '<div class="hm-flash">'+
@@ -630,10 +761,6 @@ function renderHome(){
     '<button class="bs-arr bs-arr-r" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
     '</div>'+
   '</div>'+
-
-  /* Audience */
-  hmHead('Mua theo đối tượng')+
-  '<div class="hm-tiles">'+AUDT.map(t=>'<div class="hm-tile" style="background:'+t[1]+';border-color:'+t[2]+'22" onclick="go(\'listing\',\''+t[3]+'\')"><div class="ic" style="background:'+t[2]+'18;color:'+t[2]+'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">'+t[4]+'</svg></div><span style="color:'+t[2]+'">'+t[0]+'</span></div>').join('')+'</div>'+
 
   /* Nhà bán nổi bật */
   hmHead('Nhà bán nổi bật')+
@@ -3455,7 +3582,10 @@ function renderLibrary(){
 /* ---------------- Mega-menu (mục Sách) ---------------- */
 function toggleNav(e,el){e.preventDefault();e.stopPropagation();const n=el.closest('.navitem');const open=n.classList.contains('open');closeNav();if(!open)n.classList.add('open');}
 function closeNav(){document.querySelectorAll('.mainnav .navitem.open').forEach(x=>x.classList.remove('open'));}
-document.addEventListener('click',e=>{if(!e.target.closest('.has-menu'))closeNav();});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.has-menu'))closeNav();
+  if(!e.target.closest('.search-wrap'))searchClose();
+});
 
 /* ---------------- init ---------------- */
 // Seed demo accounts (chỉ tạo nếu chưa tồn tại)
