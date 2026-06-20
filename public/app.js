@@ -37,14 +37,14 @@ const P = [
   {id:57,name:'Túi đựng bút canvas 3 ngăn',by:'Artbox',cat:'vpp',sub:'balo',aud:['thcs','thpt','sinhvien'],nxb:'Artbox',price:65000,old:88000,rate:4.7,sold:2800,c:'#6a4a2a',icon:'bag'},
   {id:58,name:'Hộp đựng đồ bàn học DELI 5 ngăn',by:'DELI',cat:'vpp',sub:'dungcu',aud:['tieuhoc','thcs','thpt','sinhvien'],nxb:'DELI',price:82000,old:110000,rate:4.6,sold:1500,c:'#4a8a4a',icon:'tool'},
   {id:11,name:'Máy tính Casio fx-580VN X',by:'Casio',cat:'tbgd',sub:'mtinh',aud:['thpt','sinhvien'],nxb:'Casio',price:490000,old:599000,rate:4.8,sold:3400,c:'#2b3a4a',icon:'calc'},
-  {id:12,name:'Bộ dụng cụ thí nghiệm Vật lý 12',by:'Thiết bị GD',cat:'tbgd',sub:'tn',aud:['thpt'],nxb:'Thiết bị GD',price:360000,old:450000,rate:4.6,sold:980,c:'#1f6e6e',icon:'flask'},
+  {id:12,name:'Bộ dụng cụ thí nghiệm Vật lý 12',by:'Thiết bị GD',cat:'tbgd',sub:'tn',aud:['thpt'],nxb:'Thiết bị GD',price:360000,old:450000,rate:4.6,sold:980,c:'#1f6e6e',icon:'flask',instock:false},
   {id:13,name:'Địa cầu phát sáng 25cm',by:'EduGlobe',cat:'tbgd',sub:'bando',aud:['tieuhoc','thcs'],nxb:'EduGlobe',price:210000,old:280000,rate:4.9,sold:1600,c:'#2f6ca5',icon:'globe'},
   {id:14,name:'Bộ dạy học giáo viên - bảng & phấn',by:'EduPro',cat:'tbgd',sub:'dayho',aud:['giaovien'],nxb:'EduPro',price:175000,old:230000,rate:4.7,sold:1100,c:'#7a4a8c',icon:'board'},
   /* ===== Thiết bị giáo dục mở rộng ===== */
   {id:59,name:'Máy tính Casio fx-991EX Classwiz',by:'Casio',cat:'tbgd',sub:'mtinh',aud:['thpt','sinhvien'],nxb:'Casio',price:295000,old:380000,rate:4.9,sold:8700,c:'#1a2a4a',tag:'hot',icon:'calc'},
   {id:60,name:'Máy tính đồ thị Casio fx-CG50',by:'Casio',cat:'tbgd',sub:'mtinh',aud:['sinhvien'],nxb:'Casio',price:1850000,old:2200000,rate:4.8,sold:1200,c:'#2a1a4a',icon:'calc'},
   {id:61,name:'Kính hiển vi học sinh 400x – 1000x',by:'Optima Lab',cat:'tbgd',sub:'tn',aud:['thcs','thpt'],nxb:'Optima Lab',price:680000,old:890000,rate:4.7,sold:840,c:'#1a4a2a',tag:'hot',icon:'micro'},
-  {id:62,name:'Bộ thí nghiệm Hóa học THCS (25 dụng cụ)',by:'EduLab',cat:'tbgd',sub:'tn',aud:['thcs'],nxb:'EduLab',price:450000,old:580000,rate:4.5,sold:620,c:'#4a1a2a',icon:'flask'},
+  {id:62,name:'Bộ thí nghiệm Hóa học THCS (25 dụng cụ)',by:'EduLab',cat:'tbgd',sub:'tn',aud:['thcs'],nxb:'EduLab',price:450000,old:580000,rate:4.5,sold:620,c:'#4a1a2a',icon:'flask',instock:false},
   {id:63,name:'Mô hình cấu trúc DNA 3D tháo lắp',by:'BioModel',cat:'tbgd',sub:'tn',aud:['thpt','sinhvien'],nxb:'BioModel',price:380000,old:490000,rate:4.7,sold:510,c:'#1a4a4a',tag:'new',icon:'flask'},
   {id:64,name:'Bản đồ Việt Nam treo tường 80×120cm',by:'EduMap',cat:'tbgd',sub:'bando',aud:['tieuhoc','thcs'],nxb:'EduMap',price:178000,old:245000,rate:4.6,sold:2300,c:'#3a5a1a',icon:'globe'},
   {id:65,name:'Địa cầu chính trị 30cm có đèn LED',by:'EduGlobe',cat:'tbgd',sub:'bando',aud:['thcs','thpt'],nxb:'EduGlobe',price:310000,old:420000,rate:4.8,sold:1450,c:'#1a3a6a',icon:'globe'},
@@ -54,7 +54,7 @@ const P = [
   {id:69,name:'Máy chiếu mini EduPro 3000 Lumen',by:'EduPro',cat:'tbgd',sub:'cntt',aud:['giaovien','school'],nxb:'EduPro',price:3200000,old:4200000,rate:4.7,sold:680,c:'#1a3a5a',tag:'hot',icon:'screen'},
   {id:70,name:'Máy đọc sách EduReader 6" E-Ink',by:'EduMart Tech',cat:'tbgd',sub:'cntt',aud:['sinhvien','giaovien'],nxb:'EduMart Tech',price:1290000,old:1680000,rate:4.6,sold:920,c:'#2a2a4a',tag:'new',icon:'note'},
   {id:71,name:'Camera tài liệu IPEVO V4K 4K',by:'IPEVO',cat:'tbgd',sub:'cntt',aud:['giaovien','school'],nxb:'IPEVO',price:2450000,old:3100000,rate:4.8,sold:460,c:'#1a4a3a',icon:'cam'},
-  {id:72,name:'Màn chiếu gập EduScreen 120"',by:'EduPro',cat:'tbgd',sub:'cntt',aud:['giaovien','school'],nxb:'EduPro',price:890000,old:1200000,rate:4.5,sold:380,c:'#3a3a1a',icon:'screen'},
+  {id:72,name:'Màn chiếu gập EduScreen 120"',by:'EduPro',cat:'tbgd',sub:'cntt',aud:['giaovien','school'],nxb:'EduPro',price:890000,old:1200000,rate:4.5,sold:380,c:'#3a3a1a',icon:'screen',instock:false},
   {id:26,name:'Sách giáo viên Ngữ văn lớp 10 - Kết nối tri thức',by:'NXB Giáo Dục Việt Nam',cat:'sach',aud:['giaovien'],nxb:'Giáo Dục',price:62000,old:82000,rate:4.8,sold:890,c:'#384c9c'},
   {id:27,name:'Hướng dẫn dạy học theo phương pháp tích cực',by:'Trường ĐHSP Hà Nội',cat:'sach',aud:['giaovien'],nxb:'ĐHSP',price:118000,old:155000,rate:4.7,sold:620,c:'#2a5a5a'},
   {id:28,name:'Kế hoạch bài dạy 4.0 - Mẫu soạn giáo án chuẩn mới',by:'EduPro Digital',cat:'ebook',aud:['giaovien'],nxb:'EduMart Digital',price:85000,old:120000,rate:4.9,sold:480,c:'#7a4400',ebook:true,format:'PDF',pages:240,size:6.2},
@@ -78,7 +78,7 @@ const P = [
   {id:43,name:'The Power of Now – Sức mạnh hiện tại (sách nói)',by:'Eckhart Tolle',cat:'audiobook',aud:['sinhvien'],nxb:'EduMart Audio',price:79000,old:115000,rate:4.7,sold:890,c:'#1a5a5a',audio:true,narrator:'Thu Giang',duration:295,format:'MP3'},
   {id:23,name:'Tắt đèn',by:'Ngô Tất Tố',cat:'sach',aud:['thpt'],nxb:'NXB Văn Học',price:72000,old:95000,rate:4.7,sold:2100,c:'#5a3a2a'},
   {id:24,name:'Cây chuối non đi giày xanh',by:'Nguyễn Nhật Ánh',cat:'sach',aud:['thcs','thpt'],nxb:'NXB Trẻ',price:110000,old:135000,rate:4.9,sold:4300,c:'#2f8f6a'},
-  {id:25,name:'Bộ SGK lớp 1 - Cánh Diều',by:'NXB ĐH Sư Phạm',cat:'sach',aud:['tieuhoc'],nxb:'Cánh Diều',price:165000,old:210000,rate:4.8,sold:1800,c:'#c1572f'}
+  {id:25,name:'Bộ SGK lớp 1 - Cánh Diều',by:'NXB ĐH Sư Phạm',cat:'sach',aud:['tieuhoc'],nxb:'Cánh Diều',price:165000,old:210000,rate:4.8,sold:1800,c:'#c1572f',instock:false}
 ];
 
 /* ---------------- Thể loại sách (genre) ---------------- */
@@ -391,6 +391,7 @@ function pcard(p){
   return '<div class="pcard">'+
     '<div class="pcover" style="background:#f3ede3" onclick="go(\'product\','+p.id+')">'+
       (p.old>p.price?'<span class="badge">-'+discount(p)+'%</span>':'')+
+      (p.instock===false?'<div class="oos-ov"></div><span class="badge-oos">Hết hàng</span>':'')+
       '<button class="fav'+(inWish(p.id)?' on':'')+'" data-wish="'+p.id+'" onclick="event.stopPropagation();toggleWish('+p.id+')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"/></svg></button>'+
       cover(p)+
     '</div>'+
@@ -398,7 +399,7 @@ function pcard(p){
       '<div class="nm" onclick="go(\'product\','+p.id+')">'+p.name+'</div>'+
       '<div class="meta"><span class="star"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg>'+p.rate.toFixed(1)+'</span>· đã bán '+(p.sold>=1000?(p.sold/1000).toFixed(1)+'k':p.sold)+'</div>'+
       '<div><span class="price">'+fmt(p.price)+'</span>'+(p.old>p.price?'<span class="price-old">'+fmt(p.old)+'</span>':'')+'</div>'+
-      '<button class="add" onclick="addToCart('+p.id+')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Thêm vào giỏ</button>'+
+      (p.instock===false?'<button class="add oos" disabled>Hết hàng</button>':'<button class="add" onclick="addToCart('+p.id+')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Thêm vào giỏ</button>')+
     '</div></div>';
 }
 
@@ -867,7 +868,7 @@ function renderHome(){
 }
 
 /* ---------------- Listing ---------------- */
-let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,q:''};
+let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,instock:false,q:'',priceMin:0,priceMax:0};
 let listView='grid';
 let _listCtx=null;
 const CATDESC={
@@ -877,7 +878,7 @@ const CATDESC={
   vpp:'Bút viết, vở, dụng cụ học tập, họa phẩm và túi balo — đầy đủ văn phòng phẩm cho mọi cấp học.',
   tbgd:'Máy tính khoa học, kính hiển vi, bản đồ, thiết bị thí nghiệm và công nghệ lớp học hiện đại.'
 };
-const PRICE_LBL={all:'Tất cả',lo:'Dưới 100.000đ',mid:'100.000 – 300.000đ',hi:'Trên 300.000đ'};
+const PRICE_LBL={all:'Tất cả',lo:'Dưới 100.000đ',mid:'100.000 – 300.000đ',hi:'Trên 300.000đ',custom:'Tùy chỉnh'};
 const AUDDESC={
   tieuhoc:'Sách giáo khoa, truyện thiếu nhi, bút màu và dụng cụ học tập dành cho học sinh Tiểu học (lớp 1–5).',
   thcs:'Sách giáo khoa, bài tập và dụng cụ học tập cho học sinh THCS (lớp 6–9). Chuẩn bị tốt cho cấp 3.',
@@ -886,8 +887,9 @@ const AUDDESC={
   giaovien:'Sách tham khảo, giáo án điện tử, thiết bị dạy học và ưu đãi đặc biệt dành cho nhà giáo.',
   school:'Mua sỉ số lượng lớn, đặt hàng theo danh sách lớp và yêu cầu báo giá cho trường học.'
 };
-function clearFilter(k){if(k==='price')filt.price='all';else if(k==='rating')filt.rating=null;else if(k==='sale')filt.sale=false;else if(k==='q')filt.q='';else filt[k]=null;renderListing();}
-function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.rating=null;filt.sale=false;filt.q='';renderListing();}
+function clearFilter(k){if(k==='price'){filt.price='all';filt.priceMin=0;filt.priceMax=0;}else if(k==='rating')filt.rating=null;else if(k==='sale')filt.sale=false;else if(k==='instock')filt.instock=false;else if(k==='q')filt.q='';else filt[k]=null;renderListing();}
+function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';renderListing();}
+function applyCustomPrice(){const mn=document.getElementById('prMinI');const mx=document.getElementById('prMaxI');filt.priceMin=mn?+mn.value||0:0;filt.priceMax=mx?+mx.value||0:0;renderListing();}
 function setSearchQ(v){filt.q=(v||'').trim();renderListing();}
 function renderListing(){
   let title='Tất cả sản phẩm', base=P.slice(), ctxKey='all', catKey=null, heroDesc='', audKey=null, ebSubTab=null, isVpp=false, isTbgd=false;
@@ -906,7 +908,7 @@ function renderListing(){
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
-  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.rating=null;filt.sale=false;filt.q='';}
+  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';}
 
   const isBookCat=!catKey||catKey==='sach'||catKey==='ebook'||catKey==='audiobook';
   const brandLabel=(catKey==='vpp'||catKey==='tbgd')?'Thương hiệu':'Nhà xuất bản';
@@ -919,12 +921,14 @@ function renderListing(){
   if(filt.price==='lo')list=list.filter(p=>p.price<100000);
   else if(filt.price==='mid')list=list.filter(p=>p.price>=100000&&p.price<300000);
   else if(filt.price==='hi')list=list.filter(p=>p.price>=300000);
+  else if(filt.price==='custom'){if(filt.priceMin>0)list=list.filter(p=>p.price>=filt.priceMin);if(filt.priceMax>0)list=list.filter(p=>p.price<=filt.priceMax);}
   if(filt.bookfmt==='giay')list=list.filter(p=>!p.ebook&&!p.audio);
   else if(filt.bookfmt==='ebook')list=list.filter(p=>!!p.ebook);
   else if(filt.bookfmt==='audio')list=list.filter(p=>!!p.audio);
   if(filt.rating==='4')list=list.filter(p=>p.rate>=4);
   else if(filt.rating==='3')list=list.filter(p=>p.rate>=3);
   if(filt.sale)list=list.filter(p=>p.old>p.price);
+  if(filt.instock)list=list.filter(p=>p.instock!==false);
   if(filt.q){const q=filt.q.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)||(p.nxb||'').toLowerCase().includes(q));}
   if(filt.sort==='sold')list.sort((a,b)=>b.sold-a.sold);
   else if(filt.sort==='priceAsc')list.sort((a,b)=>a.price-b.price);
@@ -945,7 +949,8 @@ function renderListing(){
     '<label><input type="radio" name="frat" '+(filt.rating===null?'checked':'')+' onchange="filt.rating=null;renderListing()">Tất cả</label>'+
     '<label><input type="radio" name="frat" '+(filt.rating==="4"?'checked':'')+' onchange="filt.rating=\'4\';renderListing()">4★ trở lên</label>'+
     '<label><input type="radio" name="frat" '+(filt.rating==="3"?'checked':'')+' onchange="filt.rating=\'3\';renderListing()">3★ trở lên</label>';
-  const priceOpts=[['all','Tất cả'],['lo','Dưới 100.000đ'],['mid','100.000 – 300.000đ'],['hi','Trên 300.000đ']].map(([k,v])=>'<label><input type="radio" name="fpr" '+(filt.price===k?'checked':'')+' onchange="filt.price=\''+k+'\';renderListing()">'+v+'</label>').join('');
+  const priceOpts=[['all','Tất cả'],['lo','Dưới 100.000đ'],['mid','100.000 – 300.000đ'],['hi','Trên 300.000đ'],['custom','Tùy chỉnh']].map(([k,v])=>'<label><input type="radio" name="fpr" '+(filt.price===k?'checked':'')+' onchange="filt.price=\''+k+'\''+(k!=='custom'?';filt.priceMin=0;filt.priceMax=0':'')+';renderListing()">'+v+'</label>').join('')+
+    (filt.price==='custom'?'<div class="price-custom"><input id="prMinI" type="number" class="price-inp" min="0" value="'+(filt.priceMin||'')+'" placeholder="Từ" onkeydown="if(event.key===\'Enter\')applyCustomPrice()"><span class="price-sep">–</span><input id="prMaxI" type="number" class="price-inp" min="0" value="'+(filt.priceMax||'')+'" placeholder="Đến" onkeydown="if(event.key===\'Enter\')applyCustomPrice()"><button class="price-go" onclick="applyCustomPrice()">OK</button></div>':'');
   const sortOpts=[['sold','Bán chạy'],['rate','Đánh giá cao'],['priceAsc','Giá thấp đến cao'],['priceDesc','Giá cao đến thấp']].map(([k,v])=>'<option value="'+k+'"'+(filt.sort===k?' selected':'')+'>'+v+'</option>').join('');
 
   const chips=[];
@@ -953,10 +958,11 @@ function renderListing(){
   if(filt.aud)chips.push(['aud',AUD[filt.aud]]);
   if(filt.brand)chips.push(['brand',filt.brand]);
   if(filt.fmt)chips.push(['fmt',filt.fmt]);
-  if(filt.price!=='all')chips.push(['price',PRICE_LBL[filt.price]]);
+  if(filt.price!=='all')chips.push(['price',filt.price==='custom'?(filt.priceMin>0||filt.priceMax>0?'Giá: '+(filt.priceMin>0?fmt(filt.priceMin):'0')+'–'+(filt.priceMax>0?fmt(filt.priceMax):'∞'):'Tùy chỉnh'):PRICE_LBL[filt.price]]);
   if(filt.bookfmt)chips.push(['bookfmt',{giay:'Sách giấy',ebook:'Ebook',audio:'Sách nói'}[filt.bookfmt]]);
   if(filt.rating)chips.push(['rating','Đánh giá '+filt.rating+'★+']);
   if(filt.sale)chips.push(['sale','Đang giảm giá']);
+  if(filt.instock)chips.push(['instock','Còn hàng']);
   const chipHtml=chips.length?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="clearFilter(\''+c[0]+'\')">×</button></span>').join('')+'<button class="freset" onclick="resetFilters()">Xóa tất cả</button></div>':'';
 
   document.getElementById('app').innerHTML=
@@ -971,7 +977,7 @@ function renderListing(){
       (bookFmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng</div>'+bookFmtOpts+'</div>':'')+
       '<div class="fgroup"><div class="ftitle">Khoảng giá</div>'+priceOpts+'</div>'+
       '<div class="fgroup"><div class="ftitle">Đánh giá</div>'+ratingOpts+'</div>'+
-      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label></div>'+
+      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label><label><input type="checkbox" '+(filt.instock?'checked':'')+' onchange="filt.instock=this.checked;renderListing()">Chỉ còn hàng</label></div>'+
     '</aside>'+
     '<div>'+
       (heroDesc?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+

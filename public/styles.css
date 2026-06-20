@@ -592,6 +592,9 @@
   /* ============ MODULE MỚI (wishlist, đơn, B2B, ưu đãi…) ============ */
   /* Wishlist state on cards */
   .pcover .fav.on{color:var(--coral);} .pcover .fav.on svg{fill:var(--coral);}
+  .pcover .badge-oos{position:absolute;top:8px;left:8px;background:rgba(70,65,60,.82);color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;z-index:2;}
+  .oos-ov{position:absolute;inset:0;background:rgba(248,245,240,.48);z-index:1;}
+  .pinfo .add.oos{background:#f0ece8;color:#a09080;border-color:#d8d0c8;cursor:not-allowed;pointer-events:none;}
   .hm-fav.on{color:#c8362a;background:#fff;} .hm-fav.on svg{fill:#c8362a;}
 
   /* Review / Q&A form */
@@ -819,6 +822,11 @@
   .achip button{background:rgba(160,42,32,.14);color:var(--ink);width:18px;height:18px;border-radius:50%;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;}
   .achip button:hover{background:var(--ink);color:#fff;}
   .freset{font-size:12.5px;color:var(--text-soft);text-decoration:underline;}
+  .price-custom{display:flex;align-items:center;gap:5px;margin-top:8px;flex-wrap:wrap;}
+  .price-inp{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-size:13px;outline:none;background:var(--paper);color:var(--text);font-family:inherit;}
+  .price-inp:focus{border-color:var(--ink);}
+  .price-sep{color:var(--text-soft);font-size:13px;flex-shrink:0;}
+  .price-go{font-size:12px;font-weight:600;background:var(--ink);color:#fff;border-radius:7px;padding:5px 10px;flex-shrink:0;}
   .list-top .cnt b{color:var(--ink-deep);}
   .list-top-r{display:flex;align-items:center;gap:10px;}
   .view-toggle{display:flex;gap:3px;}
