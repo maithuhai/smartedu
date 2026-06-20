@@ -6518,18 +6518,6 @@ function renderTBGDStore(){
       '</div>'+
     '</div>'+
 
-    '<h2 class="vpp-sec-h">📦 Danh mục</h2>'+
-    '<div class="tbgd-cats">'+Object.entries(TBGD_SUBS).map(([k,v])=>{
-      const items=P.filter(p=>p.cat==='tbgd'&&p.sub===k);
-      const cnt=items.length;
-      return '<div class="tbgd-cat" onclick="tbgdSub=\''+k+'\';go(\'listing\',\'tbgd\')">'+
-        '<div class="tbc-head"><span class="tbc-icon">'+v.icon+'</span><div><div class="tbc-nm">'+v.lbl+'</div><div class="tbc-cnt">'+cnt+' sản phẩm</div></div></div>'+
-        '<div class="tbc-desc">'+v.desc+'</div>'+
-        '<div class="tbc-items">'+items.slice(0,2).map(p=>'<div class="tbci-nm">'+p.name+'</div>').join('')+'</div>'+
-        '<div class="tbc-more">Xem tất cả ›</div>'+
-      '</div>';
-    }).join('')+'</div>'+
-
     '<h2 class="vpp-sec-h">🔥 Bán chạy nhất</h2>'+
     '<div class="vpp-grid">'+bestsellers.map(tCard).join('')+'</div>'+
 
@@ -6694,9 +6682,6 @@ function renderEbookStore(){
         '<div class="esh-stat"><div class="esh-sv">∞</div><div class="esh-sl">Sở hữu vĩnh viễn</div></div>'+
       '</div>'+
     '</div>'+
-
-    '<h2 class="eb-sec-h">Danh mục</h2>'+
-    '<div class="eb-cats">'+CATS.map(c=>'<div class="eb-cat" onclick="go(\''+c[2]+'\',\''+c[3]+'\')"><div class="ec-icon">'+c[0].split(' ')[0]+'</div><div class="ec-info"><div class="ec-nm">'+c[0].substring(c[0].indexOf(' ')+1)+'</div><div class="ec-cnt">'+c[4]+'</div></div></div>').join('')+'</div>'+
 
     (featured.length?'<h2 class="eb-sec-h">🔥 Nổi bật tháng này</h2>'+
     '<div class="eb-grid">'+featured.map(ebCard).join('')+'</div>':'')+
