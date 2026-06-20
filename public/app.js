@@ -891,7 +891,8 @@ const ROLE_GROUPS=[
 const ROLES=ROLE_GROUPS.flatMap(g=>g.roles.map(r=>({...r,kind:g.kind,to:g.to})));
 let lgRole='hocsinh', authView='login', authResetToken=null;
 let user=LS.get('user',null), orders=LS.get('orders',[]), acctTab='dashboard';
-let pfEditMode=false;
+let profileTab='info';
+let pfEditMode=false, emailChangeStep=null, emailChangePending='';
 let adminDays=30;
 let admUsersView='list', admUserSearch='', admUserRoleFilter='all', admUserStatusFilter='all', admSelectedUserId=null, admUserPage=0;
 let orderFilter='all';
@@ -932,7 +933,7 @@ let activeSessions=LS.get('activeSessions',null);
 function saveActiveSessions(){LS.set('activeSessions',activeSessions);}
 let privacySet=LS.get('privacy',{analytics:true,marketing:true,thirdParty:false,push:true});
 function savePrivacySet(){LS.set('privacy',privacySet);}
-let twoFAStep=null,twoFAMethod='sms';
+let twoFAStep=null,twoFAMethod='sms',twoFABackupCodes=null,otpResendSec=0,otpResendTimer=null;
 // Auth helpers
 function hashPw(pw){let h=0;for(let i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36);}
 function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);}
@@ -1277,6 +1278,8 @@ function orderCardFull(o){
 }
 function acctContent(){
   if(user.role==='admin')return adminContent();
+  const PF_SUBTABS=[['info','Thông tin'],['security','Bảo mật'],['devices','Thiết bị & Lịch sử'],['privacy','Quyền riêng tư'],['danger','Xóa tài khoản']];
+  const pfSubBar=acctTab==='profile'?'<div class="pf-subtab-bar">'+PF_SUBTABS.map(([k,l])=>'<button class="pf-stab'+(profileTab===k?' on':'')+(k==='danger'?' pf-stab-del':'')+'" onclick="profileTab=\''+k+'\';twoFAStep=null;pfEditMode=false;emailChangeStep=null;emailChangePending=\'\';renderAccount()">'+l+'</button>').join('')+'</div>':'';
   if(acctTab==='dashboard'){
     const isTeacher=user.teacherVerified==='verified';
     const tierPct=isTeacher?'15%':'5%';
@@ -1461,7 +1464,7 @@ function acctContent(){
       '<button class="btn-primary" onclick="submitStudentVerify()">Gửi yêu cầu xác thực</button>'+
       '<p style="font-size:12px;color:var(--text-soft);margin-top:10px">Thông tin chỉ dùng để xác thực và không chia sẻ bên ngoài EduMart.</p></div>';
   }
-  if(acctTab==='profile'){
+  if(acctTab==='profile'&&profileTab==='info'){
     const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
     function dobDisplay(d){if(!d)return '—';const p=d.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:'—';}
     const genderLabel=user.gender&&user.gender!==''?user.gender:'—';
@@ -1471,7 +1474,7 @@ function acctContent(){
       user.role==='school'?'<div class="pf-info-item"><div class="pf-info-label">Tên tổ chức</div><div class="pf-info-value">'+(user.orgName||'—')+'</div></div>'+
         '<div class="pf-info-item"><div class="pf-info-label">Mã số thuế</div><div class="pf-info-value">'+(user.taxCode||'—')+'</div></div>':'';
     if(!pfEditMode){
-      return '<div class="panel">'+
+      return pfSubBar+'<div class="panel">'+
         '<div class="prof-hdr">'+
           '<div class="prof-av-lg">'+user.name.charAt(0).toUpperCase()+'</div>'+
           '<div class="prof-hdr-info">'+
@@ -1496,17 +1499,50 @@ function acctContent(){
         '</div>'+
         '<div class="sec-divider"></div>'+
         '<div class="pf-section-title">Liên hệ</div>'+
-        '<div class="pf-info-grid">'+
-          '<div class="pf-info-item pf-info-full"><div class="pf-info-label">Email</div>'+
-            '<div class="pf-info-value">'+(user.email||'—')+
-              '<span class="pf-badge locked"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Liên hệ hỗ trợ để đổi</span>'+
+        (emailChangeStep===null?
+          '<div class="pf-info-grid">'+
+            '<div class="pf-info-item pf-info-full">'+
+              '<div class="pf-info-label">Email</div>'+
+              '<div class="pf-info-value" style="justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+                '<span>'+(user.email||'—')+'</span>'+
+                '<button class="pf-email-change-btn" onclick="emailChangeStep=\'input\';renderAccount()">'+
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+                  ' Đổi email'+
+                '</button>'+
+              '</div>'+
             '</div>'+
-          '</div>'+
-        '</div>'+
+          '</div>':
+        emailChangeStep==='input'?
+          '<div class="pf-email-change-box">'+
+            '<div class="pf-ecb-title">Đổi địa chỉ email</div>'+
+            '<div class="pf-ecb-cur">Email hiện tại: <b>'+(user.email||'—')+'</b></div>'+
+            '<div class="form-field" style="margin-bottom:10px"><label>Email mới</label>'+
+              '<input id="emNewEmail" type="email" placeholder="email-moi@example.com" value="'+emailChangePending.replace(/"/g,'&quot;')+'">'+
+            '</div>'+
+            '<div id="emErr" class="field-error"></div>'+
+            '<div style="display:flex;gap:8px">'+
+              '<button class="btn-primary" onclick="startEmailChange()">Gửi mã xác nhận →</button>'+
+              '<button class="btn-ghost" onclick="emailChangeStep=null;emailChangePending=\'\';renderAccount()">Hủy</button>'+
+            '</div>'+
+          '</div>':
+          /* step otp */
+          '<div class="pf-email-change-box pf-ecb-otp">'+
+            '<div class="pf-ecb-title">Xác nhận email mới</div>'+
+            '<div class="pf-ecb-cur">Nhập mã 6 số đã gửi đến <b>'+emailChangePending+'</b> <span class="demo-hint">Demo: <b>123456</b></span></div>'+
+            '<div class="otp-row" style="margin:14px 0">'+
+              Array.from({length:6},(_,i)=>'<input class="otp-box" id="emob'+i+'" type="text" maxlength="1" inputmode="numeric" onkeyup="emOtpNav('+i+',event)" oninput="if(this.value&&'+i+'<5)document.getElementById(\'emob\'+('+i+'+1)).focus()">').join('')+
+            '</div>'+
+            '<div id="emOtpErr" class="field-error"></div>'+
+            '<div style="display:flex;gap:8px">'+
+              '<button class="btn-primary" onclick="confirmEmailChange()">Xác nhận đổi email</button>'+
+              '<button class="btn-ghost" onclick="emailChangeStep=\'input\';renderAccount()">← Nhập lại</button>'+
+            '</div>'+
+          '</div>'
+        )+
       '</div>';
     }
     const genderOpts=['','Nam','Nữ','Khác'].map(g=>'<option value="'+g+'"'+((user.gender||'')===g?' selected':'')+'>'+( g||'— Chưa chọn —')+'</option>').join('');
-    return '<div class="panel">'+
+    return pfSubBar+'<div class="panel">'+
       '<div class="prof-hdr">'+
         '<div class="prof-av-lg">'+user.name.charAt(0).toUpperCase()+'</div>'+
         '<div class="prof-hdr-info">'+
@@ -1536,7 +1572,10 @@ function acctContent(){
       '<div class="form-field"><label>Email</label>'+
         '<div class="pf-email-locked">'+
           '<input value="'+(user.email||'')+'" disabled style="flex:1;opacity:.7;cursor:not-allowed">'+
-          '<span class="pf-lock-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Liên hệ hỗ trợ để đổi</span>'+
+          '<button class="pf-email-change-btn" onclick="pfEditMode=false;emailChangeStep=\'input\';renderAccount()">'+
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+            ' Đổi email'+
+          '</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -1618,47 +1657,84 @@ function acctContent(){
       '<p style="font-size:12px;color:var(--text-soft);margin-top:10px">Thông tin chỉ dùng để xác thực và không chia sẻ bên ngoài EduMart.</p></div>';
   }
   /* ── Bảo mật ── */
-  if(acctTab==='security'){
+  if(acctTab==='profile'&&profileTab==='security'){
     const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
     const has2FA=user.twoFA===true;
+    const methodIcons={'sms':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>','totp':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>','email':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'};
     const methodLabel={'sms':'SMS về SĐT','totp':'Ứng dụng TOTP','email':'Email'}[user.twoFAMethod||'sms']||'SMS';
+    const TFA_STEPS=['method','otp','backup'];
+    const stepIdx=TFA_STEPS.indexOf(twoFAStep);
+    const stepBar=(twoFAStep&&twoFAStep!=='disable')?'<div class="tfa-steps">'+
+      [['1','Phương thức'],['2','Xác nhận OTP'],['3','Mã dự phòng']].map(([n,l],i)=>
+        '<div class="tfa-step'+(i<stepIdx+1?' done':i===stepIdx+1?' active':'')+'">'+
+          '<span class="tfa-step-n">'+n+'</span><span class="tfa-step-l">'+l+'</span>'+
+          (i<2?'<span class="tfa-step-line"></span>':'')+
+        '</div>'
+      ).join('')+
+    '</div>':'';
     let tfaHtml='';
     if(twoFAStep==='method'){
-      tfaHtml='<div class="tfa-setup">'+
-        '<div style="font-weight:600;margin-bottom:12px">Chọn phương thức xác thực:</div>'+
-        [['sms','SMS về số điện thoại','Nhận OTP qua tin nhắn'],['totp','Ứng dụng TOTP','Google / Microsoft Authenticator'],['email','Email','Nhận OTP qua email đăng ký']].map(([k,t,d])=>
-          '<label class="tfa-opt'+(twoFAMethod===k?' on':'')+'"><input type="radio" name="tfaM" value="'+k+'"'+(twoFAMethod===k?' checked':'')+' onchange="twoFAMethod=\''+k+'\';document.querySelectorAll(\'.tfa-opt\').forEach(x=>x.classList.toggle(\'on\',x.querySelector(\'input\').value===\''+k+'\'))">'+
-          '<div><div style="font-weight:600;font-size:13.5px">'+t+'</div><div style="font-size:12px;color:var(--text-soft)">'+d+'</div></div></label>'
+      tfaHtml=stepBar+'<div class="tfa-setup">'+
+        '<div class="tfa-setup-title">Chọn cách nhận mã xác thực:</div>'+
+        [['sms','SMS về số điện thoại','Nhận OTP qua tin nhắn đến '+(user.phone?user.phone.replace(/(\d{4})\d{3}(\d{3})/,'$1 xxx $2'):'SĐT đã đăng ký')],
+         ['totp','Ứng dụng Authenticator','Google / Microsoft / Authy Authenticator'],
+         ['email','Email','Nhận OTP qua '+(user.email?user.email.replace(/(.{2})(.*)(@.*)/,(a,b,c,d)=>b+'***'+d):'email đăng ký')]
+        ].map(([k,t,d])=>
+          '<label class="tfa-opt'+(twoFAMethod===k?' on':'')+'"><div class="tfa-opt-ic">'+methodIcons[k]+'</div>'+
+          '<input type="radio" name="tfaM" value="'+k+'"'+(twoFAMethod===k?' checked':'')+' style="display:none" onchange="twoFAMethod=\''+k+'\';document.querySelectorAll(\'.tfa-opt\').forEach(x=>x.classList.toggle(\'on\',x.querySelector(\'input\').value===\''+k+'\'))">'+
+          '<div class="tfa-opt-body"><div class="tfa-opt-title">'+t+'</div><div class="tfa-opt-desc">'+d+'</div></div>'+
+          '<div class="tfa-opt-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div></label>'
         ).join('')+
-        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="twoFAStep=\'otp\';renderAccount()">Tiếp theo →</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
+        '<div class="tfa-actions"><button class="btn-primary" onclick="startOtpTimer();twoFAStep=\'otp\';renderAccount()">Gửi mã xác nhận →</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
       '</div>';
     } else if(twoFAStep==='otp'){
-      const dest={'sms':'SĐT '+(user.phone||'của bạn'),'totp':'ứng dụng xác thực','email':'email '+(user.email||'của bạn')}[twoFAMethod]||'';
-      tfaHtml='<div class="tfa-setup">'+
-        '<div style="font-size:13.5px;margin-bottom:14px">Nhập mã OTP gửi đến <b>'+dest+'</b> <span style="font-size:12px;color:var(--text-soft)">(demo: <b>123456</b>)</span></div>'+
-        '<div class="otp-row">'+Array.from({length:6},(_,i)=>'<input class="otp-box" id="ob'+i+'" type="text" maxlength="1" inputmode="numeric" onkeyup="otpNav('+i+',event)">').join('')+'</div>'+
-        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="confirm2FA()">Xác nhận OTP</button><button class="btn-ghost" onclick="twoFAStep=\'method\';renderAccount()">← Quay lại</button></div>'+
+      const dest={'sms':'SĐT '+(user.phone?user.phone.replace(/(\d{4})\d{3}(\d{3})/,'$1 xxx $2'):'của bạn'),'totp':'ứng dụng xác thực của bạn','email':'email '+(user.email?user.email.replace(/(.{2})(.*)(@.*)/,(a,b,c,d)=>b+'***'+d):'của bạn')}[twoFAMethod]||'';
+      tfaHtml=stepBar+'<div class="tfa-setup">'+
+        '<div class="tfa-setup-title">Nhập mã 6 chữ số</div>'+
+        '<div class="tfa-otp-dest">Đã gửi đến <b>'+dest+'</b> <span class="demo-hint">(Demo: <b>123456</b>)</span></div>'+
+        '<div class="otp-row">'+Array.from({length:6},(_,i)=>'<input class="otp-box" id="ob'+i+'" type="text" maxlength="1" inputmode="numeric" onkeyup="otpNav('+i+',event)" oninput="if(this.value&&'+i+'<5)document.getElementById(\'ob\'+('+i+'+1)).focus()">').join('')+'</div>'+
+        '<div id="otpCountdown" class="otp-countdown"></div>'+
+        '<div class="tfa-actions"><button class="btn-primary" onclick="confirm2FA()">Xác nhận →</button><button class="btn-ghost" onclick="twoFAStep=\'method\';renderAccount()">← Quay lại</button></div>'+
+      '</div>';
+    } else if(twoFAStep==='backup'){
+      const codes=twoFABackupCodes||[];
+      tfaHtml=stepBar+'<div class="tfa-setup tfa-backup">'+
+        '<div class="tfa-backup-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1a7a4a" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg></div>'+
+        '<div class="tfa-backup-title">Xác thực 2 yếu tố đã được bật!</div>'+
+        '<div class="tfa-backup-note">Lưu các mã dự phòng bên dưới. Mỗi mã chỉ dùng được <b>1 lần</b> khi không truy cập được phương thức chính.</div>'+
+        '<div class="tfa-backup-grid">'+codes.map(c=>'<code class="backup-code">'+c+'</code>').join('')+'</div>'+
+        '<div class="tfa-actions">'+
+          '<button class="btn-ghost" onclick="copyBackupCodes()">📋 Sao chép tất cả</button>'+
+          '<button class="btn-primary" onclick="twoFAStep=null;twoFABackupCodes=null;renderAccount()">Hoàn tất ✓</button>'+
+        '</div>'+
       '</div>';
     } else if(twoFAStep==='disable'){
-      tfaHtml='<div class="tfa-setup">'+
-        '<div style="font-size:13.5px;margin-bottom:12px">Nhập mật khẩu để tắt 2FA:</div>'+
-        '<div class="pw-wrap" style="max-width:320px"><input id="tfaDPw" type="password" placeholder="Mật khẩu tài khoản">'+
+      tfaHtml='<div class="tfa-setup tfa-disable-box">'+
+        '<div class="tfa-setup-title" style="color:#c0392b">Tắt xác thực 2 yếu tố</div>'+
+        '<div class="tfa-otp-dest" style="margin-bottom:14px">Nhập mật khẩu tài khoản để xác nhận:</div>'+
+        '<div class="pw-wrap" style="max-width:320px"><input id="tfaDPw" type="password" placeholder="Mật khẩu tài khoản" onkeydown="if(event.key===\'Enter\')disable2FA()">'+
         '<button type="button" class="pw-toggle" onclick="togglePw(\'tfaDPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div>'+
         '<div id="tfaDErr" class="field-error"></div>'+
-        '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn-primary" onclick="disable2FA()">Tắt 2FA</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
+        '<div class="tfa-actions"><button class="btn-primary" style="background:#c0392b" onclick="disable2FA()">Tắt 2FA</button><button class="btn-ghost" onclick="twoFAStep=null;renderAccount()">Huỷ</button></div>'+
       '</div>';
     } else {
       tfaHtml='<div class="two-fa-row">'+
-        '<div><div style="font-weight:600;font-size:14px">'+(has2FA?'🛡 Đang bật — '+methodLabel:'⚪ Chưa bật')+'</div>'+
-        '<div style="font-size:13px;color:var(--text-soft);margin-top:4px">'+(has2FA?'Bật từ: '+(user.twoFADate||todayStr()):'Thêm lớp bảo mật bằng OTP mỗi lần đăng nhập.')+'</div></div>'+
-        '<button class="btn-ghost" style="white-space:nowrap" onclick="twoFAStep=\''+(has2FA?'disable':'method')+'\';renderAccount()">'+(has2FA?'Tắt 2FA':'Bật 2FA')+'</button>'+
-      '</div>'+
-      (!has2FA?'<p style="font-size:12.5px;color:var(--text-soft);margin-top:8px">Hỗ trợ: SMS · TOTP (Google Authenticator) · Email</p>':'');
+        '<div>'+
+          '<div class="tfa-status-badge'+(has2FA?' on':'')+'">'+
+            (has2FA?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Đang bật':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Chưa bật')+
+          '</div>'+
+          '<div style="font-size:13px;color:var(--text-soft);margin-top:6px">'+
+            (has2FA?'Phương thức: <b>'+methodLabel+'</b> · Bật từ: '+(user.twoFADate||todayStr()):
+             'Thêm lớp bảo mật bằng mã OTP mỗi lần đăng nhập. Hỗ trợ SMS · TOTP · Email.')+
+          '</div>'+
+        '</div>'+
+        '<button class="btn-ghost '+(has2FA?'btn-danger-outline':'')+'" style="white-space:nowrap" onclick="twoFAStep=\''+(has2FA?'disable':'method')+'\';renderAccount()">'+(has2FA?'Tắt 2FA':'Bật 2FA')+'</button>'+
+      '</div>';
     }
-    return '<div class="panel">'+
-      '<h3 style="margin:0 0 16px">Đổi mật khẩu</h3>'+
+    return pfSubBar+'<div class="panel">'+
+      '<div class="sec-block-header"><h3>Đổi mật khẩu</h3></div>'+
       (isSocial?
-        '<div class="info-note">Tài khoản đăng nhập qua <b>'+(user.provider||'mạng xã hội')+'</b> không dùng mật khẩu. Sử dụng nút Social để đăng nhập.</div>':
+        '<div class="info-note">Tài khoản đăng nhập qua <b>'+(user.provider||'mạng xã hội')+'</b> không dùng mật khẩu.</div>':
         '<div class="form-field"><label>Mật khẩu hiện tại</label>'+
           '<div class="pw-wrap"><input id="cpOld" type="password" placeholder="Mật khẩu đang dùng">'+
           '<button type="button" class="pw-toggle" onclick="togglePw(\'cpOld\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>'+
@@ -1675,49 +1751,63 @@ function acctContent(){
         '<button class="btn-primary" onclick="doChangePw()">Cập nhật mật khẩu</button>'
       )+
       '<div class="sec-divider"></div>'+
-      '<h3 style="margin:0 0 14px">Xác thực 2 yếu tố (2FA)</h3>'+
+      '<div class="sec-block-header"><h3>Xác thực 2 yếu tố (2FA)</h3></div>'+
       tfaHtml+
     '</div>';
   }
   /* ── Thiết bị & Lịch sử ── */
-  if(acctTab==='devices'){
+  if(acctTab==='profile'&&profileTab==='devices'){
     const sessions=getActiveSessions();
     const log=getLoginLog();
     const hasOthers=sessions.some(s=>!s.current);
+    const DEV_IC={
+      desktop:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+      mobile:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+      tablet:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
+    };
     const sessHtml=sessions.map(s=>'<div class="device-card'+(s.current?' device-current':'')+'">'+
-      '<span class="dev-icon">'+s.icon+'</span>'+
-      '<div class="dev-info"><div class="dev-name">'+s.device+(s.current?' <span class="badge-cur">Thiết bị này</span>':'')+'</div>'+
-      '<div class="dev-meta">'+s.ip+' · '+s.loc+' · '+s.last+'</div></div>'+
-      (!s.current?'<button class="btn-ghost" style="white-space:nowrap;font-size:12.5px;padding:8px 14px" onclick="revokeDevice(\''+s.id+'\')">Thu hồi</button>':'')+
-    '</div>').join('');
-    const logHtml=log.map(l=>'<div class="login-log-item">'+
-      '<span class="log-dot'+(l.ok?'':' log-fail')+'"></span>'+
-      '<div class="log-info"><div class="log-dev">'+l.device+(l.note?' · <span style="color:var(--text-soft);font-size:12px">'+l.note+'</span>':'')+'</div>'+
-      '<div class="log-meta">'+l.date+' '+l.time+' · '+l.ip+' · '+l.loc+'</div></div>'+
-      '<span class="log-status'+(l.ok?'':' log-status-fail')+'">'+(l.ok?'Thành công':'Thất bại')+'</span>'+
+      '<div class="dev-icon-wrap'+(s.current?' cur':'')+'">'+( DEV_IC[s.icon]||DEV_IC.desktop)+'</div>'+
+      '<div class="dev-info">'+
+        '<div class="dev-name">'+s.device+(s.current?' <span class="badge-cur">Thiết bị này</span>':'')+'</div>'+
+        '<div class="dev-meta"><span>'+s.ip+'</span><span>'+s.loc+'</span><span class="dev-last'+(s.current?' active':'')+'">'+s.last+'</span></div>'+
+      '</div>'+
+      (!s.current?'<button class="dev-revoke-btn" onclick="revokeDevice(\''+s.id+'\')">Thu hồi</button>':
+       '<span class="dev-this-tag">Phiên hiện tại</span>')+
     '</div>').join('');
     const failCount=log.filter(l=>!l.ok).length;
-    return '<div class="panel">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
-        '<h3 style="margin:0">Thiết bị đang đăng nhập</h3>'+
-        (hasOthers?'<button class="btn-ghost" style="font-size:12.5px;padding:8px 14px" onclick="revokeAllDevices()">Thu hồi tất cả</button>':'')+
+    const logHtml=log.map(l=>'<div class="login-log-item">'+
+      '<div class="log-dot-wrap"><span class="log-dot'+(l.ok?'':' log-fail')+'"></span></div>'+
+      '<div class="log-info">'+
+        '<div class="log-dev">'+l.device+(l.note?' <span class="log-note">'+l.note+'</span>':'')+'</div>'+
+        '<div class="log-meta">'+l.date+' · '+l.time+' · '+l.ip+' · '+l.loc+'</div>'+
       '</div>'+
-      sessHtml+
-      (failCount?'<div class="info-note" style="margin-top:14px">⚠ Phát hiện <b>'+failCount+'</b> lần đăng nhập thất bại. <a style="color:var(--ink);font-weight:600;cursor:pointer" onclick="acctTab=\'security\';renderAccount()">Đổi mật khẩu ngay</a></div>':'')+
+      '<span class="log-status'+(l.ok?'':' log-status-fail')+'">'+(l.ok?'Thành công':'Thất bại')+'</span>'+
+    '</div>').join('');
+    return pfSubBar+'<div class="panel">'+
+      '<div class="dev-section-hdr">'+
+        '<h3 style="margin:0">Thiết bị đang đăng nhập <span class="dev-count">'+sessions.length+'</span></h3>'+
+        (hasOthers?'<button class="btn-ghost btn-sm-ghost" onclick="revokeAllDevices()">Đăng xuất tất cả</button>':'')+
+      '</div>'+
+      '<div class="device-list">'+sessHtml+'</div>'+
+      (failCount?'<div class="info-note warn-note">'+
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+
+        ' Phát hiện <b>'+failCount+'</b> lần đăng nhập thất bại gần đây. '+
+        '<a style="color:var(--coral);font-weight:600;cursor:pointer;text-decoration:underline" onclick="profileTab=\'security\';renderAccount()">Đổi mật khẩu ngay</a>'+
+      '</div>':'')+
       '<div class="sec-divider"></div>'+
-      '<h3 style="margin:0 0 14px">Lịch sử đăng nhập</h3>'+
-      (log.length?logHtml:'<p style="color:var(--text-soft)">Chưa có lịch sử.</p>')+
+      '<div class="dev-section-hdr"><h3 style="margin:0">Lịch sử đăng nhập</h3></div>'+
+      '<div class="login-log-list">'+(log.length?logHtml:'<p style="color:var(--text-soft);font-size:13.5px">Chưa có lịch sử.</p>')+'</div>'+
     '</div>';
   }
   /* ── Quyền riêng tư ── */
-  if(acctTab==='privacy'){
+  if(acctTab==='profile'&&profileTab==='privacy'){
     const rows=[
       ['analytics','📊','Dữ liệu hành vi mua sắm','Giúp cải thiện gợi ý sản phẩm phù hợp với bạn.'],
       ['marketing','📧','Nhận email marketing','Khuyến mãi, sản phẩm mới và bản tin hàng tuần.'],
       ['thirdParty','🤝','Chia sẻ dữ liệu bên thứ ba','Đối tác quảng cáo và phân tích. Tắt sẽ thu hồi quyền OAuth đã cấp.'],
       ['push','🔔','Thông báo đẩy (push)','Đơn hàng, khuyến mãi qua trình duyệt.'],
     ];
-    return '<div class="panel">'+
+    return pfSubBar+'<div class="panel">'+
       '<h3 style="margin:0 0 16px">Quyền riêng tư & Dữ liệu</h3>'+
       rows.map(([key,ic,title,desc])=>'<div class="privacy-row">'+
         '<div class="privacy-info"><div class="privacy-title">'+ic+' '+title+'</div><div class="privacy-desc">'+desc+'</div></div>'+
@@ -1733,27 +1823,60 @@ function acctContent(){
     '</div>';
   }
   /* ── Xóa tài khoản ── */
-  if(acctTab==='danger'){
+  if(acctTab==='profile'&&profileTab==='danger'){
     const isSocial=user.pwHash&&user.pwHash.startsWith('__social__');
     const hasActive=orders.some(o=>orderStage(o)<4);
-    return '<div class="panel">'+
+    return pfSubBar+'<div class="panel">'+
       '<h3 style="margin:0 0 4px;color:#c0392b">⚠ Vùng nguy hiểm</h3>'+
       '<p style="font-size:13px;color:var(--text-soft);margin:0 0 18px">Các thao tác trong mục này có thể gây mất dữ liệu và không thể hoàn tác.</p>'+
       '<div class="danger-zone">'+
         '<div class="danger-zone-title">🗑 Xóa tài khoản vĩnh viễn</div>'+
         '<div class="danger-zone-desc" style="margin:6px 0 14px">Sau khi xóa: toàn bộ đơn hàng, điểm thưởng và dữ liệu sẽ bị ẩn. Tài khoản bị <b>xóa vĩnh viễn sau 30 ngày</b>. Không thể khôi phục sau thời hạn này.</div>'+
-        (hasActive?
-          '<div class="info-note" style="background:#fff8f7;border-color:#f5c6c0;color:#c0392b">Bạn có đơn hàng đang xử lý. Vui lòng chờ hoàn tất trước khi xóa tài khoản.</div>':
-          (!isSocial?
-            '<div class="form-field"><label>Nhập mật khẩu để xác nhận</label>'+
-              '<div class="pw-wrap"><input id="delPw" type="password" placeholder="Mật khẩu tài khoản của bạn">'+
-              '<button type="button" class="pw-toggle" onclick="togglePw(\'delPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>':'')
-        )+
+        (hasActive?'<div class="info-note" style="background:#fff8f7;border-color:#f5c6c0;color:#c0392b;margin-bottom:14px">⚠ Bạn có đơn hàng đang xử lý. Sau khi xóa tài khoản, các đơn hàng này sẽ bị hủy.</div>':'')+
+        (!isSocial?
+          '<div class="form-field"><label>Nhập mật khẩu để xác nhận</label>'+
+            '<div class="pw-wrap"><input id="delPw" type="password" placeholder="Mật khẩu tài khoản của bạn">'+
+            '<button type="button" class="pw-toggle" onclick="togglePw(\'delPw\',this)" tabindex="-1">'+EYE_SVG+'</button></div></div>':'')+
+        '<div class="del-confirm-row">'+
+          '<label class="del-confirm-chk">'+
+            '<input type="checkbox" id="delConfirmChk">'+
+            '<span>Tôi hiểu rằng hành động này <b>không thể hoàn tác</b> và tài khoản sẽ bị xóa vĩnh viễn sau 30 ngày.</span>'+
+          '</label>'+
+        '</div>'+
         '<div id="delErr" class="field-error"></div>'+
-        (!hasActive?'<button class="btn-delete" onclick="doDeleteAccount()">Xóa tài khoản của tôi</button>':'')+
+        '<button class="btn-delete" onclick="doDeleteAccount()">Xóa tài khoản của tôi</button>'+
       '</div>'+
     '</div>';
   }
+}
+function startEmailChange(){
+  const em=val('emNewEmail').trim();
+  if(!em){showAuthErr('emErr','Nhập email mới');return;}
+  if(!validEmail(em)){showAuthErr('emErr','Email không hợp lệ');return;}
+  if(em===user.email){showAuthErr('emErr','Email mới phải khác email hiện tại');return;}
+  emailChangePending=em;
+  emailChangeStep='otp';
+  renderAccount();
+}
+function emOtpNav(i,e){
+  const boxes=document.querySelectorAll('#app .otp-box');
+  if(e.key>='0'&&e.key<='9'&&i<5)setTimeout(()=>boxes[i+1]?.focus(),10);
+  if(e.key==='Backspace'&&i>0&&!boxes[i].value)boxes[i-1]?.focus();
+}
+function confirmEmailChange(){
+  const otp=Array.from(document.querySelectorAll('#app .otp-box')).map(b=>b.value).join('');
+  if(otp.length<6){showAuthErr('emOtpErr','Nhập đủ 6 số OTP');return;}
+  if(otp!=='123456'){showAuthErr('emOtpErr','Mã OTP không đúng — demo: 123456');return;}
+  const oldEmail=user.email;
+  user.email=emailChangePending;
+  const idx=authUsers.findIndex(u=>u.id===user.id);
+  if(idx>-1){authUsers[idx].email=emailChangePending;saveAuthUsers();}
+  saveUser();
+  emailChangeStep=null;emailChangePending='';
+  loginLog.unshift({id:Date.now(),time:new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0'),date:todayStr(),device:'Trình duyệt hiện tại',ip:'103.xx.xx.x',loc:'—',ok:true,note:'Đổi email'});
+  saveLoginLog();
+  renderAccount();
+  toast('Email đã được cập nhật thành '+user.email);
 }
 function saveProfile(){
   const name=val('pfName');
@@ -1814,16 +1937,28 @@ function otpNav(i,e){
   if(e.key>='0'&&e.key<='9'&&i<5)setTimeout(()=>boxes[i+1]?.focus(),10);
   if(e.key==='Backspace'&&i>0&&!boxes[i].value)boxes[i-1]?.focus();
 }
+function startOtpTimer(){
+  clearInterval(otpResendTimer);otpResendSec=60;
+  otpResendTimer=setInterval(()=>{
+    otpResendSec--;
+    const el=document.getElementById('otpCountdown');
+    if(el)el.textContent=otpResendSec>0?'Gửi lại sau '+otpResendSec+'s':'';
+    if(otpResendSec<=0)clearInterval(otpResendTimer);
+  },1000);
+}
 function confirm2FA(){
   const otp=Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join('');
   if(otp.length<6){toast('Nhập đủ 6 số OTP');return;}
   if(otp!=='123456'){toast('Mã OTP không đúng — demo: 123456');return;}
   user.twoFA=true;user.twoFAMethod=twoFAMethod;user.twoFADate=todayStr();
-  saveUser();twoFAStep=null;
-  toast('🛡 Đã bật xác thực 2 yếu tố!');
-  renderAccount();
-  const codes=Array.from({length:6},()=>(Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)).toUpperCase()).join('\n');
-  setTimeout(()=>alert('Mã dự phòng — lưu nơi an toàn:\n\n'+codes+'\n\nMỗi mã chỉ dùng 1 lần.'),400);
+  saveUser();clearInterval(otpResendTimer);
+  const alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  twoFABackupCodes=Array.from({length:8},()=>Array.from({length:8},()=>alpha[Math.floor(Math.random()*alpha.length)]).join('').replace(/(.{4})/,'$1-').replace(/-$/,''));
+  twoFAStep='backup';renderAccount();
+}
+function copyBackupCodes(){
+  if(!twoFABackupCodes)return;
+  navigator.clipboard.writeText(twoFABackupCodes.join('\n')).then(()=>toast('Đã sao chép mã dự phòng'));
 }
 function disable2FA(){
   const pw=val('tfaDPw')||'';
@@ -1835,9 +1970,13 @@ function disable2FA(){
 /* ── Device & Log functions ── */
 function getActiveSessions(){
   if(!activeSessions||!activeSessions.length){
+    const ua=navigator.userAgent;
+    const os=ua.includes('Win')?'Windows':ua.includes('Mac')?'macOS':ua.includes('Android')?'Android':'Linux';
+    const br=ua.includes('Chrome')?'Chrome':ua.includes('Firefox')?'Firefox':ua.includes('Safari')?'Safari':'Trình duyệt';
     activeSessions=[
-      {id:'s_cur',device:'Chrome · '+(navigator.userAgent.includes('Win')?'Windows':navigator.userAgent.includes('Mac')?'macOS':'Linux'),icon:'💻',ip:'103.21.xx.x',loc:'Hà Nội, VN',last:'Đang hoạt động',current:true},
-      {id:'s_mob',device:'Safari · iPhone',icon:'📱',ip:'118.69.xx.x',loc:'TP.HCM, VN',last:'2 giờ trước',current:false},
+      {id:'s_cur',device:br+' · '+os,icon:'desktop',ip:'103.21.xx.x',loc:'Hà Nội, VN',last:'Đang hoạt động',current:true},
+      {id:'s_mob',device:'Safari · iPhone 14',icon:'mobile',ip:'118.69.xx.x',loc:'TP. Hồ Chí Minh, VN',last:'2 giờ trước',current:false},
+      {id:'s_tab',device:'Chrome · macOS',icon:'desktop',ip:'27.64.xx.x',loc:'Đà Nẵng, VN',last:'1 ngày trước',current:false},
     ];
     saveActiveSessions();
   }
@@ -1880,7 +2019,8 @@ function doDeleteAccount(){
     if(!pw){showAuthErr('delErr','Nhập mật khẩu để xác nhận');return;}
     if(hashPw(pw)!==user.pwHash){showAuthErr('delErr','Mật khẩu không đúng');return;}
   }
-  if(!confirm('Xác nhận xóa tài khoản?\n\nTài khoản sẽ bị xóa vĩnh viễn sau 30 ngày.\nHành động này KHÔNG THỂ hoàn tác.'))return;
+  const chk=document.getElementById('delConfirmChk');
+  if(!chk||!chk.checked){showAuthErr('delErr','Vui lòng xác nhận bằng cách tích vào ô bên trên');return;}
   const idx=authUsers.findIndex(u=>u.id===user.id);
   if(idx>-1){authUsers[idx].deletedAt=todayStr();saveAuthUsers();}
   user=null;LS.set('user',null);
@@ -2310,8 +2450,7 @@ function navForRole(r){
   /* Xác thực giáo viên — Người mua (không áp dụng Trường học) */
   if(user&&r!=='school'&&(user.teacherVerified||r==='hocsinh'||r==='sinhvien'||r==='parent'))
     nav.push(['teacher','Xác thực giáo viên']);
-  nav.push(['profile','Hồ sơ'],['address','Sổ địa chỉ'],['points','Điểm thưởng'],
-    ['security','Bảo mật'],['devices','Thiết bị & Lịch sử'],['privacy','Quyền riêng tư'],['danger','Xóa tài khoản']);
+  nav.push(['profile','Hồ sơ cá nhân'],['address','Sổ địa chỉ'],['points','Điểm thưởng']);
   return nav;
 }
 function renderAccount(){
@@ -2319,7 +2458,7 @@ function renderAccount(){
   const nav=navForRole(user.role);
   document.getElementById('app').innerHTML=
   '<div class="acct"><aside class="acct-side"><div class="acct-user"><div class="av">'+user.name.charAt(0).toUpperCase()+'</div><div><div class="nm">'+user.name+'</div><div class="rl">'+ROLELBL[user.role]+'</div></div></div>'+
-    '<div class="acct-nav">'+nav.map(n=>'<button class="'+(acctTab===n[0]?'on':'')+(n[0]==='danger'?' nav-del':'')+'" onclick="acctTab=\''+n[0]+'\';twoFAStep=null;pfEditMode=false;renderAccount()">'+n[1]+'</button>').join('')+'<button class="danger" onclick="logout()">Đăng xuất</button></div></aside>'+
+    '<div class="acct-nav">'+nav.map(n=>'<button class="'+(acctTab===n[0]?'on':'')+'" onclick="acctTab=\''+n[0]+'\';profileTab=\'info\';twoFAStep=null;pfEditMode=false;emailChangeStep=null;emailChangePending=\'\';renderAccount()">'+n[1]+'</button>').join('')+'<button class="danger" onclick="logout()">Đăng xuất</button></div></aside>'+
     '<div>'+acctContent()+'</div></div>';
 }
 
