@@ -481,7 +481,7 @@ function renderHome(){
   '<div class="bs-section">'+
     '<div class="bs-section-hd">'+
       '<div class="bs-section-left">'+
-        '<span class="kick">Biên tập viên gợi ý</span>'+
+        '<span class="bs-kicker">Biên tập viên gợi ý</span>'+
         '<h2 class="bs-section-title">📚 Sách nổi bật</h2>'+
       '</div>'+
       '<div class="bs-section-right">'+
@@ -505,10 +505,6 @@ function renderHome(){
             (tag?'<span class="bs-tag" style="background:'+tag.c+'">'+tag.l+'</span>':'')+
             (disc>0?'<span class="bs-disc">-'+disc+'%</span>':'')+
             '<div class="bs-hover-panel">'+
-              '<div class="bs-rate-row">'+
-                '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f1c40f"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg> '+
-                p.rate.toFixed(1)+' · '+sold+' bán'+
-              '</div>'+
               '<button class="bs-cart-btn" onclick="event.stopPropagation();addToCart('+p.id+')">'+
                 '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Thêm vào giỏ'+
               '</button>'+
@@ -517,6 +513,12 @@ function renderHome(){
           '<div class="bs-info">'+
             '<div class="bs-nm">'+p.name+'</div>'+
             '<div class="bs-by">'+p.by+'</div>'+
+            '<div class="bs-rating">'+
+              '<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg>'+
+              '<span class="bs-rate-val">'+p.rate.toFixed(1)+'</span>'+
+              '<span class="bs-rate-sep">·</span>'+
+              '<span class="bs-rate-sold">'+sold+' bán</span>'+
+            '</div>'+
             '<div class="bs-pr">'+
               '<span class="bs-now">'+fmt(p.price)+'</span>'+
               (disc>0?'<span class="bs-old">'+fmt(p.old)+'</span>':'')+
