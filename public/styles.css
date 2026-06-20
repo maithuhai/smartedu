@@ -1592,3 +1592,41 @@
 /* Responsive */
 @media(max-width:900px){.bs-item{width:148px;}.bs-cover{width:148px;height:222px;}}
 @media(max-width:600px){.bs-section{padding:0 0 24px;}.bs-section-title{font-size:18px;}.bs-arr{display:none;}.bs-carousel-wrap{padding:0;}.bs-item{width:130px;}.bs-cover{width:130px;height:195px;}.bs-nm{font-size:12px;}.bs-now{font-size:13px;}}
+
+/* ── Nhà bán nổi bật ── */
+.sup-row{display:flex;gap:18px;overflow-x:auto;padding:4px 0 20px;scrollbar-width:none;}
+.sup-row::-webkit-scrollbar{display:none;}
+.sup-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;min-width:96px;}
+.sup-avatar{width:96px;height:96px;border-radius:50%;border:2px solid var(--line);overflow:hidden;transition:box-shadow .2s,transform .2s;background:var(--surface);}
+.sup-card:hover .sup-avatar{box-shadow:0 6px 22px rgba(0,0,0,.15);transform:translateY(-3px);}
+.sup-av-in{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;letter-spacing:-1px;}
+.sup-name{font-size:12.5px;font-weight:600;color:var(--ink-deep);text-align:center;max-width:104px;line-height:1.3;}
+.sup-cnt{font-size:11px;color:var(--text-soft);text-align:center;}
+
+/* ── Top sản phẩm bán chạy ── */
+.bsr-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.bsr-tab{padding:7px 16px;border-radius:20px;border:1.5px solid var(--line);background:var(--surface);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.bsr-tab.on{background:var(--coral);border-color:var(--coral);color:#fff;}
+.bsr-tab:not(.on):hover{border-color:var(--ink);color:var(--ink);}
+.bsr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:36px;}
+.bsr-card{cursor:pointer;}
+.bsr-cover{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:2/3;background:#f3ede3;transition:transform .22s;box-shadow:0 4px 18px rgba(0,0,0,.12);}
+.bsr-card:hover .bsr-cover{transform:translateY(-6px);box-shadow:0 10px 28px rgba(0,0,0,.18);}
+.bsr-img{width:100%;height:100%;object-fit:cover;display:block;}
+.bsr-grad{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 12px 12px;}
+.bsr-gnm{font-size:12px;font-weight:700;color:#fff;line-height:1.3;}
+.bsr-gby{font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;}
+.bsr-rank{position:absolute;bottom:-6px;left:6px;font-size:84px;font-weight:900;color:#fff;line-height:1;text-shadow:0 2px 16px rgba(0,0,0,.6);font-family:'Lora',serif;pointer-events:none;user-select:none;}
+.bsr-badge{position:absolute;top:9px;right:9px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;}
+.bsr-badge.disc{background:var(--coral);color:#fff;}
+.bsr-badge.audio{background:#7c3aed;color:#fff;}
+.bsr-badge.ebook{background:#0891b2;color:#fff;}
+.bsr-info{padding:10px 2px 0;}
+.bsr-title{font-size:13px;font-weight:600;color:var(--ink-deep);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35;margin-bottom:3px;}
+.bsr-by{font-size:11.5px;color:var(--text-soft);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bsr-rating{display:flex;align-items:center;gap:3px;margin-bottom:4px;}
+.bsr-rate-val{font-size:12px;font-weight:700;color:#92400e;}
+.bsr-rate-sold{font-size:11.5px;color:var(--text-soft);}
+.bsr-price{font-size:14px;font-weight:700;color:var(--coral);}
+@media(max-width:900px){.bsr-grid{grid-template-columns:repeat(3,1fr);}.bsr-rank{font-size:64px;}}
+@media(max-width:600px){.bsr-grid{grid-template-columns:repeat(2,1fr);gap:12px;}.bsr-rank{font-size:52px;}.bsr-title{font-size:12px;}}

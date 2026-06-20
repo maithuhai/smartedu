@@ -430,6 +430,26 @@ function toggleGenSub(cat){
   const grid=document.getElementById('genGrid');
   if(grid)grid.after(panel);
 }
+function bsRankCard(p,rank){
+  const slug=HIMG[p.id];
+  const disc=p.old>p.price?Math.round((1-p.price/p.old)*100):0;
+  const badge=disc>0?'<span class="bsr-badge disc">Giảm '+disc+'%</span>':(p.audio?'<span class="bsr-badge audio">Sách nói</span>':(p.ebook?'<span class="bsr-badge ebook">Ebook</span>':''));
+  const cvr=slug?'<img src="'+uimg(slug,400)+'" alt="'+p.name+'" class="bsr-img" loading="lazy">':'<div class="bsr-grad" style="background:linear-gradient(155deg,'+p.c+',rgba(0,0,0,.6))"><div class="bsr-gnm">'+p.name+'</div><div class="bsr-gby">'+p.by+'</div></div>';
+  const sold=p.sold>=1000?(p.sold/1000).toFixed(1)+'k':String(p.sold);
+  return '<div class="bsr-card" onclick="go(\'product\','+p.id+')">'+
+    '<div class="bsr-cover">'+cvr+'<div class="bsr-rank">'+rank+'</div>'+badge+'</div>'+
+    '<div class="bsr-info">'+
+      '<div class="bsr-title">'+p.name+'</div>'+
+      '<div class="bsr-by">'+p.by+'</div>'+
+      '<div class="bsr-rating">'+
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg>'+
+        '<span class="bsr-rate-val">'+p.rate.toFixed(1)+'</span>'+
+        '<span class="bsr-rate-sold">· '+sold+' bán</span>'+
+      '</div>'+
+      '<div class="bsr-price">'+fmt(p.price)+'</div>'+
+    '</div>'+
+  '</div>';
+}
 function updateShelfArrows(){
   const t=document.getElementById('shelfTrack');
   if(!t)return;
@@ -442,7 +462,11 @@ function shelfScroll(dir){
 }
 
 function renderHome(){
-  const bestSach=P.filter(p=>p.cat==='sach').slice(0,5);
+  const suppColors=['#1a7a4a','#d4547a','#1e3a8a','#7c3aed','#b45309','#0891b2','#dc2626','#9333ea'];
+  const _suppMap={};P.forEach(p=>{if(p.nxb){if(!_suppMap[p.nxb])_suppMap[p.nxb]={name:p.nxb,count:0,cat:p.cat};_suppMap[p.nxb].count++;}});
+  const topSupps=Object.values(_suppMap).sort((a,b)=>b.count-a.count).slice(0,6).map((s,i)=>{s.short=s.name.replace(/^(NXB|Nhà xuất bản)\s*/i,'').slice(0,2).toUpperCase();s.c=suppColors[i];return s;});
+  const bsFiltBase=bstabFmt==='giay'?P.filter(p=>p.cat==='sach'&&!p.ebook&&!p.audio):bstabFmt==='ebook'?P.filter(p=>p.ebook):bstabFmt==='audio'?P.filter(p=>p.audio):P.filter(p=>p.cat==='sach'||p.ebook||p.audio);
+  const bsFiltBooks=bsFiltBase.slice().sort((a,b)=>b.sold-a.sold).slice(0,4);
   const featBooks=P.filter(p=>p.cat==='sach').sort((a,b)=>b.sold*b.rate-a.sold*a.rate).slice(0,8);
   const bsTagMap={1:{l:'Bán chạy',c:'#c0392b'},2:{l:'Kinh điển',c:'#8e44ad'},3:{l:'Best seller',c:'#2980b9'},4:{l:'Yêu thích',c:'#c1572f'},5:{l:'HOT',c:'#e67e22'},6:{l:'Luyện thi',c:'#1a7a4a'},26:{l:'Giáo viên',c:'#27ae60'},27:{l:'Phương pháp',c:'#3498db'}};
   const vpp=P.filter(p=>p.cat==='vpp');
@@ -611,9 +635,24 @@ function renderHome(){
   hmHead('Mua theo đối tượng')+
   '<div class="hm-tiles">'+AUDT.map(t=>'<div class="hm-tile" style="background:'+t[1]+';border-color:'+t[2]+'22" onclick="go(\'listing\',\''+t[3]+'\')"><div class="ic" style="background:'+t[2]+'18;color:'+t[2]+'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">'+t[4]+'</svg></div><span style="color:'+t[2]+'">'+t[0]+'</span></div>').join('')+'</div>'+
 
-  /* Bestsellers */
-  hmHead('Sách bán chạy','Trending','sach')+
-  '<div class="hm-grid g5">'+bestSach.map(p=>hmCard(p)).join('')+'</div>'+
+  /* Nhà bán nổi bật */
+  hmHead('Nhà bán nổi bật')+
+  '<div class="sup-row">'+
+    topSupps.map(s=>'<div class="sup-card" onclick="go(\'listing\',\''+s.cat+'\')">'+
+      '<div class="sup-avatar"><div class="sup-av-in" style="background:'+s.c+'18;color:'+s.c+'">'+s.short+'</div></div>'+
+      '<div class="sup-name">'+s.name+'</div>'+
+      '<div class="sup-cnt">'+s.count+' sản phẩm</div>'+
+    '</div>').join('')+
+  '</div>'+
+
+  /* Top sản phẩm bán chạy */
+  hmHead('Top sản phẩm bán chạy')+
+  '<div class="bsr-tabs">'+
+    [['all','Tất cả'],['giay','Sách giấy'],['ebook','Sách điện tử'],['audio','Sách nói']].map(([k,v])=>
+      '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
+    ).join('')+
+  '</div>'+
+  '<div class="bsr-grid">'+bsFiltBooks.map((p,i)=>bsRankCard(p,i+1)).join('')+'</div>'+
 
   /* Stationery */
   '<div class="vpp-banner">'+
@@ -1059,6 +1098,7 @@ let adminDays=30;
 let admUsersView='list', admUserSearch='', admUserRoleFilter='all', admUserStatusFilter='all', admSelectedUserId=null, admUserPage=0;
 let orderFilter='all';
 let libFilter='all';
+let bstabFmt='all';
 let vppSub='all';
 let tbgdSub='all';
 let returns=LS.get('returns',[]);
