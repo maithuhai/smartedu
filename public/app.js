@@ -319,6 +319,44 @@ function triSearch(){
 /* Photo assets (Unsplash) for the redesigned home page */
 const HIMG={1:'1595123550384-b81222e23cf9',2:'1513185041617-8ab03f83d6c5',3:'1456513080510-7bf3a84b82f8',4:'1595123336219-5eedd543bc4a',5:'1506880018603-83d5b814b5a6',7:'1501349800519-48093d60bde0',8:'1513542789411-b6a5d4f31634',9:'1516383607781-913a19294fd1',10:'1630343710506-89f8b9f21d31',11:'1762265591492-1454ae17f31a',12:'1761546571631-a4d61b55cd2f',13:'1761821170104-ccd3e3e21318',14:'1762831063505-68022b6133a9'};
 const HTAG={1:'Bán chạy',4:'Yêu thích',7:'HOT',11:'Chính hãng'};
+const GENT_SUBS={
+  sgk:[
+    {l:'Tiểu học',d:'Lớp 1 – 5',c:'#2d5a2d',bg:'#e8f4e8',t:'tieuhoc'},
+    {l:'THCS',d:'Lớp 6 – 9',c:'#1e3a5a',bg:'#e8f0f8',t:'thcs'},
+    {l:'THPT',d:'Lớp 10 – 12',c:'#7a3800',bg:'#fdf0e0',t:'thpt'},
+    {l:'Giáo viên',d:'SGK & tài liệu tham khảo',c:'#1a5a2a',bg:'#e8f5ec',t:'giaovien'},
+  ],
+  thamkhao:[
+    {l:'Tiểu học',d:'Bài tập & ôn luyện',c:'#2d5a2d',bg:'#e8f4e8',t:'tieuhoc'},
+    {l:'THCS',d:'Nâng cao, luyện thi',c:'#1e3a5a',bg:'#e8f0f8',t:'thcs'},
+    {l:'THPT',d:'Luyện thi đại học',c:'#7a3800',bg:'#fdf0e0',t:'thpt'},
+    {l:'Sinh viên',d:'Giáo trình & bài tập',c:'#4a1e7a',bg:'#f0e8f8',t:'sinhvien'},
+  ],
+  vanhoc:[
+    {l:'Thiếu nhi',d:'Truyện & cổ tích',c:'#2d5a2d',bg:'#e8f4e8',t:'tieuhoc'},
+    {l:'Học sinh',d:'Trong & ngoài chương trình',c:'#1e3a5a',bg:'#e8f0f8',t:'thcs'},
+    {l:'Người trẻ',d:'Tiểu thuyết, tản văn',c:'#4a1e7a',bg:'#f0e8f8',t:'sinhvien'},
+    {l:'Người lớn',d:'Kinh điển & đương đại',c:'#7a3800',bg:'#fdf0e0',t:'sach'},
+  ],
+  thieunhi:[
+    {l:'Mầm non',d:'Tranh truyện & tô màu',c:'#7a4500',bg:'#fff3e0',t:'tieuhoc'},
+    {l:'Tiểu học',d:'Lớp 1 – 5',c:'#2d5a2d',bg:'#e8f4e8',t:'tieuhoc'},
+    {l:'Thiếu niên',d:'Tuổi teen & teen fiction',c:'#1e3a5a',bg:'#e8f0f8',t:'thcs'},
+    {l:'Phụ huynh',d:'Sách nuôi dạy con',c:'#6a1a3a',bg:'#f5eaf0',t:'sach'},
+  ],
+  kynang:[
+    {l:'Học sinh',d:'Tư duy & thói quen tốt',c:'#1e3a5a',bg:'#e8f0f8',t:'thpt'},
+    {l:'Sinh viên',d:'Giao tiếp & quản lý thời gian',c:'#4a1e7a',bg:'#f0e8f8',t:'sinhvien'},
+    {l:'Giáo viên',d:'Nghiệp vụ & phát triển bản thân',c:'#1a5a2a',bg:'#e8f5ec',t:'giaovien'},
+    {l:'Người đi làm',d:'Lãnh đạo & tài chính cá nhân',c:'#7a3800',bg:'#fdf0e0',t:'sach'},
+  ],
+  ngoaingu:[
+    {l:'Tiểu học',d:'Tiếng Anh cho bé',c:'#2d5a2d',bg:'#e8f4e8',t:'tieuhoc'},
+    {l:'THCS / THPT',d:'Luyện thi, giao tiếp',c:'#1e3a5a',bg:'#e8f0f8',t:'thcs'},
+    {l:'Sinh viên',d:'TOEIC, IELTS, TOEFL',c:'#4a1e7a',bg:'#f0e8f8',t:'sinhvien'},
+    {l:'Giáo viên',d:'Phương pháp giảng dạy',c:'#1a5a2a',bg:'#e8f5ec',t:'giaovien'},
+  ],
+};
 function uimg(slug,w){return 'https://images.unsplash.com/photo-'+slug+'?auto=format&fit=crop&w='+(w||600)+'&q=80';}
 function himg(id,w){return uimg(HIMG[id],w);}
 const ARR='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
@@ -360,6 +398,38 @@ function hmColl(c,tall){
   '</div>';
 }
 
+function toggleGenSub(cat){
+  const existing=document.getElementById('genSubPanel');
+  document.querySelectorAll('.gen-card').forEach(c=>c.classList.remove('active'));
+  if(existing&&existing.dataset.cat===cat){existing.remove();return;}
+  if(existing)existing.remove();
+  const subs=GENT_SUBS[cat];
+  if(!subs)return;
+  const card=document.querySelector('.gen-card[data-cat="'+cat+'"]');
+  if(card)card.classList.add('active');
+  const panel=document.createElement('div');
+  panel.id='genSubPanel';
+  panel.dataset.cat=cat;
+  panel.className='gen-sub-panel';
+  panel.innerHTML=
+    '<div class="gsp-head">'+
+      '<span class="gsp-title">Phân loại theo đối tượng</span>'+
+      '<button class="gsp-close" onclick="toggleGenSub(\''+cat+'\')">'+
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>'+
+      '</button>'+
+    '</div>'+
+    '<div class="gsp-grid">'+
+      subs.map(s=>
+        '<div class="gsp-card" style="background:'+s.bg+';border-color:'+s.c+'33" onclick="go(\'listing\',\''+s.t+'\')">'+
+          '<div class="gsp-lbl" style="color:'+s.c+'">'+s.l+'</div>'+
+          '<div class="gsp-desc">'+s.d+'</div>'+
+          '<span class="gsp-link" style="color:'+s.c+'">Xem sách <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>'+
+        '</div>'
+      ).join('')+
+    '</div>';
+  const grid=document.getElementById('genGrid');
+  if(grid)grid.after(panel);
+}
 function updateShelfArrows(){
   const t=document.getElementById('shelfTrack');
   if(!t)return;
@@ -631,7 +701,8 @@ function renderHome(){
 }
 
 /* ---------------- Listing ---------------- */
-let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,rating:false,sale:false,q:''};
+let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,q:''};
+let listView='grid';
 let _listCtx=null;
 const CATDESC={
   sach:'Sách giáo khoa, tham khảo, văn học và kỹ năng từ các nhà xuất bản uy tín.',
@@ -649,8 +720,8 @@ const AUDDESC={
   giaovien:'Sách tham khảo, giáo án điện tử, thiết bị dạy học và ưu đãi đặc biệt dành cho nhà giáo.',
   school:'Mua sỉ số lượng lớn, đặt hàng theo danh sách lớp và yêu cầu báo giá cho trường học.'
 };
-function clearFilter(k){if(k==='price')filt.price='all';else if(k==='rating')filt.rating=false;else if(k==='sale')filt.sale=false;else if(k==='q')filt.q='';else filt[k]=null;renderListing();}
-function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.price='all';filt.rating=false;filt.sale=false;filt.q='';renderListing();}
+function clearFilter(k){if(k==='price')filt.price='all';else if(k==='rating')filt.rating=null;else if(k==='sale')filt.sale=false;else if(k==='q')filt.q='';else filt[k]=null;renderListing();}
+function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.rating=null;filt.sale=false;filt.q='';renderListing();}
 function setSearchQ(v){filt.q=(v||'').trim();renderListing();}
 function renderListing(){
   let title='Tất cả sản phẩm', base=P.slice(), ctxKey='all', catKey=null, heroDesc='', audKey=null, ebSubTab=null, isVpp=false, isTbgd=false;
@@ -669,7 +740,7 @@ function renderListing(){
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
-  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.price='all';filt.rating=false;filt.sale=false;filt.q='';}
+  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.rating=null;filt.sale=false;filt.q='';}
 
   const isBookCat=!catKey||catKey==='sach'||catKey==='ebook'||catKey==='audiobook';
   const brandLabel=(catKey==='vpp'||catKey==='tbgd')?'Thương hiệu':'Nhà xuất bản';
@@ -682,7 +753,11 @@ function renderListing(){
   if(filt.price==='lo')list=list.filter(p=>p.price<100000);
   else if(filt.price==='mid')list=list.filter(p=>p.price>=100000&&p.price<300000);
   else if(filt.price==='hi')list=list.filter(p=>p.price>=300000);
-  if(filt.rating)list=list.filter(p=>p.rate>=4.8);
+  if(filt.bookfmt==='giay')list=list.filter(p=>!p.ebook&&!p.audio);
+  else if(filt.bookfmt==='ebook')list=list.filter(p=>!!p.ebook);
+  else if(filt.bookfmt==='audio')list=list.filter(p=>!!p.audio);
+  if(filt.rating==='4')list=list.filter(p=>p.rate>=4);
+  else if(filt.rating==='3')list=list.filter(p=>p.rate>=3);
   if(filt.sale)list=list.filter(p=>p.old>p.price);
   if(filt.q){const q=filt.q.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)||(p.nxb||'').toLowerCase().includes(q));}
   if(filt.sort==='sold')list.sort((a,b)=>b.sold-a.sold);
@@ -694,6 +769,16 @@ function renderListing(){
   const brandOpts='<label><input type="radio" name="fbr" '+(!filt.brand?'checked':'')+' onchange="filt.brand=null;renderListing()">Tất cả</label>'+
     brands.map(b=>{const cnt=base.filter(p=>p.nxb===b).length;const be=b.replace(/'/g,"\\'");return '<label><input type="radio" name="fbr" '+(filt.brand===b?'checked':'')+' onchange="filt.brand=\''+be+'\';renderListing()">'+b+'<span class="fcount">'+cnt+'</span></label>';}).join('');
   const fmtOpts=catKey==='ebook'?'<label><input type="radio" name="ffmt" '+(!filt.fmt?'checked':'')+' onchange="filt.fmt=null;renderListing()">Tất cả</label>'+['PDF','EPUB'].map(f=>'<label><input type="radio" name="ffmt" '+(filt.fmt===f?'checked':'')+' onchange="filt.fmt=\''+f+'\';renderListing()">'+f+'</label>').join(''):'';
+  const showBookFmt=catKey!=='vpp'&&catKey!=='tbgd'&&catKey!=='ebook'&&catKey!=='audiobook';
+  const bookFmtOpts=showBookFmt?
+    '<label><input type="radio" name="fbf" '+(filt.bookfmt===null?'checked':'')+' onchange="filt.bookfmt=null;renderListing()">Tất cả</label>'+
+    '<label><input type="radio" name="fbf" '+(filt.bookfmt==="giay"?'checked':'')+' onchange="filt.bookfmt=\'giay\';renderListing()">📚 Sách giấy</label>'+
+    '<label><input type="radio" name="fbf" '+(filt.bookfmt==="ebook"?'checked':'')+' onchange="filt.bookfmt=\'ebook\';renderListing()">📖 Ebook</label>'+
+    '<label><input type="radio" name="fbf" '+(filt.bookfmt==="audio"?'checked':'')+' onchange="filt.bookfmt=\'audio\';renderListing()">🎧 Sách nói</label>':'';
+  const ratingOpts=
+    '<label><input type="radio" name="frat" '+(filt.rating===null?'checked':'')+' onchange="filt.rating=null;renderListing()">Tất cả</label>'+
+    '<label><input type="radio" name="frat" '+(filt.rating==="4"?'checked':'')+' onchange="filt.rating=\'4\';renderListing()">4★ trở lên</label>'+
+    '<label><input type="radio" name="frat" '+(filt.rating==="3"?'checked':'')+' onchange="filt.rating=\'3\';renderListing()">3★ trở lên</label>';
   const priceOpts=[['all','Tất cả'],['lo','Dưới 100.000đ'],['mid','100.000 – 300.000đ'],['hi','Trên 300.000đ']].map(([k,v])=>'<label><input type="radio" name="fpr" '+(filt.price===k?'checked':'')+' onchange="filt.price=\''+k+'\';renderListing()">'+v+'</label>').join('');
   const sortOpts=[['sold','Bán chạy'],['rate','Đánh giá cao'],['priceAsc','Giá thấp đến cao'],['priceDesc','Giá cao đến thấp']].map(([k,v])=>'<option value="'+k+'"'+(filt.sort===k?' selected':'')+'>'+v+'</option>').join('');
 
@@ -703,7 +788,8 @@ function renderListing(){
   if(filt.brand)chips.push(['brand',filt.brand]);
   if(filt.fmt)chips.push(['fmt',filt.fmt]);
   if(filt.price!=='all')chips.push(['price',PRICE_LBL[filt.price]]);
-  if(filt.rating)chips.push(['rating','Đánh giá 4.8★+']);
+  if(filt.bookfmt)chips.push(['bookfmt',{giay:'Sách giấy',ebook:'Ebook',audio:'Sách nói'}[filt.bookfmt]]);
+  if(filt.rating)chips.push(['rating','Đánh giá '+filt.rating+'★+']);
   if(filt.sale)chips.push(['sale','Đang giảm giá']);
   const chipHtml=chips.length?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="clearFilter(\''+c[0]+'\')">×</button></span>').join('')+'<button class="freset" onclick="resetFilters()">Xóa tất cả</button></div>':'';
 
@@ -715,9 +801,11 @@ function renderListing(){
       '<div class="fgroup"><div class="ftitle">Tìm trong danh mục</div><div class="filt-search"><input value="'+filt.q.replace(/"/g,'&quot;')+'" placeholder="Tên, tác giả…" onkeydown="if(event.key===\'Enter\')setSearchQ(this.value)"><button onclick="setSearchQ(this.previousElementSibling.value)">Tìm</button></div></div>'+
       '<div class="fgroup"><div class="ftitle">Đối tượng</div><label><input type="radio" name="faud" '+(!filt.aud?'checked':'')+' onchange="filt.aud=null;renderListing()">Tất cả</label>'+audOpts+'</div>'+
       (brands.length>1?'<div class="fgroup scroll"><div class="ftitle">'+brandLabel+'</div>'+brandOpts+'</div>':'')+
-      (fmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng</div>'+fmtOpts+'</div>':'')+
+      (fmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng số</div>'+fmtOpts+'</div>':'')+
+      (bookFmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng</div>'+bookFmtOpts+'</div>':'')+
       '<div class="fgroup"><div class="ftitle">Khoảng giá</div>'+priceOpts+'</div>'+
-      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.rating?'checked':'')+' onchange="filt.rating=this.checked;renderListing()">Đánh giá 4.8★ trở lên</label><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label></div>'+
+      '<div class="fgroup"><div class="ftitle">Đánh giá</div>'+ratingOpts+'</div>'+
+      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label></div>'+
     '</aside>'+
     '<div>'+
       (heroDesc?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+
@@ -739,8 +827,15 @@ function renderListing(){
       '</div>':'')+
       chipHtml+
       '<div class="list-top"><span class="cnt"><b>'+list.length+'</b> sản phẩm</span>'+
-        '<select onchange="filt.sort=this.value;renderListing()">'+sortOpts+'</select></div>'+
-      (list.length?'<div class="grid listing-grid">'+list.map(pcard).join('')+'</div>':'<div class="empty"><div style="font-size:16px;margin-bottom:12px">Không tìm thấy sản phẩm phù hợp.</div><button class="btn-ghost" onclick="resetFilters()">Xóa bộ lọc</button></div>')+
+        '<div class="list-top-r">'+
+          '<select onchange="filt.sort=this.value;renderListing()">'+sortOpts+'</select>'+
+          '<div class="view-toggle">'+
+            '<button class="'+(listView==='grid'?'on':'')+'" onclick="listView=\'grid\';renderListing()" title="Dạng lưới"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>'+
+            '<button class="'+(listView==='list'?'on':'')+'" onclick="listView=\'list\';renderListing()" title="Dạng danh sách"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      (list.length?'<div class="grid listing-grid'+(listView==='list'?' list-view':'')+'">'+list.map(pcard).join('')+'</div>':'<div class="empty"><div style="font-size:16px;margin-bottom:12px">Không tìm thấy sản phẩm phù hợp.</div><button class="btn-ghost" onclick="resetFilters()">Xóa bộ lọc</button></div>')+
     '</div>'+
   '</div>';
 }

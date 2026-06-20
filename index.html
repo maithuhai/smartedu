@@ -84,10 +84,46 @@
         </div>
       </div>
     </div>
-    <a onclick="go('ebooks')">Ebook & Sách nói</a>
-    <a onclick="go('stationery')">Văn phòng phẩm</a>
-    <a onclick="go('equipment')">Thiết bị giáo dục</a>
-    <a onclick="go('rfq')">Trường học · Mua sỉ</a>
+    <div class="navitem has-menu">
+      <a class="menu-trigger" onclick="toggleNav(event,this)">Ebook & Sách nói <span class="caret">▾</span></a>
+      <div class="dropdown">
+        <a onclick="go('ebooks');closeNav()"><b>Kho sách số</b> — Tất cả</a>
+        <a onclick="go('listing','ebook');closeNav()">📖 Ebook (PDF · EPUB)</a>
+        <a onclick="go('listing','audiobook');closeNav()">🎧 Sách nói</a>
+        <a onclick="go('library');closeNav()">📚 Tủ sách của tôi</a>
+      </div>
+    </div>
+    <div class="navitem has-menu">
+      <a class="menu-trigger" onclick="toggleNav(event,this)">Văn phòng phẩm <span class="caret">▾</span></a>
+      <div class="dropdown">
+        <a onclick="go('stationery');closeNav()"><b>Tất cả VPP</b></a>
+        <a onclick="vppSub='but';go('listing','vpp');closeNav()">🖊 Bút viết</a>
+        <a onclick="vppSub='vo';go('listing','vpp');closeNav()">📓 Vở & giấy</a>
+        <a onclick="vppSub='dungcu';go('listing','vpp');closeNav()">📐 Dụng cụ học tập</a>
+        <a onclick="vppSub='hoapham';go('listing','vpp');closeNav()">🎨 Họa phẩm</a>
+        <a onclick="vppSub='balo';go('listing','vpp');closeNav()">🎒 Túi & balo</a>
+      </div>
+    </div>
+    <div class="navitem has-menu">
+      <a class="menu-trigger" onclick="toggleNav(event,this)">Thiết bị giáo dục <span class="caret">▾</span></a>
+      <div class="dropdown">
+        <a onclick="go('equipment');closeNav()"><b>Tất cả thiết bị</b></a>
+        <a onclick="tbgdSub='mtinh';go('listing','tbgd');closeNav()">🔢 Máy tính cầm tay</a>
+        <a onclick="tbgdSub='tn';go('listing','tbgd');closeNav()">🔬 Thí nghiệm</a>
+        <a onclick="tbgdSub='bando';go('listing','tbgd');closeNav()">🌍 Bản đồ & biểu đồ</a>
+        <a onclick="tbgdSub='dayho';go('listing','tbgd');closeNav()">📋 Dụng cụ dạy học</a>
+        <a onclick="tbgdSub='cntt';go('listing','tbgd');closeNav()">💻 Công nghệ TT</a>
+      </div>
+    </div>
+    <div class="navitem has-menu">
+      <a class="menu-trigger" onclick="toggleNav(event,this)">Trường học · Mua sỉ <span class="caret">▾</span></a>
+      <div class="dropdown">
+        <a onclick="go('rfq');closeNav()"><b>Đặt hàng theo danh sách lớp</b></a>
+        <a onclick="go('classlist');closeNav()">📋 Tạo danh sách lớp</a>
+        <a onclick="go('rfq');closeNav()">📦 Yêu cầu báo giá sỉ</a>
+        <a onclick="toast('Liên hệ: 1900 6868');closeNav()">📞 Hỗ trợ trường học</a>
+      </div>
+    </div>
     <a class="mystic" onclick="go('huyenhoc')">✦ Quẻ sách</a>
   </div></nav>
 </header>

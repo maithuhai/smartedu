@@ -774,6 +774,18 @@
   .achip button:hover{background:var(--ink);color:#fff;}
   .freset{font-size:12.5px;color:var(--text-soft);text-decoration:underline;}
   .list-top .cnt b{color:var(--ink-deep);}
+  .list-top-r{display:flex;align-items:center;gap:10px;}
+  .view-toggle{display:flex;gap:3px;}
+  .view-toggle button{width:32px;height:32px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+  .view-toggle button.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .view-toggle button:not(.on):hover{background:var(--paper);border-color:var(--ink);}
+  /* List-view layout */
+  .listing-grid.list-view{grid-template-columns:1fr!important;gap:10px;}
+  .listing-grid.list-view .pcard{display:flex;flex-direction:row;}
+  .listing-grid.list-view .pcover{width:110px;min-height:130px;flex-shrink:0;border-radius:var(--r) 0 0 var(--r);}
+  .listing-grid.list-view .pinfo{padding:10px 14px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
+  .listing-grid.list-view .nm{-webkit-line-clamp:2;font-size:14px;}
+  .listing-grid.list-view .add{align-self:flex-start;margin-top:8px;}
 
   /* ===== Đăng nhập: chọn vai trò + dashboard tài khoản ===== */
   .auth-wrap.wide{max-width:640px;}
