@@ -871,6 +871,7 @@ function renderHome(){
 let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,instock:false,q:'',priceMin:0,priceMax:0};
 let listView='grid';
 let _listCtx=null;
+let brandExpanded=false;
 const CATDESC={
   sach:'Sách giáo khoa, tham khảo, văn học và kỹ năng từ các nhà xuất bản uy tín.',
   ebook:'Sách số đọc ngay trên mọi thiết bị — mua hoặc thuê tiết kiệm.',
@@ -908,7 +909,7 @@ function renderListing(){
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
-  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';}
+  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';brandExpanded=false;}
 
   const isBookCat=!catKey||catKey==='sach'||catKey==='ebook'||catKey==='audiobook';
   const brandLabel=(catKey==='vpp'||catKey==='tbgd')?'Thương hiệu':'Nhà xuất bản';
@@ -936,8 +937,11 @@ function renderListing(){
   else if(filt.sort==='rate')list.sort((a,b)=>b.rate-a.rate);
 
   const audOpts=Object.entries(AUD).map(([k,v])=>'<label><input type="radio" name="faud" '+(filt.aud===k?'checked':'')+' onchange="filt.aud=\''+k+'\';renderListing()">'+v+'</label>').join('');
+  const BRAND_LIMIT=5;
+  const visibleBrands=brandExpanded?brands:brands.slice(0,BRAND_LIMIT);
   const brandOpts='<label><input type="radio" name="fbr" '+(!filt.brand?'checked':'')+' onchange="filt.brand=null;renderListing()">Tất cả</label>'+
-    brands.map(b=>{const cnt=base.filter(p=>p.nxb===b).length;const be=b.replace(/'/g,"\\'");return '<label><input type="radio" name="fbr" '+(filt.brand===b?'checked':'')+' onchange="filt.brand=\''+be+'\';renderListing()">'+b+'<span class="fcount">'+cnt+'</span></label>';}).join('');
+    visibleBrands.map(b=>{const be=b.replace(/'/g,"\\'");return '<label><input type="radio" name="fbr" '+(filt.brand===b?'checked':'')+' onchange="filt.brand=\''+be+'\';renderListing()">'+b+'</label>';}).join('')+
+    (brands.length>BRAND_LIMIT?'<button class="brand-more" onclick="brandExpanded=!brandExpanded;renderListing()">'+(brandExpanded?'Thu gọn ▲':'Xem thêm '+(brands.length-BRAND_LIMIT)+' ▼')+'</button>':'');
   const fmtOpts=catKey==='ebook'?'<label><input type="radio" name="ffmt" '+(!filt.fmt?'checked':'')+' onchange="filt.fmt=null;renderListing()">Tất cả</label>'+['PDF','EPUB'].map(f=>'<label><input type="radio" name="ffmt" '+(filt.fmt===f?'checked':'')+' onchange="filt.fmt=\''+f+'\';renderListing()">'+f+'</label>').join(''):'';
   const showBookFmt=catKey!=='vpp'&&catKey!=='tbgd'&&catKey!=='ebook'&&catKey!=='audiobook';
   const bookFmtOpts=showBookFmt?
@@ -972,7 +976,7 @@ function renderListing(){
       '<div class="filt-head"><h4>Bộ lọc</h4>'+(chips.length?'<button class="freset-sm" onclick="resetFilters()">Đặt lại</button>':'')+'</div>'+
       '<div class="fgroup"><div class="ftitle">Tìm trong danh mục</div><div class="filt-search"><input value="'+filt.q.replace(/"/g,'&quot;')+'" placeholder="Tên, tác giả…" onkeydown="if(event.key===\'Enter\')setSearchQ(this.value)"><button onclick="setSearchQ(this.previousElementSibling.value)">Tìm</button></div></div>'+
       '<div class="fgroup"><div class="ftitle">Đối tượng</div><label><input type="radio" name="faud" '+(!filt.aud?'checked':'')+' onchange="filt.aud=null;renderListing()">Tất cả</label>'+audOpts+'</div>'+
-      (brands.length>1?'<div class="fgroup scroll"><div class="ftitle">'+brandLabel+'</div>'+brandOpts+'</div>':'')+
+      (brands.length>1?'<div class="fgroup"><div class="ftitle">'+brandLabel+'</div>'+brandOpts+'</div>':'')+
       (fmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng số</div>'+fmtOpts+'</div>':'')+
       (bookFmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng</div>'+bookFmtOpts+'</div>':'')+
       '<div class="fgroup"><div class="ftitle">Khoảng giá</div>'+priceOpts+'</div>'+

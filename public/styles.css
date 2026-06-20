@@ -815,7 +815,7 @@
   .filt-search input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;background:var(--paper);color:var(--text);}
   .filt-search input:focus{border-color:var(--ink);}
   .filt-search button{background:var(--ink);color:#fff;font-size:12.5px;font-weight:500;padding:0 12px;border-radius:8px;flex-shrink:0;}
-  .fgroup.scroll{max-height:196px;overflow:auto;}
+  .brand-more{display:block;margin-top:4px;font-size:12.5px;color:var(--ink);font-weight:500;padding:3px 0;background:none;border:none;cursor:pointer;}
   .fgroup .fcount{margin-left:auto;color:var(--text-soft);font-size:11.5px;}
   .active-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;}
   .achip{display:inline-flex;align-items:center;gap:7px;background:#f6ece4;color:var(--ink);border:1px solid #e8d3c4;border-radius:20px;padding:4px 5px 4px 12px;font-size:12.5px;font-weight:500;}
