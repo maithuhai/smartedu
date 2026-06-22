@@ -937,21 +937,18 @@ function renderCollections(){
       '</div>'+
       '<div class="colls-grid">'+
         COLLS.map(c=>{
-          const books=c.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);
-          const cnt=books.length;
-          const covers=books.slice(0,3).map(b=>'<img src="'+uimg(b.img,120)+'" alt="'+b.name+'">').join('');
+          const cnt=c.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean).length;
           return '<div class="coll-card" onclick="go(\'listing\',\'coll:'+c.id+'\')">'+
             '<div class="coll-card-img" style="background-image:url('+uimg(c.img,800)+')">'+
               '<div class="coll-card-tint" style="background:'+c.tint+'"></div>'+
-              '<span class="coll-card-tag">'+c.tag+'</span>'+
+              '<div class="coll-card-badges">'+
+                '<span class="coll-card-tag">'+c.tag+'</span>'+
+                '<span class="coll-card-cnt">'+cnt+' cuốn</span>'+
+              '</div>'+
             '</div>'+
             '<div class="coll-card-body">'+
               '<h3 class="coll-card-title">'+c.title+'</h3>'+
               '<p class="coll-card-desc">'+c.desc+'</p>'+
-              '<div class="coll-card-foot">'+
-                '<div class="coll-card-covers">'+covers+'</div>'+
-                '<span class="coll-card-cnt">'+cnt+' cuốn</span>'+
-              '</div>'+
               '<span class="coll-card-link">Xem bộ sưu tập '+ARR+'</span>'+
             '</div>'+
           '</div>';
