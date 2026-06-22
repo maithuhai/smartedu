@@ -106,27 +106,33 @@ const MOODS=[
 
 /* ---------------- Bộ sưu tập (global) ---------------- */
 const COLLS=[
-  {id:'bien-tap', tag:'Tuyển chọn biên tập', title:'100 cuốn sách nên đọc trong đời',
+  {id:'bien-tap', tag:'Tuyển chọn biên tập', aud:'all', genre:'vanhoc',
+   title:'100 cuốn sách nên đọc trong đời',
    desc:'Hành trình văn học vượt thời gian, từ kinh điển đến hiện đại.',
    img:'1771647287015-f30dbb239646', tint:'rgba(120,30,20,.6)',
    bookIds:[4,5,3,20,23,24,2,42,43]},
-  {id:'hoc-duong', tag:'Học đường', title:'Sách kinh điển cho học sinh',
+  {id:'hoc-duong', tag:'Học đường', aud:'hocsinh', genre:'mixed',
+   title:'Sách kinh điển cho học sinh',
    desc:'Những tác phẩm trong và ngoài chương trình nuôi dưỡng tâm hồn.',
    img:'1535688391459-479d308104f8', tint:'rgba(30,50,80,.5)',
    bookIds:[1,2,23,6,18,25]},
-  {id:'on-thi', tag:'Ôn thi', title:'Luyện thi THPT Quốc gia',
+  {id:'on-thi', tag:'Ôn thi', aud:'hocsinh', genre:'thamkhao',
+   title:'Luyện thi THPT Quốc gia',
    desc:'Tuyển tập đề và sách luyện thi tinh gọn theo từng môn học.',
    img:'1514369118554-e20d93546b30', tint:'rgba(80,55,15,.55)',
    bookIds:[6,18,38,17,36]},
-  {id:'nguoi-tre', tag:'Người trẻ', title:'Phát triển bản thân cho sinh viên',
+  {id:'nguoi-tre', tag:'Người trẻ', aud:'sinhvien', genre:'kynang',
+   title:'Phát triển bản thân cho sinh viên',
    desc:'Tư duy, kỹ năng và những thói quen tốt dành cho người trẻ.',
    img:'1570945880236-10f34833a271', tint:'rgba(30,65,40,.52)',
    bookIds:[5,3,17,37,39,15,41,43]},
-  {id:'thieu-nhi', tag:'Thiếu nhi', title:'Sách thiếu nhi hay nhất',
+  {id:'thieu-nhi', tag:'Thiếu nhi', aud:'thieunhi', genre:'thieunhi',
+   title:'Sách thiếu nhi hay nhất',
    desc:'Thế giới diệu kỳ và những bài học đầu đời cho các bạn nhỏ.',
    img:'1777639629798-e3e75d967d3d', tint:'rgba(80,25,55,.5)',
    bookIds:[2,24,19,9,53,54]},
-  {id:'suu-tam', tag:'Sưu tầm', title:'Sách cũ & sách hiếm',
+  {id:'suu-tam', tag:'Sưu tầm', aud:'all', genre:'vanhoc',
+   title:'Sách cũ & sách hiếm',
    desc:'Những ấn bản đặc biệt và bản in đầu từ nhà cung cấp uy tín.',
    img:'1644211492216-8a5e874023f4', tint:'rgba(40,28,18,.55)',
    bookIds:[23,4,24,20,21,22]},
@@ -593,6 +599,16 @@ function hmCard(p,dark,rank){
       '<button class="hm-add" onclick="addToCart('+p.id+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Thêm vào giỏ</button>'+
     '</div></div>';
 }
+function mkCrumb(items){
+  // items: [[label], [label, onclickStr], ...] — last item = current page (no link)
+  return '<nav class="breadcrumb" aria-label="breadcrumb">'+
+    items.map((it,i)=>
+      i===items.length-1
+        ? '<span class="bc-cur">'+it[0]+'</span>'
+        : '<a class="bc-a" onclick="'+it[1]+'">'+it[0]+'</a>'
+    ).join('<span class="bc-sep">›</span>')+
+  '</nav>';
+}
 function hmHead(title,kicker,target,linkView){
   const allLink=linkView
     ?'<a class="all" onclick="go(\''+linkView+'\')">Xem tất cả '+ARR+'</a>'
@@ -924,12 +940,27 @@ function renderHome(){
 }
 
 /* ---------------- Collections page ---------------- */
+const COLL_AUD_OPTS=[
+  {k:null,       e:'📚', l:'Tất cả'},
+  {k:'thieunhi', e:'🧒', l:'Thiếu nhi'},
+  {k:'hocsinh',  e:'✏️',  l:'Học sinh'},
+  {k:'sinhvien', e:'🎓', l:'Sinh viên'},
+  {k:'all',      e:'🌟', l:'Tổng hợp'},
+];
+const COLL_SORT_OPTS=[
+  {k:'default', l:'Mặc định'},
+  {k:'az',      l:'Tên A → Z'},
+  {k:'cnt',     l:'Nhiều sách nhất'},
+];
+function resetCollFilters(){collSearch='';collAudFilter=null;collGenreFilter=null;collSort='default';renderCollections();}
 function renderCollections(){
   const app=document.getElementById('app');
-  const tags=[...new Set(COLLS.map(c=>c.tag))];
   let filtered=COLLS.slice();
-  if(collTagFilter)filtered=filtered.filter(c=>c.tag===collTagFilter);
+  if(collAudFilter!==null)filtered=filtered.filter(c=>c.aud===collAudFilter);
   if(collSearch){const q=collSearch.toLowerCase().trim();filtered=filtered.filter(c=>c.title.toLowerCase().includes(q)||c.tag.toLowerCase().includes(q)||c.desc.toLowerCase().includes(q));}
+  if(collSort==='az')filtered.sort((a,b)=>a.title.localeCompare(b.title,'vi'));
+  else if(collSort==='cnt')filtered.sort((a,b)=>b.bookIds.length-a.bookIds.length);
+  const hasFilter=!!(collSearch||collAudFilter!==null||collSort!=='default');
 
   app.innerHTML=
     '<div class="colls-page">'+
@@ -941,21 +972,32 @@ function renderCollections(){
         '</div>'+
       '</div>'+
       '<div class="colls-filter-bar">'+
-        '<div class="colls-search-wrap">'+
-          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
-          '<input class="colls-search-input" type="text" placeholder="Tìm bộ sưu tập…" value="'+collSearch.replace(/"/g,'&quot;')+'" oninput="collSearch=this.value;renderCollections()">'+
-          (collSearch?'<button class="colls-search-clear" onclick="collSearch=\'\';renderCollections()">×</button>':'')+
+        '<div class="cfb-row1">'+
+          '<div class="colls-search-wrap">'+
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
+            '<input class="colls-search-input" type="text" placeholder="Tìm theo tên, chủ đề, mô tả…" value="'+collSearch.replace(/"/g,'&quot;')+'" oninput="collSearch=this.value;renderCollections()">'+
+            (collSearch?'<button class="colls-search-clear" onclick="collSearch=\'\';renderCollections()">×</button>':'')+
+          '</div>'+
+          '<div class="cfb-sort">'+
+            '<label class="cfb-sort-lbl">Sắp xếp</label>'+
+            '<select class="cfb-sort-sel" onchange="collSort=this.value;renderCollections()">'+
+              COLL_SORT_OPTS.map(o=>'<option value="'+o.k+'"'+(collSort===o.k?' selected':'')+'>'+o.l+'</option>').join('')+
+            '</select>'+
+          '</div>'+
         '</div>'+
-        '<div class="colls-tag-pills">'+
-          '<button class="colls-tag-pill'+(collTagFilter===null?' on':'')+'" onclick="collTagFilter=null;renderCollections()">Tất cả</button>'+
-          tags.map(t=>'<button class="colls-tag-pill'+(collTagFilter===t?' on':'')+'" onclick="collTagFilter=\''+t.replace(/'/g,"\\'")+'\';renderCollections()">'+t+'</button>').join('')+
+        '<div class="cfb-row2">'+
+          '<span class="cfb-label">Đối tượng:</span>'+
+          '<div class="cfb-pills">'+
+            COLL_AUD_OPTS.map(o=>'<button class="cfb-pill'+(collAudFilter===o.k?' on':'')+'" onclick="collAudFilter='+(o.k===null?'null':'\''+o.k+'\'')+';renderCollections()">'+o.e+' '+o.l+'</button>').join('')+
+          '</div>'+
+          (hasFilter?'<button class="cfb-reset" onclick="resetCollFilters()">× Xóa bộ lọc</button>':'')+
         '</div>'+
       '</div>'+
       (filtered.length===0?
         '<div class="colls-empty">'+
           '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
-          '<p>Không tìm thấy bộ sưu tập nào phù hợp</p>'+
-          '<button onclick="collSearch=\'\';collTagFilter=null;renderCollections()">Xóa bộ lọc</button>'+
+          '<p>Không có bộ sưu tập nào phù hợp với bộ lọc đã chọn</p>'+
+          '<button onclick="resetCollFilters()">Xóa bộ lọc</button>'+
         '</div>':
         '<div class="colls-grid">'+
           filtered.map(c=>{
@@ -985,7 +1027,7 @@ let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rati
 let listView='grid';
 let _listCtx=null;
 let brandExpanded=false;
-let collSearch='',collTagFilter=null;
+let collSearch='',collAudFilter=null,collGenreFilter=null,collSort='default';
 const CATDESC={
   sach:'Sách giáo khoa, tham khảo, văn học và kỹ năng từ các nhà xuất bản uy tín.',
   ebook:'Sách số đọc ngay trên mọi thiết bị — mua hoặc thuê tiết kiệm.',
