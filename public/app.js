@@ -304,14 +304,13 @@ function searchSuggest(){
       });
       html+='</div>';
     }
-    html+='<div class="sdrop-sec"><div class="sdrop-sh">Chuyên mục phổ biến</div>';
-    [{e:'📘',l:'Sách giáo khoa',c:'sgk'},{e:'📖',l:'Văn học',c:'vanhoc'},{e:'🌟',l:'Thiếu nhi',c:'thieunhi'},{e:'⚡',l:'Kỹ năng sống',c:'kynang'},{e:'🌐',l:'Ngoại ngữ',c:'ngoaingu'},{e:'🖊',l:'Văn phòng phẩm',c:'vpp'}].forEach(cat=>{
-      html+='<div class="sdrop-item sdrop-cat" onclick="go(\'listing\',\''+cat.c+'\');searchClose()">'+
-        '<span class="sdrop-cat-ic">'+cat.e+'</span><span>'+cat.l+'</span>'+
-      '</div>';
-    });
-    html+='</div>';
-    html+='<div class="sdrop-sec sdrop-moods"><div class="sdrop-sh">Tâm trạng hôm nay?</div>'+
+    const TRENDS=['Atomic Habits','Đắc Nhân Tâm','Nguyễn Nhật Ánh','SGK lớp 6','Luyện IELTS','Bút Thiên Long','Sách kỹ năng','Tư duy tích cực','Casio fx-991','Vở Campus','Sách thiếu nhi'];
+    const trendIcon='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+    html+='<div class="sdrop-sec"><div class="sdrop-sh">Xu hướng tìm kiếm</div>'+
+      '<div class="sdrop-trend-row">'+
+      TRENDS.map(t=>'<button class="trend-pill" onclick="searchExec(\''+t.replace(/'/g,"\\'")+'\')" >'+trendIcon+t+'</button>').join('')+
+      '</div></div>';
+    html+='<div class="sdrop-sec sdrop-moods"><div class="sdrop-sh">Tâm trạng của bạn hôm nay?</div>'+
       '<div class="sdrop-mood-row">'+
       MOODS.map(m=>'<button class="mood-chip" onclick="go(\'listing\',\'mood:'+m.k+'\');searchClose()">'+m.e+' '+m.l+'</button>').join('')+
       '</div></div>';

@@ -68,6 +68,12 @@
   .sdrop-all{padding:10px 14px;text-align:center;font-size:13px;cursor:pointer;color:var(--ink);border-top:1px solid var(--line);transition:background .1s;}
   .sdrop-all:hover{background:var(--surface);}
   .sdrop-empty{padding:16px 14px;text-align:center;font-size:13px;color:var(--text-soft);}
+  /* Trending search pills */
+  .sdrop-trend-row{display:flex;flex-wrap:wrap;gap:7px;padding:4px 14px 12px;}
+  .trend-pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);border-radius:20px;background:var(--paper);color:var(--text);cursor:pointer;transition:border-color .15s,background .15s,color .15s;white-space:nowrap;font-family:inherit;}
+  .trend-pill svg{color:var(--text-soft);flex-shrink:0;transition:color .15s;}
+  .trend-pill:hover{border-color:var(--ink);background:var(--surface);color:var(--ink);}
+  .trend-pill:hover svg{color:var(--ink);}
   /* Mood chips */
   .sdrop-moods{border-top:1px solid var(--line);}
   .sdrop-mood-row{display:flex;flex-wrap:wrap;gap:6px;padding:4px 14px 10px;}
