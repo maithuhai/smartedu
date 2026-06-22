@@ -28,6 +28,8 @@
       <div class="search">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
         <input id="searchInput" placeholder="Tìm theo tựa sách, tác giả, từ khóa hoặc ISBN…" oninput="searchSuggest()" onfocus="searchSuggest()" onkeydown="if(event.key==='Enter')doSearch();else if(event.key==='Escape')searchClose()" autocomplete="off" />
+        <button id="micBtn" class="srch-act-btn" onclick="startVoiceSearch()" title="Tìm bằng giọng nói"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3M9 22h6"/></svg></button>
+        <button class="srch-act-btn" onclick="openISBNScan()" title="Quét mã ISBN"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V5a2 2 0 0 1 2-2h4M3 15v4a2 2 0 0 0 2 2h4M21 9V5a2 2 0 0 0-2-2h-4M21 15v4a2 2 0 0 1-2 2h-4M7 8v8M10 8v8M14 8v8M17 8v8"/></svg></button>
       </div>
       <div id="searchDrop" class="search-drop" style="display:none"></div>
     </div>
@@ -147,6 +149,24 @@
 </footer>
 
 <div class="toast" id="toast"></div>
+
+<div id="isbnModal" class="isbn-modal-bg" style="display:none" onclick="if(event.target===this)closeISBNModal()">
+  <div class="isbn-modal">
+    <div class="isbn-modal-hd">
+      <span>📷 Quét mã vạch ISBN</span>
+      <button class="isbn-close" onclick="closeISBNModal()">×</button>
+    </div>
+    <div class="isbn-video-wrap">
+      <video id="isbnVideo" class="isbn-video" playsinline muted></video>
+      <div class="isbn-frame"><div class="isbn-scanline"></div></div>
+    </div>
+    <p class="isbn-hint">Đưa mã vạch vào khung để quét tự động</p>
+    <div class="isbn-manual">
+      <input id="isbnManual" type="text" placeholder="Hoặc nhập ISBN thủ công…" onkeydown="if(event.key==='Enter')submitManualISBN()">
+      <button onclick="submitManualISBN()">Tìm</button>
+    </div>
+  </div>
+</div>
 
 <script src="/app.js"></script>
 </body>

@@ -10,12 +10,12 @@ const AUD = {tieuhoc:'Tiểu học',thcs:'THCS',thpt:'THPT',sinhvien:'Sinh viên
 const CATLBL = {sach:'Sách',vpp:'Văn phòng phẩm',tbgd:'Thiết bị giáo dục',ebook:'Ebook',audiobook:'Sách nói'};
 
 const P = [
-  {id:1,name:'Bộ SGK lớp 6 - Kết nối tri thức',by:'NXB Giáo Dục Việt Nam',cat:'sach',aud:['thcs'],nxb:'Giáo Dục',price:187000,old:249000,rate:4.9,sold:1200,c:'#2f6ca5'},
-  {id:2,name:'Dế Mèn phiêu lưu ký',by:'Tô Hoài',cat:'sach',aud:['tieuhoc'],nxb:'Kim Đồng',price:45000,old:55000,rate:4.8,sold:5400,c:'#3a7a52'},
-  {id:3,name:'Tư duy nhanh và chậm',by:'Daniel Kahneman',cat:'sach',aud:['sinhvien'],nxb:'NXB Trẻ',price:169000,old:199000,rate:4.7,sold:2800,c:'#7a4a8c'},
-  {id:4,name:'Mắt biếc',by:'Nguyễn Nhật Ánh',cat:'sach',aud:['thpt'],nxb:'NXB Trẻ',price:88000,old:110000,rate:5.0,sold:8100,c:'#c1572f'},
-  {id:5,name:'Atomic Habits - Thay đổi tí hon',by:'James Clear',cat:'sach',aud:['sinhvien','thpt'],nxb:'Thế Giới',price:145000,old:180000,rate:4.9,sold:6700,c:'#1f6e6e'},
-  {id:6,name:'Luyện thi THPT QG môn Toán',by:'NXB ĐHQG Hà Nội',cat:'sach',aud:['thpt'],nxb:'ĐHQG',price:95000,old:120000,rate:4.6,sold:3300,c:'#384c9c'},
+  {id:1,name:'Bộ SGK lớp 6 - Kết nối tri thức',by:'NXB Giáo Dục Việt Nam',cat:'sach',aud:['thcs'],nxb:'Giáo Dục',price:187000,old:249000,rate:4.9,sold:1200,c:'#2f6ca5',isbn:'9786040281708'},
+  {id:2,name:'Dế Mèn phiêu lưu ký',by:'Tô Hoài',cat:'sach',aud:['tieuhoc'],nxb:'Kim Đồng',price:45000,old:55000,rate:4.8,sold:5400,c:'#3a7a52',isbn:'9786041060487'},
+  {id:3,name:'Tư duy nhanh và chậm',by:'Daniel Kahneman',cat:'sach',aud:['sinhvien'],nxb:'NXB Trẻ',price:169000,old:199000,rate:4.7,sold:2800,c:'#7a4a8c',isbn:'9786041149595'},
+  {id:4,name:'Mắt biếc',by:'Nguyễn Nhật Ánh',cat:'sach',aud:['thpt'],nxb:'NXB Trẻ',price:88000,old:110000,rate:5.0,sold:8100,c:'#c1572f',isbn:'9786041071230'},
+  {id:5,name:'Atomic Habits - Thay đổi tí hon',by:'James Clear',cat:'sach',aud:['sinhvien','thpt'],nxb:'Thế Giới',price:145000,old:180000,rate:4.9,sold:6700,c:'#1f6e6e',isbn:'9786041168237'},
+  {id:6,name:'Luyện thi THPT QG môn Toán',by:'NXB ĐHQG Hà Nội',cat:'sach',aud:['thpt'],nxb:'ĐHQG',price:95000,old:120000,rate:4.6,sold:3300,c:'#384c9c',isbn:'9786041093447'},
   {id:7,name:'Combo bút bi Thiên Long 20 cây',by:'Thiên Long',cat:'vpp',sub:'but',aud:['thcs','thpt','sinhvien'],nxb:'Thiên Long',price:48000,old:80000,rate:5.0,sold:9200,c:'#2563a8',icon:'pen'},
   {id:8,name:'Vở Campus 200 trang (lốc 10)',by:'Campus',cat:'vpp',sub:'vo',aud:['thcs','thpt'],nxb:'Campus',price:102000,old:120000,rate:4.9,sold:5600,c:'#e08a2e',icon:'note'},
   {id:9,name:'Bộ bút màu Colokit 24 màu',by:'Colokit',cat:'vpp',sub:'hoapham',aud:['tieuhoc'],nxb:'Colokit',price:65000,old:85000,rate:4.8,sold:4100,c:'#c94f7c',icon:'palette'},
@@ -76,8 +76,8 @@ const P = [
   {id:41,name:'Mindset – Tâm thế thành công (sách nói)',by:'Carol S. Dweck',cat:'audiobook',aud:['sinhvien','giaovien'],nxb:'EduMart Audio',price:75000,old:110000,rate:4.8,sold:1560,c:'#4a1e7a',audio:true,narrator:'Lan Anh',duration:320,format:'MP3'},
   {id:42,name:'Atomic Habits – Thói quen nguyên tử (sách nói)',by:'James Clear',cat:'audiobook',aud:['sinhvien','giaovien'],nxb:'EduMart Audio',price:85000,old:125000,rate:4.9,sold:3120,c:'#c1572f',tag:'hot',audio:true,narrator:'Minh Khoa',duration:410,format:'MP3'},
   {id:43,name:'The Power of Now – Sức mạnh hiện tại (sách nói)',by:'Eckhart Tolle',cat:'audiobook',aud:['sinhvien'],nxb:'EduMart Audio',price:79000,old:115000,rate:4.7,sold:890,c:'#1a5a5a',audio:true,narrator:'Thu Giang',duration:295,format:'MP3'},
-  {id:23,name:'Tắt đèn',by:'Ngô Tất Tố',cat:'sach',aud:['thpt'],nxb:'NXB Văn Học',price:72000,old:95000,rate:4.7,sold:2100,c:'#5a3a2a'},
-  {id:24,name:'Cây chuối non đi giày xanh',by:'Nguyễn Nhật Ánh',cat:'sach',aud:['thcs','thpt'],nxb:'NXB Trẻ',price:110000,old:135000,rate:4.9,sold:4300,c:'#2f8f6a'},
+  {id:23,name:'Tắt đèn',by:'Ngô Tất Tố',cat:'sach',aud:['thpt'],nxb:'NXB Văn Học',price:72000,old:95000,rate:4.7,sold:2100,c:'#5a3a2a',isbn:'9786041023345'},
+  {id:24,name:'Cây chuối non đi giày xanh',by:'Nguyễn Nhật Ánh',cat:'sach',aud:['thcs','thpt'],nxb:'NXB Trẻ',price:110000,old:135000,rate:4.9,sold:4300,c:'#2f8f6a',isbn:'9786041112780'},
   {id:25,name:'Bộ SGK lớp 1 - Cánh Diều',by:'NXB ĐH Sư Phạm',cat:'sach',aud:['tieuhoc'],nxb:'Cánh Diều',price:165000,old:210000,rate:4.8,sold:1800,c:'#c1572f',instock:false}
 ];
 
@@ -93,6 +93,16 @@ const GENREDESC={
 };
 const GENRE_MAP={1:'sgk',2:'thieunhi',3:'kynang',4:'vanhoc',5:'kynang',6:'thamkhao',15:'kynang',16:'ngoaingu',17:'kynang',18:'thamkhao',19:'thamkhao',20:'kynang',21:'kynang',22:'ngoaingu',23:'vanhoc',24:'thieunhi',25:'sgk',35:'vanhoc',36:'thamkhao',37:'kynang',38:'sgk',39:'kynang',40:'ngoaingu',41:'kynang',42:'kynang',43:'kynang'};
 P.forEach(p=>{if(GENRE_MAP[p.id])p.genre=GENRE_MAP[p.id];});
+
+/* ---------------- Tìm theo tâm trạng ---------------- */
+const MOODS=[
+  {e:'🌸',l:'Sách nhẹ nhàng',      k:'nhe-nhang', kw:['nhẹ nhàng','nhẹ','thư giãn'],   fn:p=>p.cat==='sach'&&p.genre==='vanhoc'&&p.rate>=4.3},
+  {e:'⚡',l:'Truyền cảm hứng',      k:'cam-hung',  kw:['cảm hứng','động lực','truyền cảm'],fn:p=>p.genre==='kynang'&&p.rate>=4.5},
+  {e:'🌙',l:'Đọc trước khi ngủ',   k:'truoc-ngu', kw:['ngủ','buổi tối','trước khi ngủ'],fn:p=>!!p.audio||(p.genre==='vanhoc'&&p.rate>=4.5)},
+  {e:'🎯',l:'Ôn thi hiệu quả',     k:'on-thi',    kw:['ôn thi','luyện thi','thi cử'],    fn:p=>['sgk','thamkhao'].includes(p.genre)},
+  {e:'🌍',l:'Mở mang tầm nhìn',    k:'tam-nhin',  kw:['tầm nhìn','mở mang','ngoại ngữ'],fn:p=>p.genre==='ngoaingu'||(p.genre==='kynang'&&p.rate>=4.7)},
+  {e:'👶',l:'Sách cho bé',          k:'cho-be',    kw:['bé','thiếu nhi','trẻ em'],        fn:p=>p.genre==='thieunhi'},
+];
 
 /* Mục lục (TOC) cho từng ebook, danh sách track cho audiobook */
 const EBOOK_TOC={
@@ -301,6 +311,10 @@ function searchSuggest(){
       '</div>';
     });
     html+='</div>';
+    html+='<div class="sdrop-sec sdrop-moods"><div class="sdrop-sh">Tâm trạng hôm nay?</div>'+
+      '<div class="sdrop-mood-row">'+
+      MOODS.map(m=>'<button class="mood-chip" onclick="go(\'listing\',\'mood:'+m.k+'\');searchClose()">'+m.e+' '+m.l+'</button>').join('')+
+      '</div></div>';
   } else {
     const matches=P.filter(p=>normVi(p.name).includes(qn)||normVi(p.by).includes(qn)||(p.nxb&&normVi(p.nxb).includes(qn))).slice(0,5);
     if(matches.length>0){
@@ -335,7 +349,16 @@ function searchSuggest(){
       });
       html+='</div>';
     }
-    if(!matches.length&&!catHits.length){
+    const moodHit=MOODS.find(m=>m.kw.some(kw=>normVi(kw).includes(qn)||qn.includes(normVi(kw))));
+    if(moodHit){
+      const cnt=P.filter(moodHit.fn).length;
+      html+='<div class="sdrop-item sdrop-mood-hint" onclick="go(\'listing\',\'mood:'+moodHit.k+'\');searchClose()">'+
+        '<span class="sdrop-mood-ic">'+moodHit.e+'</span>'+
+        '<span class="sdrop-mood-lbl">'+moodHit.l+'</span>'+
+        '<span class="sdrop-mood-cnt">'+cnt+' sách</span>'+
+      '</div>';
+    }
+    if(!matches.length&&!catHits.length&&!moodHit){
       html+='<div class="sdrop-empty">Không tìm thấy gợi ý cho "<strong>'+q+'</strong>"</div>';
     }
     html+='<div class="sdrop-all" onclick="doSearch()">Xem tất cả kết quả cho "<strong>'+q+'</strong>" →</div>';
@@ -359,6 +382,71 @@ function searchExec(q){
 
 function clearSrchHistory(){srchHistory=[];LS.set('srchHistory',[]);searchSuggest();}
 function removeSrchHistory(q){srchHistory=srchHistory.filter(h=>h!==q);LS.set('srchHistory',srchHistory);searchSuggest();}
+
+/* ---------------- Voice search ---------------- */
+function startVoiceSearch(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const btn=document.getElementById('micBtn');
+  if(!SR){if(btn)btn.title='Trình duyệt chưa hỗ trợ';return;}
+  const r=new SR();
+  r.lang='vi-VN';r.interimResults=false;r.maxAlternatives=1;
+  r.onstart=()=>{if(btn)btn.classList.add('listening');};
+  r.onend=()=>{if(btn)btn.classList.remove('listening');};
+  r.onresult=e=>{
+    const q=(e.results[0][0].transcript||'').trim();
+    if(!q)return;
+    const inp=document.getElementById('searchInput');
+    if(inp)inp.value=q;
+    searchExec(q);
+  };
+  r.onerror=()=>{if(btn)btn.classList.remove('listening');};
+  r.start();
+}
+
+/* ---------------- ISBN camera scan ---------------- */
+let _isbnStream=null,_isbnTimer=null;
+function openISBNScan(){
+  if(!navigator.mediaDevices?.getUserMedia){alert('Trình duyệt không hỗ trợ camera');return;}
+  document.getElementById('isbnModal').style.display='flex';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+    .then(stream=>{
+      _isbnStream=stream;
+      const vid=document.getElementById('isbnVideo');
+      vid.srcObject=stream;vid.play();
+      const BD=window.BarcodeDetector;
+      if(BD){
+        const det=new BD({formats:['ean_13','ean_8','upc_a','upc_e']});
+        _isbnTimer=setInterval(async()=>{
+          try{
+            const res=await det.detect(vid);
+            if(res.length){
+              const isbn=res[0].rawValue;
+              closeISBNModal();
+              const found=P.find(p=>p.isbn===isbn);
+              if(found)go('product',found.id);
+              else{const inp=document.getElementById('searchInput');if(inp)inp.value=isbn;searchExec(isbn);}
+            }
+          }catch(e){}
+        },400);
+      }
+    })
+    .catch(()=>{closeISBNModal();alert('Không thể mở camera. Vui lòng kiểm tra quyền truy cập.');});
+}
+function closeISBNModal(){
+  clearInterval(_isbnTimer);
+  if(_isbnStream)_isbnStream.getTracks().forEach(t=>t.stop());
+  _isbnStream=null;
+  const m=document.getElementById('isbnModal');
+  if(m)m.style.display='none';
+}
+function submitManualISBN(){
+  const val=(document.getElementById('isbnManual')?.value||'').trim();
+  if(!val)return;
+  closeISBNModal();
+  const found=P.find(p=>p.isbn===val);
+  if(found)go('product',found.id);
+  else searchExec(val);
+}
 
 function render(){
   if(view==='home')renderHome();
@@ -455,7 +543,7 @@ function himg(id,w){return uimg(HIMG[id],w);}
 const ARR='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
 
 /* Home-only product card (photo cover) — does not touch the shared pcard() */
-function hmCard(p,dark){
+function hmCard(p,dark,rank){
   const isBook=p.cat==='sach';
   const overlay=isBook?'linear-gradient(to top,rgba(15,8,4,.68),rgba(15,8,4,.1) 55%,transparent)':'linear-gradient(to top,rgba(15,8,4,.3),transparent 60%)';
   const tag=HTAG[p.id];
@@ -467,6 +555,7 @@ function hmCard(p,dark){
         : '<img src="'+himg(p.id,500)+'" alt="'+p.name+'" loading="lazy"><div class="hm-cov-ov" style="background:'+overlay+'"></div>'+(isBook?'<div class="hm-cov-tt"><div class="t">'+p.name+'</div><div class="a">'+p.by+'</div></div>':''))+
       '<span class="hm-disc">-'+discount(p)+'%</span>'+
       (tag?'<span class="hm-tag">'+tag+'</span>':'')+
+      (rank?'<span class="hm-rank-num">'+rank+'</span>':'')+
       '<button class="hm-fav'+(inWish(p.id)?' on':'')+'" data-wish="'+p.id+'" onclick="event.stopPropagation();toggleWish('+p.id+')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"/></svg></button>'+
     '</div>'+
     '<div class="hm-info">'+
@@ -710,7 +799,7 @@ function renderHome(){
       '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
     ).join('')+
   '</div>'+
-  '<div class="hm-grid g4">'+bsFiltBooks.map(p=>hmCard(p)).join('')+'</div>'+
+  '<div class="hm-grid g4 top-sell">'+bsFiltBooks.map((p,i)=>hmCard(p,false,i+1)).join('')+'</div>'+
 
   /* Nhà bán nổi bật */
   hmHead('Nhà bán nổi bật')+
@@ -723,7 +812,7 @@ function renderHome(){
   '</div>'+
 
   /* ── Sách nổi bật ── */
-  hmHead('📚 Sách nổi bật','','sach')+
+  hmHead('Sách nổi bật','','sach')+
   '<div class="hm-grid g4">'+featBooks.slice(0,4).map(p=>hmCard(p)).join('')+'</div>'+
 
   /* Stationery */
@@ -852,6 +941,7 @@ function renderListing(){
     else if(arg==='tbgd'){title='Thiết bị giáo dục';base=P.filter(p=>p.cat==='tbgd');ctxKey='cat:tbgd';catKey='tbgd';isTbgd=true;heroDesc=CATDESC['tbgd']||'';if(tbgdSub!=='all')base=base.filter(p=>p.sub===tbgdSub);}
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
+    else if(arg.startsWith('mood:')){const mk=arg.slice(5);const mood=MOODS.find(m=>m.k===mk);if(mood){title=mood.e+' '+mood.l;base=P.filter(mood.fn);ctxKey='mood:'+mk;heroDesc='Gợi ý được chọn lọc theo tâm trạng của bạn.';}}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
   if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';brandExpanded=false;}
 
@@ -872,6 +962,8 @@ function renderListing(){
   else if(filt.bookfmt==='audio')list=list.filter(p=>!!p.audio);
   if(filt.rating==='4')list=list.filter(p=>p.rate>=4);
   else if(filt.rating==='3')list=list.filter(p=>p.rate>=3);
+  else if(filt.rating==='2')list=list.filter(p=>p.rate>=2);
+  else if(filt.rating==='1')list=list.filter(p=>p.rate>=1);
   if(filt.sale)list=list.filter(p=>p.old>p.price);
   if(filt.instock)list=list.filter(p=>p.instock!==false);
   if(filt.q){const q=filt.q.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)||(p.nxb||'').toLowerCase().includes(q));}
@@ -896,7 +988,9 @@ function renderListing(){
   const ratingOpts=
     '<label><input type="radio" name="frat" '+(filt.rating===null?'checked':'')+' onchange="filt.rating=null;renderListing()">Tất cả</label>'+
     '<label><input type="radio" name="frat" '+(filt.rating==="4"?'checked':'')+' onchange="filt.rating=\'4\';renderListing()">4★ trở lên</label>'+
-    '<label><input type="radio" name="frat" '+(filt.rating==="3"?'checked':'')+' onchange="filt.rating=\'3\';renderListing()">3★ trở lên</label>';
+    '<label><input type="radio" name="frat" '+(filt.rating==="3"?'checked':'')+' onchange="filt.rating=\'3\';renderListing()">3★ trở lên</label>'+
+    '<label><input type="radio" name="frat" '+(filt.rating==="2"?'checked':'')+' onchange="filt.rating=\'2\';renderListing()">2★ trở lên</label>'+
+    '<label><input type="radio" name="frat" '+(filt.rating==="1"?'checked':'')+' onchange="filt.rating=\'1\';renderListing()">1★ trở lên</label>';
   const priceOpts=[['all','Tất cả'],['lo','Dưới 100.000đ'],['mid','100.000 – 300.000đ'],['hi','Trên 300.000đ'],['custom','Tùy chỉnh']].map(([k,v])=>'<label><input type="radio" name="fpr" '+(filt.price===k?'checked':'')+' onchange="filt.price=\''+k+'\''+(k!=='custom'?';filt.priceMin=0;filt.priceMax=0':'')+';renderListing()">'+v+'</label>').join('')+
     (filt.price==='custom'?'<div class="price-custom"><input id="prMinI" type="number" class="price-inp" min="0" value="'+(filt.priceMin||'')+'" placeholder="Từ" onkeydown="if(event.key===\'Enter\')applyCustomPrice()"><span class="price-sep">–</span><input id="prMaxI" type="number" class="price-inp" min="0" value="'+(filt.priceMax||'')+'" placeholder="Đến" onkeydown="if(event.key===\'Enter\')applyCustomPrice()"><button class="price-go" onclick="applyCustomPrice()">OK</button></div>':'');
   const sortOpts=[['sold','Bán chạy'],['rate','Đánh giá cao'],['priceAsc','Giá thấp đến cao'],['priceDesc','Giá cao đến thấp']].map(([k,v])=>'<option value="'+k+'"'+(filt.sort===k?' selected':'')+'>'+v+'</option>').join('');
@@ -946,7 +1040,13 @@ function renderListing(){
         '<a class="eb-lib-link" onclick="go(\'equipment\')">🏫 Cửa hàng TBGD</a>'+
       '</div>':'')+
       chipHtml+
-      '<div class="list-top"><span class="cnt"><b>'+list.length+'</b> sản phẩm</span>'+
+      '<div class="list-top"><span class="cnt">'+
+        (filt.q
+          ? '<b>'+list.length+'</b> kết quả cho <span class="cnt-query">"'+filt.q+'"</span>'
+          : chips.length
+            ? '<b>'+list.length+'</b><span class="cnt-slash">/</span><span class="cnt-total">'+base.length+'</span> sản phẩm'
+            : '<b>'+list.length+'</b> sản phẩm')+
+      '</span>'+
         '<div class="list-top-r">'+
           '<select onchange="filt.sort=this.value;renderListing()">'+sortOpts+'</select>'+
           '<div class="view-toggle">'+
@@ -955,7 +1055,13 @@ function renderListing(){
           '</div>'+
         '</div>'+
       '</div>'+
-      (list.length?'<div class="grid listing-grid'+(listView==='list'?' list-view':'')+'">'+list.map(pcard).join('')+'</div>':'<div class="empty"><div style="font-size:16px;margin-bottom:12px">Không tìm thấy sản phẩm phù hợp.</div><button class="btn-ghost" onclick="resetFilters()">Xóa bộ lọc</button></div>')+
+      (list.length
+        ?'<div class="grid listing-grid'+(listView==='list'?' list-view':'')+'">'+list.map(pcard).join('')+'</div>'
+        :'<div class="list-empty">'+
+            '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg>'+
+            '<p>'+(filt.q?'Không tìm thấy kết quả nào cho "<b>'+filt.q+'</b>"':'Không có sản phẩm phù hợp với bộ lọc đã chọn')+'</p>'+
+            '<button onclick="resetFilters()">Xóa bộ lọc</button>'+
+          '</div>')+
     '</div>'+
   '</div>';
 }
