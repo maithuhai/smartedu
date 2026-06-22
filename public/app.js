@@ -7,7 +7,7 @@ const LS={
 /* ---------------- Data ---------------- */
 const fmt = n => n.toLocaleString('vi-VN') + 'đ';
 const AUD = {tieuhoc:'Tiểu học',thcs:'THCS',thpt:'THPT',sinhvien:'Sinh viên',giaovien:'Giáo viên',school:'Trường học'};
-const CATLBL = {sach:'Sách',vpp:'Văn phòng phẩm',tbgd:'Thiết bị giáo dục',ebook:'Ebook',audiobook:'Sách nói'};
+const CATLBL = {sach:'Sách nổi bật',vpp:'Văn phòng phẩm',tbgd:'Thiết bị giáo dục',ebook:'Ebook',audiobook:'Sách nói'};
 
 const P = [
   {id:1,name:'Bộ SGK lớp 6 - Kết nối tri thức',by:'NXB Giáo Dục Việt Nam',cat:'sach',aud:['thcs'],nxb:'Giáo Dục',price:187000,old:249000,rate:4.9,sold:1200,c:'#2f6ca5',isbn:'9786040281708'},
@@ -91,8 +91,22 @@ const GENREDESC={
   kynang:'Phát triển bản thân, tư duy và thói quen tốt cho học sinh, sinh viên.',
   ngoaingu:'Sách học tiếng Anh và ngoại ngữ: từ vựng, giao tiếp, luyện thi.'
 };
+const BOOKDESC={
+  2:'Tác phẩm kinh điển của Tô Hoài kể về cuộc phiêu lưu kỳ thú của chú Dế Mèn — người bạn đồng hành tuổi thơ không thể thiếu của nhiều thế hệ bạn đọc Việt Nam.',
+  3:'Giải thưởng Nobel Kinh tế học — Daniel Kahneman khám phá hai hệ thống tư duy của não bộ và cách chúng ảnh hưởng đến mọi quyết định trong cuộc sống hàng ngày.',
+  4:'Tình yêu học trò trong sáng của Ngạn và Hà Lan trải qua bao năm tháng — kiệt tác văn học xúc động nhất của Nguyễn Nhật Ánh, đã được chuyển thể thành phim điện ảnh.',
+  5:'Phương pháp khoa học giúp xây dựng thói quen tốt thông qua những thay đổi nhỏ bé hàng ngày. Cuốn sách đã thay đổi tư duy của hàng triệu độc giả trên toàn thế giới.',
+  6:'Bộ đề thi thử và tài liệu luyện thi THPT Quốc gia môn Toán được biên soạn kỹ lưỡng bởi đội ngũ chuyên gia tại NXB Đại học Quốc gia Hà Nội.',
+  20:'Nghệ thuật giao tiếp và chinh phục lòng người — một trong những cuốn sách phát triển bản thân bán chạy nhất mọi thời đại của Dale Carnegie.',
+  23:'Hành trình khám phá bản thân qua triết học thiền định — tác phẩm của Thích Nhất Hạnh giúp người đọc tìm lại sự bình yên trong cuộc sống hiện đại.',
+  24:'Câu chuyện tình yêu đầy xúc động về mất mát và hành trình chữa lành của Haruki Murakami — bestseller số một Nhật Bản nhiều năm liền.',
+  42:'Khám phá tư duy tài chính khác biệt giữa người giàu và người nghèo qua cách họ dạy con về tiền bạc, đầu tư và tự do tài chính.',
+  43:'Nhật ký Anne Frank — tài liệu lịch sử đầy xúc động về một cô gái Do Thái ghi lại cuộc sống ẩn náu trong thời kỳ Thế chiến II.',
+};
 const GENRE_MAP={1:'sgk',2:'thieunhi',3:'kynang',4:'vanhoc',5:'kynang',6:'thamkhao',15:'kynang',16:'ngoaingu',17:'kynang',18:'thamkhao',19:'thamkhao',20:'kynang',21:'kynang',22:'ngoaingu',23:'vanhoc',24:'thieunhi',25:'sgk',35:'vanhoc',36:'thamkhao',37:'kynang',38:'sgk',39:'kynang',40:'ngoaingu',41:'kynang',42:'kynang',43:'kynang'};
 P.forEach(p=>{if(GENRE_MAP[p.id])p.genre=GENRE_MAP[p.id];});
+const NEW_DATE_MAP={1:'2025-09-01',2:'2024-08-15',3:'2026-05-28',4:'2026-05-15',5:'2026-06-01',6:'2025-08-10',15:'2025-12-01',16:'2026-04-10',17:'2026-05-20',18:'2025-10-15',19:'2025-11-01',20:'2025-10-01',21:'2026-03-15',22:'2026-04-20',23:'2025-07-15',24:'2026-04-20',25:'2025-08-01',26:'2025-09-15',27:'2025-10-20',28:'2026-05-01',35:'2026-02-10',36:'2025-12-15',37:'2026-06-10',38:'2025-11-20',39:'2026-05-20',40:'2026-06-15',41:'2026-04-25',42:'2026-06-05',43:'2026-03-10'};
+P.forEach(p=>{if(NEW_DATE_MAP[p.id])p.releaseDate=NEW_DATE_MAP[p.id];});
 
 /* ---------------- Tìm theo tâm trạng ---------------- */
 const MOODS=[
@@ -506,6 +520,8 @@ function render(){
   else if(view==='stationery')renderVPPStore();
   else if(view==='equipment')renderTBGDStore();
   else if(view==='collections')renderCollections();
+  else if(view==='bestseller')renderBestseller();
+  else if(view==='newbooks')renderNewBooks();
 }
 
 /* ---------------- Cards ---------------- */
@@ -832,13 +848,22 @@ function renderHome(){
   '</div>'+
 
   /* Top sản phẩm bán chạy */
-  hmHead('Top sản phẩm bán chạy')+
+  hmHead('Top sản phẩm bán chạy','','','bestseller')+
   '<div class="bsr-tabs">'+
     [['all','Tất cả'],['giay','Sách giấy'],['ebook','Sách điện tử'],['audio','Sách nói']].map(([k,v])=>
       '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
     ).join('')+
   '</div>'+
   '<div class="hm-grid g4 top-sell">'+bsFiltBooks.map((p,i)=>hmCard(p,false,i+1)).join('')+'</div>'+
+
+  /* Sách mới nhất */
+  hmHead('Sách Mới Nhất','','','newbooks')+
+  '<div class="hm-grid g4">'+
+    P.filter(p=>(p.cat==='sach'||p.ebook||p.audio)&&p.releaseDate)
+      .sort((a,b)=>new Date(b.releaseDate)-new Date(a.releaseDate))
+      .slice(0,4)
+      .map(p=>'<div class="nb-card-wrap">'+hmCard(p)+'<span class="nb-badge-new">MỚI</span></div>').join('')+
+  '</div>'+
 
   /* Nhà bán nổi bật */
   hmHead('Nhà bán nổi bật')+
@@ -1018,10 +1043,13 @@ function renderCollections(){
 }
 
 /* ---------------- Listing ---------------- */
-let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,instock:false,q:'',priceMin:0,priceMax:0};
+let filt={aud:[],price:'all',sort:'sold',brand:[],fmt:null,bookfmt:null,rating:null,sale:false,instock:false,q:'',priceMin:0,priceMax:0,genre:[]};
 let listView='grid';
 let _listCtx=null;
 let brandExpanded=false;
+let genreExpanded=false;
+let nbGenreFilter=[],nbNxbFilter=[],nbSort='date',nbNxbExpanded=false,nbGenreExpanded=false;
+let nbAud=[],nbBookfmt=null,nbPrice='all',nbPriceMin=0,nbPriceMax=0,nbRating=null,nbSale=false,nbInstock=false,nbQ='';
 let collSearch='',collAudFilter=null,collGenreFilter=null,collSort='default';
 const CATDESC={
   sach:'Sách giáo khoa, tham khảo, văn học và kỹ năng từ các nhà xuất bản uy tín.',
@@ -1039,10 +1067,232 @@ const AUDDESC={
   giaovien:'Sách tham khảo, giáo án điện tử, thiết bị dạy học và ưu đãi đặc biệt dành cho nhà giáo.',
   school:'Mua sỉ số lượng lớn, đặt hàng theo danh sách lớp và yêu cầu báo giá cho trường học.'
 };
-function clearFilter(k){if(k==='price'){filt.price='all';filt.priceMin=0;filt.priceMax=0;}else if(k==='rating')filt.rating=null;else if(k==='sale')filt.sale=false;else if(k==='instock')filt.instock=false;else if(k==='q')filt.q='';else filt[k]=null;renderListing();}
-function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';renderListing();}
+function clearFilter(k){if(k==='price'){filt.price='all';filt.priceMin=0;filt.priceMax=0;}else if(k==='rating')filt.rating=null;else if(k==='sale')filt.sale=false;else if(k==='instock')filt.instock=false;else if(k==='q')filt.q='';else if(k.startsWith('genre_')){const _g=k.slice(6);const _i=filt.genre.indexOf(_g);if(_i>=0)filt.genre.splice(_i,1);}else if(k==='aud'||k.startsWith('aud_')){if(k==='aud')filt.aud=[];else{const _a=k.slice(4);const _i=filt.aud.indexOf(_a);if(_i>=0)filt.aud.splice(_i,1);}}else if(k==='brand'||k.startsWith('brand_')){if(k==='brand')filt.brand=[];else{const _b=k.slice(6);const _i=filt.brand.indexOf(_b);if(_i>=0)filt.brand.splice(_i,1);}}else filt[k]=null;renderListing();}
+function resetFilters(){filt.aud=[];filt.brand=[];filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';filt.genre=[];renderListing();}
+function toggleGenre(g){const i=filt.genre.indexOf(g);if(i>=0)filt.genre.splice(i,1);else filt.genre.push(g);renderListing();}
+function toggleAud(a){const i=filt.aud.indexOf(a);if(i>=0)filt.aud.splice(i,1);else filt.aud.push(a);renderListing();}
+function toggleBrand(b){const i=filt.brand.indexOf(b);if(i>=0)filt.brand.splice(i,1);else filt.brand.push(b);renderListing();}
 function applyCustomPrice(){const mn=document.getElementById('prMinI');const mx=document.getElementById('prMaxI');filt.priceMin=mn?+mn.value||0:0;filt.priceMax=mx?+mx.value||0:0;renderListing();}
 function setSearchQ(v){filt.q=(v||'').trim();renderListing();}
+function nbToggleGenre(g){const i=nbGenreFilter.indexOf(g);if(i>=0)nbGenreFilter.splice(i,1);else nbGenreFilter.push(g);renderNewBooks();}
+function nbToggleNxb(n){const i=nbNxbFilter.indexOf(n);if(i>=0)nbNxbFilter.splice(i,1);else nbNxbFilter.push(n);renderNewBooks();}
+function nbToggleAud(a){const i=nbAud.indexOf(a);if(i>=0)nbAud.splice(i,1);else nbAud.push(a);renderNewBooks();}
+function nbSetQ(v){nbQ=(v||'').trim();renderNewBooks();}
+function nbApplyPrice(){const mn=document.getElementById('nbPrMin');const mx=document.getElementById('nbPrMax');nbPriceMin=mn?+mn.value||0:0;nbPriceMax=mx?+mx.value||0:0;renderNewBooks();}
+function nbResetFilters(){nbGenreFilter=[];nbNxbFilter=[];nbAud=[];nbBookfmt=null;nbPrice='all';nbPriceMin=0;nbPriceMax=0;nbRating=null;nbSale=false;nbInstock=false;nbQ='';nbNxbExpanded=false;nbGenreExpanded=false;renderNewBooks();}
+function renderBestseller(){
+  const allBase=P.filter(p=>p.cat==='sach'||p.ebook||p.audio);
+  let base=allBase.slice();
+  if(bsGenre!=='all')base=base.filter(p=>p.genre===bsGenre);
+  if(bsFmt==='giay')base=base.filter(p=>!p.ebook&&!p.audio);
+  else if(bsFmt==='ebook')base=base.filter(p=>!!p.ebook);
+  else if(bsFmt==='audio')base=base.filter(p=>!!p.audio);
+  const ranked=base.slice().sort((a,b)=>b.sold-a.sold).slice(0,20);
+  if(bsActive>=ranked.length)bsActive=0;
+  const maxSold=ranked.length>0?ranked[0].sold:1;
+  const gtabHtml=[['all','Tất cả'],...Object.entries(GENRE)].map(([k,v])=>{
+    const cnt=k==='all'?allBase.length:allBase.filter(p=>p.genre===k).length;
+    const dis=cnt===0;
+    return '<button class="bs-gtab'+(bsGenre===k?' on':'')+(dis?' dis':'')+'" onclick="'+(dis?'':'bsGenre=\''+k+'\';bsActive=0;renderBestseller()')+'">'
+      +v+'</button>';
+  }).join('');
+  const fpillHtml=[['all','Tất cả'],['giay','Sách giấy'],['ebook','Ebook'],['audio','Sách nói']].map(([k,v])=>
+    '<button class="bs-fpill'+(bsFmt===k?' on':'')+'" onclick="bsFmt=\''+k+'\';bsActive=0;renderBestseller()">'+v+'</button>'
+  ).join('');
+  function rBadge(r){
+    if(r===1)return '<span class="bs-badge bs-b1">Top 1</span>';
+    if(r===2)return '<span class="bs-badge bs-b2">Top 2</span>';
+    if(r===3)return '<span class="bs-badge bs-b3">Top 3</span>';
+    return '';
+  }
+  const listHtml=ranked.map((p,i)=>{
+    const r=i+1;
+    const slug=HIMG[p.id];
+    const sold=p.sold>=1000?(p.sold/1000).toFixed(1)+'k':String(p.sold);
+    const pct=Math.round(p.sold/maxSold*100);
+    const cvr=slug
+      ?'<img src="'+uimg(slug,120)+'" alt="" class="bs-row-img" loading="lazy">'
+      :'<div class="bs-row-img bs-row-grad" style="background:linear-gradient(135deg,'+p.c+',#333)"></div>';
+    return '<div class="bs-row'+(bsActive===i?' on':'')+'" onclick="bsActive='+i+';renderBestseller()">'+
+      '<span class="bs-rnum'+(r<=3?' top':'')+'" data-rank="'+r+'">'+r+'</span>'+
+      cvr+
+      '<div class="bs-row-info">'+
+        rBadge(r)+
+        '<div class="bs-row-title">'+p.name+'</div>'+
+        '<div class="bs-row-by">'+p.by+'</div>'+
+        '<div class="bs-bar-wrap"><div class="bs-bar-track"><div class="bs-bar" style="width:'+pct+'%"></div></div>'+
+        '<span class="bs-sold">'+sold+' đã bán</span></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  let pvHtml='';
+  if(ranked.length>0){
+    const p=ranked[bsActive]||ranked[0];
+    const r=(ranked[bsActive]?bsActive:0)+1;
+    const slug=HIMG[p.id];
+    const sold=p.sold>=1000?(p.sold/1000).toFixed(1)+'k':String(p.sold);
+    const disc=p.old>p.price?Math.round((1-p.price/p.old)*100):0;
+    const rlabel=r===1?'Top 1':r===2?'Top 2':r===3?'Top 3':'#'+r;
+    const glabel=bsGenre==='all'?'Tất cả sách':GENRE[bsGenre];
+    const cvr=slug
+      ?'<img src="'+uimg(slug,400)+'" alt="'+p.name+'" class="bs-pv-img" onclick="go(\'product\','+p.id+')" loading="lazy">'
+      :'<div class="bs-pv-img bs-pv-grad" style="background:linear-gradient(135deg,'+p.c+',#222)" onclick="go(\'product\','+p.id+')"></div>';
+    const stars=Array.from({length:5},(_,j)=>'<svg width="12" height="12" viewBox="0 0 24 24" fill="'+(j<Math.round(p.rate)?'#c8362a':'#ddd')+'"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg>').join('');
+    const desc=BOOKDESC[p.id]||'';
+    pvHtml=
+      '<div class="bs-preview">'+
+        '<div class="bs-pv-inner">'+
+          cvr+
+          '<div class="bs-pv-body">'+
+            '<span class="bs-pv-badge">'+rlabel+' &middot; '+glabel+'</span>'+
+            '<h2 class="bs-pv-title" onclick="go(\'product\','+p.id+')">'+p.name+'</h2>'+
+            '<div class="bs-pv-meta">'+
+              '<span class="bs-pv-auth">'+p.by+'</span>'+
+              (p.nxb?'<span class="bs-pv-nxb">NXB '+p.nxb+'</span>':'')+
+            '</div>'+
+            '<div class="bs-pv-stars">'+stars+'<span class="bs-pv-rval">'+p.rate.toFixed(1)+'</span></div>'+
+            '<div class="bs-pv-sold-big">'+sold+' đã bán</div>'+
+            '<div class="bs-pv-price">'+fmt(p.price)+
+              (disc>0?'<span class="bs-pv-old">'+fmt(p.old)+'</span><span class="bs-pv-disc">-'+disc+'%</span>':'')+
+            '</div>'+
+            '<div class="bs-pv-acts">'+
+              (p.instock===false
+                ?'<button class="bs-pv-cart" disabled>Hết hàng</button>'
+                :'<button class="bs-pv-cart" onclick="addToCart('+p.id+')">Thêm vào giỏ</button>'
+              )+
+              '<a class="bs-pv-det" onclick="go(\'product\','+p.id+')">Xem chi tiết sản phẩm ›</a>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        (desc?'<div class="bs-pv-desc"><div class="bs-pv-desc-h">Mô tả sản phẩm</div><p class="bs-pv-desc-t">'+desc+'</p></div>':'')+
+      '</div>';
+  }
+  document.getElementById('app').innerHTML=
+    mkCrumb([["Trang chủ","go('home')"],["Bảng xếp hạng"]])+
+    '<div class="bs-page">'+
+      '<div class="bs-hd">'+
+        '<div class="bs-hero" style="background-image:url('+uimg('1625053376622-e462848c453f',1400)+')">'+
+          '<div class="bs-hero-ov"></div>'+
+          '<div class="bs-hero-box">'+
+            '<h1 class="bs-hdtitle">Bảng Xếp Hạng Sách Bán Chạy</h1>'+
+            '<p class="bs-hdsub">Cập nhật theo doanh số thực tế</p>'+
+          '</div>'+
+        '</div>'+
+        '<div class="bs-gtabs">'+gtabHtml+'</div>'+
+      '</div>'+
+      (ranked.length===0
+        ?'<div class="bs-empty">Không có sách nào trong danh mục này.</div>'
+        :'<div class="bs-body"><div class="bs-list">'+listHtml+'</div>'+pvHtml+'</div>'
+      )+
+    '</div>';
+}
+function renderNewBooks(){
+  const _now=new Date(),_ms=90*24*60*60*1000;
+  const isRecent=p=>p.tag==='new'||(p.releaseDate&&(_now-new Date(p.releaseDate))<=_ms);
+  const base=P.filter(p=>(p.cat==='sach'||p.ebook||p.audio)&&isRecent(p));
+  const allGenres=[...new Set(base.map(p=>p.genre).filter(Boolean))];
+  const allNxbs=[...new Set(base.map(p=>p.nxb))].sort((a,b)=>a.localeCompare(b,'vi'));
+  /* ── Apply filters ── */
+  let list=base.slice();
+  if(nbQ){const q=nbQ.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)||(p.nxb||'').toLowerCase().includes(q));}
+  if(nbAud.length)list=list.filter(p=>nbAud.some(a=>p.aud&&p.aud.includes(a)));
+  if(nbGenreFilter.length)list=list.filter(p=>nbGenreFilter.includes(p.genre));
+  if(nbNxbFilter.length)list=list.filter(p=>nbNxbFilter.includes(p.nxb));
+  if(nbBookfmt==='giay')list=list.filter(p=>!p.ebook&&!p.audio);
+  else if(nbBookfmt==='ebook')list=list.filter(p=>!!p.ebook);
+  else if(nbBookfmt==='audio')list=list.filter(p=>!!p.audio);
+  if(nbPrice==='lo')list=list.filter(p=>p.price<100000);
+  else if(nbPrice==='mid')list=list.filter(p=>p.price>=100000&&p.price<300000);
+  else if(nbPrice==='hi')list=list.filter(p=>p.price>=300000);
+  else if(nbPrice==='custom'){if(nbPriceMin>0)list=list.filter(p=>p.price>=nbPriceMin);if(nbPriceMax>0)list=list.filter(p=>p.price<=nbPriceMax);}
+  if(nbRating)list=list.filter(p=>p.rate>=(+nbRating));
+  if(nbSale)list=list.filter(p=>p.old>p.price);
+  if(nbInstock)list=list.filter(p=>p.instock!==false);
+  /* ── Sort ── */
+  if(nbSort==='date')list.sort((a,b)=>new Date(b.releaseDate||'2000-01-01')-new Date(a.releaseDate||'2000-01-01'));
+  else if(nbSort==='sold')list.sort((a,b)=>b.sold-a.sold);
+  else if(nbSort==='rate')list.sort((a,b)=>b.rate-a.rate);
+  else if(nbSort==='priceAsc')list.sort((a,b)=>a.price-b.price);
+  else if(nbSort==='priceDesc')list.sort((a,b)=>b.price-a.price);
+  /* ── Sidebar helpers ── */
+  const audOpts=Object.entries(AUD).map(([k,v])=>'<label><input type="checkbox" class="sq-chk"'+(nbAud.includes(k)?' checked':'')+' onchange="nbToggleAud(\''+k+'\')">'+v+'</label>').join('');
+  const GLIMIT=4,_gkeys=Object.keys(GENRE).filter(k=>allGenres.includes(k));
+  const visG=nbGenreExpanded?_gkeys:_gkeys.slice(0,GLIMIT);
+  const genreOpts=visG.map(k=>'<label><input type="checkbox" class="sq-chk"'+(nbGenreFilter.includes(k)?' checked':'')+' onchange="nbToggleGenre(\''+k+'\')"><span>'+GENRE[k]+'</span></label>').join('')+
+    (_gkeys.length>GLIMIT?'<button class="brand-more" onclick="nbGenreExpanded=!nbGenreExpanded;renderNewBooks()">'+(nbGenreExpanded?'Rút gọn ▲':'Xem thêm '+(_gkeys.length-GLIMIT)+' ▼')+'</button>':'');
+  const NLIMIT=5,visN=nbNxbExpanded?allNxbs:allNxbs.slice(0,NLIMIT);
+  const nxbOpts=visN.map(n=>'<label><input type="checkbox" class="sq-chk"'+(nbNxbFilter.includes(n)?' checked':'')+' onchange="nbToggleNxb(\''+n.replace(/'/g,"\\'")+'\')">&nbsp;'+n+'</label>').join('')+
+    (allNxbs.length>NLIMIT?'<button class="brand-more" onclick="nbNxbExpanded=!nbNxbExpanded;renderNewBooks()">'+(nbNxbExpanded?'Rút gọn ▲':'Xem thêm '+(allNxbs.length-NLIMIT)+' ▼')+'</button>':'');
+  const fmtOpts='<label><input type="radio" name="nbfmt"'+(nbBookfmt===null?' checked':'')+' onchange="nbBookfmt=null;renderNewBooks()">Tất cả</label>'+
+    '<label><input type="radio" name="nbfmt"'+(nbBookfmt==='giay'?' checked':'')+' onchange="nbBookfmt=\'giay\';renderNewBooks()">📚 Sách giấy</label>'+
+    '<label><input type="radio" name="nbfmt"'+(nbBookfmt==='ebook'?' checked':'')+' onchange="nbBookfmt=\'ebook\';renderNewBooks()">📖 Ebook</label>'+
+    '<label><input type="radio" name="nbfmt"'+(nbBookfmt==='audio'?' checked':'')+' onchange="nbBookfmt=\'audio\';renderNewBooks()">🎧 Sách nói</label>';
+  const prOpts=[['all','Tất cả'],['lo','Dưới 100.000đ'],['mid','100.000 – 300.000đ'],['hi','Trên 300.000đ'],['custom','Tùy chỉnh']].map(([k,v])=>
+    '<label><input type="radio" name="nbprice"'+(nbPrice===k?' checked':'')+' onchange="nbPrice=\''+k+'\''+(k!=='custom'?';nbPriceMin=0;nbPriceMax=0':'')+';renderNewBooks()">'+v+'</label>').join('')+
+    (nbPrice==='custom'?'<div class="price-custom"><input id="nbPrMin" type="number" class="price-inp" min="0" value="'+(nbPriceMin||'')+'" placeholder="Từ" onkeydown="if(event.key===\'Enter\')nbApplyPrice()"><span class="price-sep">–</span><input id="nbPrMax" type="number" class="price-inp" min="0" value="'+(nbPriceMax||'')+'" placeholder="Đến" onkeydown="if(event.key===\'Enter\')nbApplyPrice()"><button class="price-go" onclick="nbApplyPrice()">OK</button></div>':'');
+  const ratOpts='<label><input type="radio" name="nbrat"'+(nbRating===null?' checked':'')+' onchange="nbRating=null;renderNewBooks()">Tất cả</label>'+
+    ['4','3','2','1'].map(r=>'<label><input type="radio" name="nbrat"'+(nbRating===r?' checked':'')+' onchange="nbRating=\''+r+'\';renderNewBooks()">'+r+'★ trở lên</label>').join('');
+  /* ── Chips ── */
+  const chips=[];
+  if(nbQ)chips.push(['q','Tìm: "'+nbQ+'"','nbQ=\'\';renderNewBooks()']);
+  nbAud.forEach(a=>chips.push(['aud_'+a,AUD[a],'nbToggleAud(\''+a+'\')']));
+  nbGenreFilter.forEach(g=>chips.push(['g_'+g,GENRE[g],'nbToggleGenre(\''+g+'\')']));
+  nbNxbFilter.forEach(n=>chips.push(['n_'+n,n,'nbToggleNxb(\''+n.replace(/'/g,"\\'")+'\')']));
+  if(nbBookfmt)chips.push(['fmt',{giay:'Sách giấy',ebook:'Ebook',audio:'Sách nói'}[nbBookfmt],'nbBookfmt=null;renderNewBooks()']);
+  if(nbPrice!=='all')chips.push(['price',nbPrice==='custom'?(nbPriceMin>0||nbPriceMax>0?'Giá: '+(nbPriceMin||0)+'–'+(nbPriceMax||'∞'):'Tùy chỉnh'):PRICE_LBL[nbPrice],'nbPrice=\'all\';nbPriceMin=0;nbPriceMax=0;renderNewBooks()']);
+  if(nbRating)chips.push(['rat','Đánh giá '+nbRating+'★+','nbRating=null;renderNewBooks()']);
+  if(nbSale)chips.push(['sale','Đang giảm giá','nbSale=false;renderNewBooks()']);
+  if(nbInstock)chips.push(['ins','Còn hàng','nbInstock=false;renderNewBooks()']);
+  const chipsHtml=chips.length
+    ?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="'+c[2]+'">×</button></span>').join('')+'<button class="freset" onclick="nbResetFilters()">Xóa tất cả</button></div>'
+    :'';
+  /* ── Grid ── */
+  function nbCard(p){return '<div class="nb-card-wrap">'+hmCard(p)+'<span class="nb-badge-new">MỚI</span></div>';}
+  const sortOpts=[['date','Mới nhất'],['sold','Bán chạy'],['rate','Đánh giá cao'],['priceAsc','Giá thấp→cao'],['priceDesc','Giá cao→thấp']]
+    .map(([k,v])=>'<option value="'+k+'"'+(nbSort===k?' selected':'')+'>'+v+'</option>').join('');
+  const grid=list.length===0
+    ?'<div class="list-empty"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg><p>Không tìm thấy sách mới phù hợp.</p><button onclick="nbResetFilters()">Xóa bộ lọc</button></div>'
+    :'<div class="hm-grid g4">'+list.map(nbCard).join('')+'</div>';
+  const hasFilter=chips.length>0;
+  document.getElementById('app').innerHTML=
+    mkCrumb([["Trang chủ","go('home')"],["Sách mới"]])+
+    '<div class="nb-page">'+
+      '<div class="bs-hero" style="background-image:url('+uimg('1512820790803-83ca734da794',1400)+')">'+
+        '<div class="bs-hero-ov"></div>'+
+        '<div class="bs-hero-box">'+
+          '<h1 class="bs-hdtitle">Sách Mới Nhất</h1>'+
+          '<p class="bs-hdsub">Những tựa sách vừa ra mắt — cập nhật liên tục</p>'+
+        '</div>'+
+      '</div>'+
+      '<div class="nb-wrap">'+
+        '<div class="listing">'+
+          '<aside class="filters">'+
+            '<div class="filt-head"><h4>Bộ lọc</h4>'+(hasFilter?'<button class="freset-sm" onclick="nbResetFilters()">Đặt lại</button>':'')+'</div>'+
+            '<div class="fgroup"><div class="ftitle">Tìm trong danh mục</div><div class="filt-search"><input value="'+nbQ.replace(/"/g,'&quot;')+'" placeholder="Tên, tác giả…" onkeydown="if(event.key===\'Enter\')nbSetQ(this.value)"><button onclick="nbSetQ(this.previousElementSibling.value)">Tìm</button></div></div>'+
+            '<div class="fgroup"><div class="ftitle">Đối tượng</div>'+audOpts+'</div>'+
+            (genreOpts?'<div class="fgroup"><div class="ftitle genre-ftitle">Thể loại</div>'+genreOpts+'</div>':'')+
+            (allNxbs.length>1?'<div class="fgroup"><div class="ftitle">Nhà xuất bản</div>'+nxbOpts+'</div>':'')+
+            '<div class="fgroup"><div class="ftitle">Định dạng</div>'+fmtOpts+'</div>'+
+            '<div class="fgroup"><div class="ftitle">Khoảng giá</div>'+prOpts+'</div>'+
+            '<div class="fgroup"><div class="ftitle">Đánh giá</div>'+ratOpts+'</div>'+
+            '<div class="fgroup"><div class="ftitle">Khác</div>'+
+              '<label><input type="checkbox" class="sq-chk"'+(nbSale?' checked':'')+' onchange="nbSale=this.checked;renderNewBooks()">Đang giảm giá</label>'+
+              '<label><input type="checkbox" class="sq-chk"'+(nbInstock?' checked':'')+' onchange="nbInstock=this.checked;renderNewBooks()">Chỉ còn hàng</label>'+
+            '</div>'+
+          '</aside>'+
+          '<div>'+
+            chipsHtml+
+            '<div class="list-top"><span class="cnt">'+
+              (hasFilter?'<b>'+list.length+'</b><span class="cnt-slash">/</span><span class="cnt-total">'+base.length+'</span> tựa sách mới':'<b>'+list.length+'</b> tựa sách mới')+
+            '</span>'+
+              '<div class="list-top-r"><select onchange="nbSort=this.value;renderNewBooks()">'+sortOpts+'</select></div>'+
+            '</div>'+
+            grid+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+}
 function renderListing(){
   let title='Tất cả sản phẩm', base=P.slice(), ctxKey='all', catKey=null, heroDesc='', audKey=null, ebSubTab=null, isVpp=false, isTbgd=false, collCtx=null;
   if(typeof arg==='string'){
@@ -1062,15 +1312,15 @@ function renderListing(){
     else if(arg.startsWith('mood:')){const mk=arg.slice(5);const mood=MOODS.find(m=>m.k===mk);if(mood){title=mood.e+' '+mood.l;base=P.filter(mood.fn);ctxKey='mood:'+mk;heroDesc='Gợi ý được chọn lọc theo tâm trạng của bạn.';}}
     else if(arg.startsWith('coll:')){const ck=arg.slice(5);const coll=COLLS.find(c=>c.id===ck);if(coll){title=coll.title;base=coll.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);ctxKey='coll:'+ck;heroDesc=coll.desc;collCtx=coll;}}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
-  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';brandExpanded=false;}
+  if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=[];filt.brand=[];filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';filt.genre=[];brandExpanded=false;genreExpanded=false;}
 
   const isBookCat=!catKey||catKey==='sach'||catKey==='ebook'||catKey==='audiobook';
   const brandLabel=(catKey==='vpp'||catKey==='tbgd')?'Thương hiệu':'Nhà xuất bản';
   const brands=[...new Set(base.map(p=>p.nxb))].sort((a,b)=>a.localeCompare(b,'vi'));
 
   let list=base.slice();
-  if(filt.aud)list=list.filter(p=>p.aud&&p.aud.includes(filt.aud));
-  if(filt.brand)list=list.filter(p=>p.nxb===filt.brand);
+  if(filt.aud.length)list=list.filter(p=>filt.aud.some(a=>p.aud&&p.aud.includes(a)));
+  if(filt.brand.length)list=list.filter(p=>filt.brand.includes(p.nxb));
   if(filt.fmt)list=list.filter(p=>(p.format||'').includes(filt.fmt));
   if(filt.price==='lo')list=list.filter(p=>p.price<100000);
   else if(filt.price==='mid')list=list.filter(p=>p.price>=100000&&p.price<300000);
@@ -1085,18 +1335,23 @@ function renderListing(){
   else if(filt.rating==='1')list=list.filter(p=>p.rate>=1);
   if(filt.sale)list=list.filter(p=>p.old>p.price);
   if(filt.instock)list=list.filter(p=>p.instock!==false);
+  if(filt.genre.length)list=list.filter(p=>filt.genre.includes(p.genre));
   if(filt.q){const q=filt.q.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q)||(p.nxb||'').toLowerCase().includes(q));}
   if(filt.sort==='sold')list.sort((a,b)=>b.sold-a.sold);
   else if(filt.sort==='priceAsc')list.sort((a,b)=>a.price-b.price);
   else if(filt.sort==='priceDesc')list.sort((a,b)=>b.price-a.price);
   else if(filt.sort==='rate')list.sort((a,b)=>b.rate-a.rate);
 
-  const audOpts=Object.entries(AUD).map(([k,v])=>'<label><input type="radio" name="faud" '+(filt.aud===k?'checked':'')+' onchange="filt.aud=\''+k+'\';renderListing()">'+v+'</label>').join('');
+  const audOpts=Object.entries(AUD).map(([k,v])=>'<label><input type="checkbox" class="sq-chk" '+(filt.aud.includes(k)?'checked':'')+' onchange="toggleAud(\''+k+'\')">'+v+'</label>').join('');
   const BRAND_LIMIT=5;
   const visibleBrands=brandExpanded?brands:brands.slice(0,BRAND_LIMIT);
-  const brandOpts='<label><input type="radio" name="fbr" '+(!filt.brand?'checked':'')+' onchange="filt.brand=null;renderListing()">Tất cả</label>'+
-    visibleBrands.map(b=>{const be=b.replace(/'/g,"\\'");return '<label><input type="radio" name="fbr" '+(filt.brand===b?'checked':'')+' onchange="filt.brand=\''+be+'\';renderListing()">'+b+'</label>';}).join('')+
+  const brandOpts=visibleBrands.map(b=>{const be=b.replace(/'/g,"\\'");return '<label><input type="checkbox" class="sq-chk" '+(filt.brand.includes(b)?'checked':'')+' onchange="toggleBrand(\''+be+'\')">'+b+'</label>';}).join('')+
     (brands.length>BRAND_LIMIT?'<button class="brand-more" onclick="brandExpanded=!brandExpanded;renderListing()">'+(brandExpanded?'Thu gọn ▲':'Xem thêm '+(brands.length-BRAND_LIMIT)+' ▼')+'</button>':'');
+  const GENRE_LIMIT=4;
+  const _genreKeys=Object.keys(GENRE);
+  const _visGenres=genreExpanded?_genreKeys:_genreKeys.slice(0,GENRE_LIMIT);
+  const genreOpts=_visGenres.map(k=>'<label><input type="checkbox" class="sq-chk" '+(filt.genre.includes(k)?'checked':'')+' onchange="toggleGenre(\''+k+'\')"><span>'+GENRE[k]+'</span></label>').join('')+(_genreKeys.length>GENRE_LIMIT?'<button class="brand-more" onclick="genreExpanded=!genreExpanded;renderListing()">'+(genreExpanded?'Rút gọn ▲':'Xem thêm '+(_genreKeys.length-GENRE_LIMIT)+' ▼')+'</button>':'');
+  const showGenreFilter=!GENRE[arg]&&!collCtx&&catKey!=='vpp'&&catKey!=='tbgd'&&catKey!=='ebook'&&catKey!=='audiobook';
   const fmtOpts=catKey==='ebook'?'<label><input type="radio" name="ffmt" '+(!filt.fmt?'checked':'')+' onchange="filt.fmt=null;renderListing()">Tất cả</label>'+['PDF','EPUB'].map(f=>'<label><input type="radio" name="ffmt" '+(filt.fmt===f?'checked':'')+' onchange="filt.fmt=\''+f+'\';renderListing()">'+f+'</label>').join(''):'';
   const showBookFmt=catKey!=='vpp'&&catKey!=='tbgd'&&catKey!=='ebook'&&catKey!=='audiobook';
   const bookFmtOpts=showBookFmt?
@@ -1116,14 +1371,15 @@ function renderListing(){
 
   const chips=[];
   if(filt.q)chips.push(['q','Tìm: "'+filt.q+'"']);
-  if(filt.aud)chips.push(['aud',AUD[filt.aud]]);
-  if(filt.brand)chips.push(['brand',filt.brand]);
+  filt.aud.forEach(a=>chips.push(['aud_'+a,AUD[a]]));
+  filt.brand.forEach(b=>chips.push(['brand_'+b,b]));
   if(filt.fmt)chips.push(['fmt',filt.fmt]);
   if(filt.price!=='all')chips.push(['price',filt.price==='custom'?(filt.priceMin>0||filt.priceMax>0?'Giá: '+(filt.priceMin>0?fmt(filt.priceMin):'0')+'–'+(filt.priceMax>0?fmt(filt.priceMax):'∞'):'Tùy chỉnh'):PRICE_LBL[filt.price]]);
   if(filt.bookfmt)chips.push(['bookfmt',{giay:'Sách giấy',ebook:'Ebook',audio:'Sách nói'}[filt.bookfmt]]);
   if(filt.rating)chips.push(['rating','Đánh giá '+filt.rating+'★+']);
   if(filt.sale)chips.push(['sale','Đang giảm giá']);
   if(filt.instock)chips.push(['instock','Còn hàng']);
+  filt.genre.forEach(g=>chips.push(['genre_'+g,'Thể loại: '+GENRE[g]]));
   const chipHtml=chips.length?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="clearFilter(\''+c[0]+'\')">×</button></span>').join('')+'<button class="freset" onclick="resetFilters()">Xóa tất cả</button></div>':'';
 
   /* Breadcrumb hierarchy */
@@ -1136,6 +1392,7 @@ function renderListing(){
   else if(arg&&arg.q){_crumb.push(['Tìm kiếm: "'+arg.q+'"']);}
   else{_crumb.push([title]);}
 
+  const _lstImg=catKey==='vpp'?null:catKey==='tbgd'?null:catKey==='sach'||GENRE[arg]?'1512820790803-83ca734da794':catKey==='ebook'||catKey==='audiobook'?'1625053376622-e462848c453f':AUD[arg]?'1512820790803-83ca734da794':null;
   document.getElementById('app').innerHTML=
   (collCtx?
     '<div class="coll-list-hero" style="background-image:url('+uimg(collCtx.img,1200)+')">'+
@@ -1151,23 +1408,32 @@ function renderListing(){
         '<span class="coll-list-cnt">'+base.length+' cuốn sách</span>'+
       '</div>'+
     '</div>':
-    ''
+    (_lstImg&&heroDesc?
+      '<div class="bs-hero lst-hero" style="background-image:url('+uimg(_lstImg,1400)+')">'+
+        '<div class="bs-hero-ov"></div>'+
+        '<div class="bs-hero-box">'+
+          '<h1 class="bs-hdtitle">'+title+'</h1>'+
+          '<p class="bs-hdsub">'+heroDesc+'</p>'+
+        '</div>'+
+      '</div>'
+    :'')
   )+
   mkCrumb(_crumb)+
   '<div class="listing">'+
     '<aside class="filters">'+
       '<div class="filt-head"><h4>Bộ lọc</h4>'+(chips.length?'<button class="freset-sm" onclick="resetFilters()">Đặt lại</button>':'')+'</div>'+
       '<div class="fgroup"><div class="ftitle">Tìm trong danh mục</div><div class="filt-search"><input value="'+filt.q.replace(/"/g,'&quot;')+'" placeholder="Tên, tác giả…" onkeydown="if(event.key===\'Enter\')setSearchQ(this.value)"><button onclick="setSearchQ(this.previousElementSibling.value)">Tìm</button></div></div>'+
-      '<div class="fgroup"><div class="ftitle">Đối tượng</div><label><input type="radio" name="faud" '+(!filt.aud?'checked':'')+' onchange="filt.aud=null;renderListing()">Tất cả</label>'+audOpts+'</div>'+
+      '<div class="fgroup"><div class="ftitle">Đối tượng</div>'+audOpts+'</div>'+
+      (showGenreFilter?'<div class="fgroup"><div class="ftitle genre-ftitle">Thể loại</div>'+genreOpts+'</div>':'')+
       (brands.length>1?'<div class="fgroup"><div class="ftitle">'+brandLabel+'</div>'+brandOpts+'</div>':'')+
       (fmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng số</div>'+fmtOpts+'</div>':'')+
       (bookFmtOpts?'<div class="fgroup"><div class="ftitle">Định dạng</div>'+bookFmtOpts+'</div>':'')+
       '<div class="fgroup"><div class="ftitle">Khoảng giá</div>'+priceOpts+'</div>'+
       '<div class="fgroup"><div class="ftitle">Đánh giá</div>'+ratingOpts+'</div>'+
-      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label><label><input type="checkbox" '+(filt.instock?'checked':'')+' onchange="filt.instock=this.checked;renderListing()">Chỉ còn hàng</label></div>'+
+      '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" class="sq-chk" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label><label><input type="checkbox" class="sq-chk" '+(filt.instock?'checked':'')+' onchange="filt.instock=this.checked;renderListing()">Chỉ còn hàng</label></div>'+
     '</aside>'+
     '<div>'+
-      (!collCtx&&heroDesc?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+
+      (!collCtx&&heroDesc&&!_lstImg?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+
       (ebSubTab!==null?'<div class="eb-subtabs">'+
         ['all','ebook','audio'].map(k=>({all:'Tất cả',ebook:'📖 Ebook',audio:'🎧 Sách nói'})[k]).map((lbl,i)=>{const k=['all','ebook','audio'][i];return '<button class="eb-stab'+(ebSubTab===k?' active':'')+'" onclick="go(\'listing\','+(k==='all'?'\'ebook\'':k==='audio'?'\'audiobook\'':'\'ebook\'')+')">'+lbl+'</button>';}).join('')+
         '<a class="eb-lib-link" onclick="go(\'library\')">📚 Tủ sách của tôi</a>'+
@@ -1464,6 +1730,7 @@ let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFil
 let orderFilter='all';
 let libFilter='all';
 let bstabFmt='all';
+let bsGenre='all',bsFmt='all',bsActive=0;
 let vppSub='all';
 let tbgdSub='all';
 let returns=LS.get('returns',[]);
