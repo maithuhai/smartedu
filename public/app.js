@@ -1453,6 +1453,14 @@ let admVoucherEditId=null;
 let admFlashSaleEditId=null, admFlashSaleDetailId=null;
 let admFsFilter='all';
 let admPointsTab='settings';
+// System Settings
+let admSettingsTab='general';
+let admSettingsGeneralTab='info';
+let admSettingsPaymentTab='gateways';
+// Email & Notification Management
+let admNotifTab='compose';
+let admEmailPage=0, admEmailSearch='';
+let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
 let libFilter='all';
 let bstabFmt='all';
@@ -3149,6 +3157,100 @@ if(!promoPoints){
 }
 function savePromoPoints(){LS.set('promoPoints',promoPoints);}
 
+// ===== Email & Notifications =====
+let emailCampaigns=LS.get('emailCampaigns',null);
+if(!emailCampaigns){
+  emailCampaigns=[
+    {id:'EM-001',subject:'Thông báo khai giảng năm học 2025–2026',targetGroup:'all',targetCount:15420,sentAt:'05/08/2025',sentBy:'Admin',status:'sent',content:'<h2>Chuẩn bị cho năm học mới!</h2><p>EduMart trân trọng thông báo các chương trình ưu đãi mừng khai giảng năm học 2025–2026. Hãy ghé thăm sàn để nhận voucher giảm 25%.</p>',stats:{sent:15420,opened:7242,clicked:2150,bounced:312,unsubscribed:48}},
+    {id:'EM-002',subject:'🎁 Flash Sale 20/11 — Tri ân thầy cô giáo',targetGroup:'all',targetCount:15420,sentAt:'18/11/2025',sentBy:'Admin',status:'sent',content:'<h2>Flash Sale tri ân Ngày Nhà giáo Việt Nam</h2><p>Nhân dịp 20/11, EduMart tổ chức Flash Sale đặc biệt với hàng nghìn sản phẩm giảm giá sâu từ 30–60%.</p>',stats:{sent:15420,opened:9105,clicked:4320,bounced:289,unsubscribed:31}},
+    {id:'EM-003',subject:'🥇 Chúc mừng bạn đã đạt hạng Vàng!',targetGroup:'buyer',targetCount:4231,sentAt:'01/06/2025',sentBy:'Admin',status:'sent',content:'<h2>Chào mừng bạn gia nhập hạng Vàng</h2><p>Bạn đã tích lũy đủ 2.000 điểm để lên hạng Vàng. Từ nay bạn được hưởng hệ số tích điểm x1.5 và voucher sinh nhật đặc biệt.</p>',stats:{sent:4231,opened:3105,clicked:1820,bounced:87,unsubscribed:12}},
+    {id:'EM-004',subject:'📈 Bí quyết tăng doanh số cho Seller EduMart',targetGroup:'seller',targetCount:892,sentAt:'15/06/2025',sentBy:'Admin',status:'sent',content:'<h2>Tối ưu gian hàng để tăng doanh thu</h2><p>Chúng tôi tổng hợp 5 chiến lược hiệu quả nhất giúp Seller tăng tỷ lệ chuyển đổi trên EduMart.</p>',stats:{sent:892,opened:621,clicked:298,bounced:14,unsubscribed:7}},
+    {id:'EM-005',subject:'🎉 Voucher đặc biệt dành riêng cho bạn!',targetGroup:'new',targetCount:2145,sentAt:'20/06/2025',sentBy:'Admin',status:'sent',content:'<h2>Chào mừng đến với EduMart!</h2><p>Cảm ơn bạn đã đăng ký tài khoản. Sử dụng mã NEWUSER30 để được giảm 30% đơn hàng đầu tiên.</p>',stats:{sent:2145,opened:1876,clicked:1240,bounced:42,unsubscribed:19}},
+    {id:'EM-006',subject:'📋 Cập nhật Điều khoản sử dụng EduMart',targetGroup:'all',targetCount:15420,sentAt:'01/06/2025',sentBy:'Admin',status:'sent',content:'<h2>Điều khoản sử dụng được cập nhật</h2><p>EduMart đã cập nhật Điều khoản sử dụng có hiệu lực từ ngày 01/07/2025. Vui lòng đọc kỹ trước khi tiếp tục sử dụng dịch vụ.</p>',stats:{sent:15420,opened:5102,clicked:2840,bounced:401,unsubscribed:88}}
+  ];
+  LS.set('emailCampaigns',emailCampaigns);
+}
+function saveEmailCampaigns(){LS.set('emailCampaigns',emailCampaigns);}
+
+let newsletterSubs=LS.get('newsletterSubs',null);
+if(!newsletterSubs){
+  newsletterSubs=[
+    {id:'NS-001',email:'nguyen.an@gmail.com',name:'Nguyễn An',userId:'U001',subscribedAt:'01/01/2025',status:'active',source:'register',tags:['hocsinh']},
+    {id:'NS-002',email:'tran.binh@yahoo.com',name:'Trần Bình',userId:'U002',subscribedAt:'05/01/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-003',email:'le.cam@outlook.com',name:'Lê Cẩm',userId:'U003',subscribedAt:'10/01/2025',status:'unsubscribed',source:'register',tags:['buyer']},
+    {id:'NS-004',email:'pham.dung@gmail.com',name:'Phạm Dũng',userId:'U004',subscribedAt:'12/01/2025',status:'active',source:'register',tags:['seller']},
+    {id:'NS-005',email:'hoang.em@gmail.com',name:'Hoàng Em',userId:'U005',subscribedAt:'15/01/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-006',email:'vu.phuong@gmail.com',name:'Vũ Phương',userId:'U006',subscribedAt:'18/01/2025',status:'active',source:'manual',tags:['giaovien']},
+    {id:'NS-007',email:'do.giang@gmail.com',name:'Đỗ Giang',userId:'U007',subscribedAt:'20/01/2025',status:'unsubscribed',source:'register',tags:['sinhvien']},
+    {id:'NS-008',email:'bui.huong@gmail.com',name:'Bùi Hương',userId:'U008',subscribedAt:'22/01/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-009',email:'ngo.ich@gmail.com',name:'Ngô Ích',userId:'U009',subscribedAt:'25/01/2025',status:'active',source:'register',tags:['seller']},
+    {id:'NS-010',email:'dinh.khanh@gmail.com',name:'Đinh Khánh',userId:'U010',subscribedAt:'28/01/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-011',email:'trinh.lan@gmail.com',name:'Trịnh Lan',userId:'U011',subscribedAt:'01/02/2025',status:'unsubscribed',source:'register',tags:['buyer']},
+    {id:'NS-012',email:'cao.minh@gmail.com',name:'Cao Minh',userId:'U012',subscribedAt:'05/02/2025',status:'active',source:'manual',tags:['giaovien']},
+    {id:'NS-013',email:'ly.nga@gmail.com',name:'Lý Nga',userId:'U013',subscribedAt:'10/02/2025',status:'active',source:'register',tags:['hocsinh']},
+    {id:'NS-014',email:'thai.oanh@gmail.com',name:'Thái Oanh',userId:'U014',subscribedAt:'15/02/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-015',email:'ha.phat@gmail.com',name:'Hà Phát',userId:'U015',subscribedAt:'20/02/2025',status:'active',source:'register',tags:['seller']},
+    {id:'NS-016',email:'truc.quoc@gmail.com',name:'Trúc Quốc',userId:'U016',subscribedAt:'01/03/2025',status:'active',source:'checkout',tags:['buyer']},
+    {id:'NS-017',email:'mai.rong@gmail.com',name:'Mai Rồng',userId:'U017',subscribedAt:'05/03/2025',status:'unsubscribed',source:'register',tags:['buyer']},
+    {id:'NS-018',email:'truong.son@gmail.com',name:'Trương Sơn',userId:'U018',subscribedAt:'10/03/2025',status:'active',source:'manual',tags:['seller']},
+    {id:'NS-019',email:'vo.tam@gmail.com',name:'Võ Tâm',userId:'U019',subscribedAt:'15/03/2025',status:'active',source:'register',tags:['hocsinh']},
+    {id:'NS-020',email:'chu.uan@gmail.com',name:'Chử Uẩn',userId:'U020',subscribedAt:'20/03/2025',status:'active',source:'checkout',tags:['buyer']}
+  ];
+  LS.set('newsletterSubs',newsletterSubs);
+}
+function saveNewsletterSubs(){LS.set('newsletterSubs',newsletterSubs);}
+
+// ---- System Config seed ----
+let sysConfig=LS.get('sysConfig',null);
+if(!sysConfig){
+  sysConfig={
+    siteName:'EduMart',siteDesc:'Sàn thương mại điện tử sách & thiết bị giáo dục hàng đầu Việt Nam',
+    logoUrl:'/logo.png',faviconUrl:'/favicon.ico',
+    email:'support@edumart.vn',phone:'1900 1234',
+    address:'123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+    facebook:'https://facebook.com/edumart.vn',zalo:'0901234567',
+    timezone:'Asia/Ho_Chi_Minh',currency:'VND',currencySymbol:'đ',dateFormat:'DD/MM/YYYY',
+    modules:{ebook:true,vpp:true,tbgd:true,audiobook:true,blog:true,flashsale:true,voucher:true,points:true,review:true,chat:false}
+  };
+  LS.set('sysConfig',sysConfig);
+}
+function saveSysConfig(){LS.set('sysConfig',sysConfig);}
+
+let sysPayment=LS.get('sysPayment',null);
+if(!sysPayment){
+  sysPayment={
+    gateways:[
+      {id:'momo',name:'MoMo',icon:'💜',enabled:true,clientId:'MOMOPAY_PARTNER_CODE',secretKey:'momo_secret_key_***',env:'sandbox',desc:'Ví điện tử MoMo'},
+      {id:'zalopay',name:'ZaloPay',icon:'🔵',enabled:true,clientId:'553035',secretKey:'PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL',env:'sandbox',desc:'Ví ZaloPay / ZaloPay Gateway'},
+      {id:'vnpay',name:'VNPAY',icon:'🔴',enabled:false,clientId:'EDUMART01',secretKey:'EDUMARTSECRETKEY2025',env:'production',desc:'Cổng thanh toán VNPAY (ATM, Visa, Master)'}
+    ],
+    shipping:{
+      freeThreshold:300000,
+      regions:[
+        {id:'hcm',name:'TP. Hồ Chí Minh',fee:20000},
+        {id:'hn',name:'Hà Nội',fee:25000},
+        {id:'central',name:'Miền Trung',fee:35000},
+        {id:'north',name:'Miền Bắc (ngoài HN)',fee:40000},
+        {id:'south',name:'Miền Nam (ngoài HCM)',fee:35000},
+        {id:'remote',name:'Vùng xa / Hải đảo',fee:60000}
+      ]
+    },
+    tax:{vatEnabled:true,vatRate:10,vatIncluded:false,taxCode:'0312345678',companyName:'Công ty Cổ phần EduMart',taxAddress:'123 Nguyễn Huệ, Q.1, TP.HCM'}
+  };
+  LS.set('sysPayment',sysPayment);
+}
+function saveSysPayment(){LS.set('sysPayment',sysPayment);}
+
+let sysOAuth=LS.get('sysOAuth',null);
+if(!sysOAuth){
+  sysOAuth={
+    google:{enabled:true,clientId:'123456789-abcdefghijk.apps.googleusercontent.com',clientSecret:'GOCSPX-secretkey_placeholder',redirectUri:'https://edumart.vn/auth/google/callback'},
+    facebook:{enabled:false,appId:'1234567890123456',appSecret:'fb_appsecret_placeholder',redirectUri:'https://edumart.vn/auth/facebook/callback'}
+  };
+  LS.set('sysOAuth',sysOAuth);
+}
+function saveSysOAuth(){LS.set('sysOAuth',sysOAuth);}
+
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _admLevelLbl(l){return {super:'Toàn quyền',readonly:'Chỉ xem',content:'Nội dung'}[l]||l;}
 function fmtMil(n){if(n>=1e9)return (n/1e9).toFixed(1).replace('.',',')+'B';if(n>=1e6)return Math.round(n/1e6)+'M';return n.toLocaleString('vi-VN');}
@@ -3162,6 +3264,8 @@ function adminContent(){
   if(acctTab==='adm-finance') return adminFinance();
   if(acctTab==='adm-cms')     return adminCms();
   if(acctTab==='adm-promo')   return adminPromo();
+  if(acctTab==='adm-notif')    return adminNotif();
+  if(acctTab==='adm-settings') return adminSettings();
   if(acctTab==='adm-shops')   return adminShops();
   return adminOverview();
 }
@@ -4906,13 +5010,15 @@ function adminFinance(){
   const tabs=[['overview','Tổng quan tài chính'],['withdrawals','Thanh toán Seller'],['history','Lịch sử thanh toán']];
   const pendingCnt=finWithdrawals.filter(w=>w.status==='pending').length;
   const content=tab==='withdrawals'?adminFinWithdrawals():tab==='history'?adminFinPayHistory():adminFinOverview();
-  return `<div class="adm-ncc-doc-title">Quản lý Tài chính</div>
-  <div class="adm-shops-tab" style="margin-bottom:18px;">
+  return `<div class="adm-section">
+  <h2 class="adm-section-title">Quản lý Tài chính</h2>
+  <div class="adm-shops-tabs">
     ${tabs.map(([k,lbl])=>`<button class="adm-tab-btn${tab===k?' active':''}" onclick="admFinTab='${k}';renderAccount()">
       ${escHtml(lbl)}${k==='withdrawals'&&pendingCnt>0?` <span class="adm-tab-badge">${pendingCnt}</span>`:''}
     </button>`).join('')}
   </div>
-  ${content}`;
+  ${content}
+  </div>`;
 }
 
 function adminFinOverview(){
@@ -5033,7 +5139,7 @@ function adminFinWithdrawals(){
     </div>`:''}
   </div>`).join('');
 
-  return `<div class="adm-shops-tab" style="margin-bottom:14px;">
+  return `<div class="adm-shops-tabs">
     ${subTabs.map(([k,lbl])=>`<button class="adm-tab-btn${subTab===k?' active':''}" onclick="admFinWithdrawTab='${k}';renderAccount()">
       ${escHtml(lbl)}${tabCounts[k]>0?' <span class="adm-tab-badge">'+tabCounts[k]+'</span>':''}
     </button>`).join('')}
@@ -5176,13 +5282,15 @@ function adminCms(){
     admCmsTab==='banners'?adminCmsBanners():
     admCmsTab==='static'?adminCmsStatic():
     adminCmsBlogSection();
-  return `<div class="adm-ncc-doc-title">Quản lý Nội dung</div>
-  <div class="adm-shops-tab" style="margin-bottom:18px;">
+  return `<div class="adm-section">
+  <h2 class="adm-section-title">Quản lý Nội dung</h2>
+  <div class="adm-shops-tabs">
     ${tabs.map(([k,lbl])=>`<button class="adm-tab-btn${admCmsTab===k?' active':''}" onclick="admCmsTab='${k}';admBlogEditId=null;renderAccount()">
       ${escHtml(lbl)}${k==='comments'&&pendingCmt>0?' <span class="adm-tab-badge">'+pendingCmt+'</span>':''}
     </button>`).join('')}
   </div>
-  ${content}`;
+  ${content}
+  </div>`;
 }
 
 /* ── BLOG ── */
@@ -5458,7 +5566,7 @@ function doCmtBanUser(id){
 function adminCmsBanners(){
   const subTabs=[['banners','Banner trang chủ'],['popup','Popup khuyến mãi']];
   const content=admCmsBannerSubTab==='popup'?adminCmsPopupForm():adminCmsBannerList();
-  return `<div class="adm-shops-tab" style="margin-bottom:14px;">
+  return `<div class="adm-shops-tabs">
     ${subTabs.map(([k,lbl])=>`<button class="adm-tab-btn${admCmsBannerSubTab===k?' active':''}" onclick="admCmsBannerSubTab='${k}';renderAccount()">${escHtml(lbl)}</button>`).join('')}
   </div>${content}`;
 }
@@ -5596,7 +5704,7 @@ function adminCmsStatic(){
   const pages=[['about','Về chúng tôi'],['terms','Điều khoản sử dụng'],['privacy','Chính sách bảo mật'],['returns','Chính sách đổi/trả']];
   const cur=admStaticPage;
   const pageData=cmsStaticPages[cur]||{title:'',content:'',updatedAt:''};
-  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+  return `<div class="adm-shops-tabs">
     ${pages.map(([k,lbl])=>`<button class="adm-tab-btn${cur===k?' active':''}" onclick="admStaticPage='${k}';renderAccount()">${escHtml(lbl)}</button>`).join('')}
   </div>
   <div class="cms-side-section" style="max-width:860px;">
@@ -5644,7 +5752,7 @@ function adminPromo(){
     adminPromoVouchers();
   return `<div class="adm-section">
     <h2 class="adm-section-title">Quản lý Khuyến mãi</h2>
-    <div class="adm-shops-tab" style="margin-bottom:18px;">
+    <div class="adm-shops-tabs">
       ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admPromoTab===k?' active':''}" onclick="admPromoTab='${k}';admVoucherEditId=null;admFlashSaleEditId=null;admFlashSaleDetailId=null;renderAccount()">${lbl}</button>`).join('')}
     </div>
     ${content}
@@ -6026,7 +6134,7 @@ function adminPromoPoints(){
     admPointsTab==='stats'?adminPromoPointsStats():
     adminPromoPointsSettings();
   return `<div>
-    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+    <div class="adm-shops-tabs">
       ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admPointsTab===k?' active':''}" onclick="admPointsTab='${k}';renderAccount()">${lbl}</button>`).join('')}
     </div>${content}
   </div>`;
@@ -6171,9 +6279,822 @@ function doSavePointsConfig(){
   savePromoPoints();renderAccount();toast('Đã lưu cài đặt điểm thưởng');
 }
 
+// =====================================================================
+// CÀI ĐẶT HỆ THỐNG
+// =====================================================================
+const SYS_MODULES={
+  ebook:{label:'Sách điện tử (Ebook)',icon:'📖',desc:'Cho phép mua/bán file ebook'},
+  vpp:{label:'Văn phòng phẩm (VPP)',icon:'✏️',desc:'Danh mục văn phòng phẩm'},
+  tbgd:{label:'Thiết bị giáo dục',icon:'🔭',desc:'Thiết bị dạy học, thí nghiệm'},
+  audiobook:{label:'Sách nói (Audiobook)',icon:'🎧',desc:'Nội dung audio bản quyền'},
+  blog:{label:'Blog / Tin tức',icon:'📰',desc:'Hệ thống bài viết & tin tức'},
+  flashsale:{label:'Flash Sale',icon:'⚡',desc:'Chương trình khuyến mãi theo giờ'},
+  voucher:{label:'Mã giảm giá',icon:'🏷️',desc:'Hệ thống voucher toàn sàn'},
+  points:{label:'Điểm thưởng',icon:'⭐',desc:'Chương trình tích lũy điểm'},
+  review:{label:'Đánh giá sản phẩm',icon:'⭐',desc:'Cho phép người mua đánh giá'},
+  chat:{label:'Chat trực tiếp',icon:'💬',desc:'Chat giữa buyer và seller'}
+};
+const SYS_TIMEZONES=['Asia/Ho_Chi_Minh','Asia/Bangkok','Asia/Singapore','Asia/Tokyo','UTC'];
+const SYS_CURRENCIES=[{code:'VND',symbol:'đ',name:'Việt Nam Đồng'},{code:'USD',symbol:'$',name:'US Dollar'},{code:'EUR',symbol:'€',name:'Euro'}];
+const SYS_DATE_FORMATS=['DD/MM/YYYY','MM/DD/YYYY','YYYY-MM-DD'];
+
+function adminSettings(){
+  const TABS=[['general','⚙️ Cấu hình chung'],['payment','💳 Thanh toán'],['oauth','🔐 OAuth']];
+  const content=admSettingsTab==='payment'?adminSettingsPayment():
+    admSettingsTab==='oauth'?adminSettingsOAuth():
+    adminSettingsGeneral();
+  return `<div class="adm-section">
+    <h2 class="adm-section-title">Cài đặt hệ thống</h2>
+    <div class="adm-shops-tabs">
+      ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admSettingsTab===k?' active':''}" onclick="admSettingsTab='${k}';renderAccount()">${lbl}</button>`).join('')}
+    </div>
+    ${content}
+  </div>`;
+}
+
+/* ========== GENERAL ========== */
+function adminSettingsGeneral(){
+  const SUB=[['info','Thông tin chung'],['locale','Ngôn ngữ & Khu vực'],['modules','Tính năng']];
+  const body=admSettingsGeneralTab==='locale'?_sysGeneralLocale():
+    admSettingsGeneralTab==='modules'?_sysGeneralModules():
+    _sysGeneralInfo();
+  return `<div class="sys-sub-tabs" style="margin-bottom:16px">
+    ${SUB.map(([k,lbl])=>`<button class="sys-sub-btn${admSettingsGeneralTab===k?' active':''}" onclick="admSettingsGeneralTab='${k}';renderAccount()">${lbl}</button>`).join('')}
+  </div>
+  ${body}`;
+}
+
+function _sysGeneralInfo(){
+  const c=sysConfig;
+  return `<div class="sys-form-grid">
+    <div class="adm-form-card">
+      <h3 class="sys-card-title">🏢 Thông tin website</h3>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Tên website <span style="color:red">*</span></label>
+        <input id="cfgSiteName" class="cms-input" value="${escHtml(c.siteName)}" placeholder="EduMart">
+      </div>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Mô tả website</label>
+        <textarea id="cfgSiteDesc" class="cms-input" rows="2" style="resize:vertical">${escHtml(c.siteDesc)}</textarea>
+      </div>
+      <div class="sys-form-row">
+        <div style="flex:1">
+          <label class="adm-form-lbl">URL Logo</label>
+          <input id="cfgLogoUrl" class="cms-input" value="${escHtml(c.logoUrl)}" placeholder="/logo.png">
+        </div>
+        <div style="flex:1">
+          <label class="adm-form-lbl">URL Favicon</label>
+          <input id="cfgFaviconUrl" class="cms-input" value="${escHtml(c.faviconUrl)}" placeholder="/favicon.ico">
+        </div>
+      </div>
+      <div class="sys-logo-preview">
+        <div class="sys-logo-box">
+          <div style="font-size:11px;color:var(--text-soft);margin-bottom:4px">Logo preview</div>
+          <div style="width:120px;height:40px;background:var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px">📚 ${escHtml(c.siteName)}</div>
+        </div>
+        <div class="sys-logo-box">
+          <div style="font-size:11px;color:var(--text-soft);margin-bottom:4px">Favicon preview</div>
+          <div style="width:32px;height:32px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px">📚</div>
+        </div>
+      </div>
+    </div>
+    <div class="adm-form-card">
+      <h3 class="sys-card-title">📞 Thông tin liên hệ</h3>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Email hỗ trợ</label>
+        <input id="cfgEmail" class="cms-input" type="email" value="${escHtml(c.email)}" placeholder="support@edumart.vn">
+      </div>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Hotline</label>
+        <input id="cfgPhone" class="cms-input" value="${escHtml(c.phone)}" placeholder="1900 1234">
+      </div>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Địa chỉ</label>
+        <textarea id="cfgAddress" class="cms-input" rows="2" style="resize:vertical">${escHtml(c.address)}</textarea>
+      </div>
+      <div class="sys-form-row">
+        <div style="flex:1">
+          <label class="adm-form-lbl">Facebook</label>
+          <input id="cfgFacebook" class="cms-input" value="${escHtml(c.facebook)}" placeholder="https://facebook.com/...">
+        </div>
+        <div style="flex:1">
+          <label class="adm-form-lbl">Zalo</label>
+          <input id="cfgZalo" class="cms-input" value="${escHtml(c.zalo)}" placeholder="Số điện thoại Zalo">
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="adm-btn" onclick="doSaveGeneralInfo()">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function _sysGeneralLocale(){
+  const c=sysConfig;
+  return `<div class="adm-form-card" style="max-width:600px">
+    <h3 class="sys-card-title">🌏 Ngôn ngữ & Khu vực</h3>
+    <div class="sys-form-group">
+      <label class="adm-form-lbl">Múi giờ</label>
+      <select id="cfgTimezone" class="cms-input">
+        ${SYS_TIMEZONES.map(tz=>`<option value="${tz}"${c.timezone===tz?' selected':''}>${tz}</option>`).join('')}
+      </select>
+      <div class="sys-hint">Múi giờ ảnh hưởng đến hiển thị ngày giờ đơn hàng, Flash Sale, báo cáo.</div>
+    </div>
+    <div class="sys-form-group">
+      <label class="adm-form-lbl">Đơn vị tiền tệ</label>
+      <select id="cfgCurrency" class="cms-input">
+        ${SYS_CURRENCIES.map(cur=>`<option value="${cur.code}"${c.currency===cur.code?' selected':''}>${cur.name} (${cur.symbol})</option>`).join('')}
+      </select>
+    </div>
+    <div class="sys-form-group">
+      <label class="adm-form-lbl">Định dạng ngày</label>
+      <select id="cfgDateFormat" class="cms-input">
+        ${SYS_DATE_FORMATS.map(f=>`<option value="${f}"${c.dateFormat===f?' selected':''}>${f}</option>`).join('')}
+      </select>
+    </div>
+    <div class="sys-locale-preview" style="margin-top:12px;padding:14px;background:var(--paper);border-radius:8px;font-size:13.5px">
+      <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">Ví dụ hiển thị:</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div>📅 Ngày: <strong>${todayStr()}</strong></div>
+        <div>💰 Giá: <strong>${fmt(125000)}</strong></div>
+        <div>⏰ Múi giờ: <strong>${c.timezone}</strong></div>
+      </div>
+    </div>
+    <div style="margin-top:16px"><button class="adm-btn" onclick="doSaveLocale()">💾 Lưu cài đặt</button></div>
+  </div>`;
+}
+
+function _sysGeneralModules(){
+  const mods=sysConfig.modules;
+  const activeCount=Object.values(mods).filter(Boolean).length;
+  return `<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13.5px;color:var(--text-soft)">${activeCount}/${Object.keys(SYS_MODULES).length} tính năng đang bật</div>
+      <div style="display:flex;gap:8px">
+        <button class="adm-btn-sm" onclick="doToggleAllModules(true)">Bật tất cả</button>
+        <button class="adm-btn-sm" onclick="doToggleAllModules(false)">Tắt tất cả</button>
+      </div>
+    </div>
+    <div class="sys-modules-grid">
+      ${Object.entries(SYS_MODULES).map(([key,m])=>{
+        const on=!!mods[key];
+        return `<div class="sys-module-card${on?'':' disabled'}">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:22px;line-height:1">${m.icon}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:14px;color:var(--ink-deep)">${m.label}</div>
+              <div style="font-size:12.5px;color:var(--text-soft);margin-top:2px">${m.desc}</div>
+            </div>
+            <label class="sys-toggle" title="${on?'Tắt':'Bật'} ${m.label}">
+              <input type="checkbox" ${on?'checked':''} onchange="doToggleModule('${key}')">
+              <span class="sys-toggle-slider"></span>
+            </label>
+          </div>
+          <div class="sys-module-status ${on?'on':'off'}">${on?'✅ Đang hoạt động':'⚫ Đã tắt'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function doSaveGeneralInfo(){
+  const fields={
+    siteName:document.getElementById('cfgSiteName'),
+    siteDesc:document.getElementById('cfgSiteDesc'),
+    logoUrl:document.getElementById('cfgLogoUrl'),
+    faviconUrl:document.getElementById('cfgFaviconUrl'),
+    email:document.getElementById('cfgEmail'),
+    phone:document.getElementById('cfgPhone'),
+    address:document.getElementById('cfgAddress'),
+    facebook:document.getElementById('cfgFacebook'),
+    zalo:document.getElementById('cfgZalo')
+  };
+  if(!fields.siteName||!fields.siteName.value.trim()){toast('Tên website không được để trống');return;}
+  Object.entries(fields).forEach(([k,el])=>{if(el)sysConfig[k]=el.value.trim();});
+  saveSysConfig();renderAccount();toast('✅ Đã lưu thông tin website');
+}
+
+function doSaveLocale(){
+  const tz=document.getElementById('cfgTimezone');
+  const cur=document.getElementById('cfgCurrency');
+  const df=document.getElementById('cfgDateFormat');
+  if(tz)sysConfig.timezone=tz.value;
+  if(cur){sysConfig.currency=cur.value;const c=SYS_CURRENCIES.find(x=>x.code===cur.value);if(c)sysConfig.currencySymbol=c.symbol;}
+  if(df)sysConfig.dateFormat=df.value;
+  saveSysConfig();renderAccount();toast('✅ Đã lưu cài đặt khu vực');
+}
+
+function doToggleModule(key){
+  sysConfig.modules[key]=!sysConfig.modules[key];
+  saveSysConfig();renderAccount();
+  toast((sysConfig.modules[key]?'✅ Đã bật: ':'⚫ Đã tắt: ')+SYS_MODULES[key].label);
+}
+
+function doToggleAllModules(val){
+  Object.keys(sysConfig.modules).forEach(k=>{sysConfig.modules[k]=val;});
+  saveSysConfig();renderAccount();toast(val?'✅ Đã bật tất cả tính năng':'⚫ Đã tắt tất cả tính năng');
+}
+
+/* ========== PAYMENT ========== */
+function adminSettingsPayment(){
+  const SUB=[['gateways','Cổng thanh toán'],['shipping','Phí vận chuyển'],['tax','Thuế (VAT)']];
+  const body=admSettingsPaymentTab==='shipping'?_sysPayShipping():
+    admSettingsPaymentTab==='tax'?_sysPayTax():
+    _sysPayGateways();
+  return `<div class="sys-sub-tabs" style="margin-bottom:16px">
+    ${SUB.map(([k,lbl])=>`<button class="sys-sub-btn${admSettingsPaymentTab===k?' active':''}" onclick="admSettingsPaymentTab='${k}';renderAccount()">${lbl}</button>`).join('')}
+  </div>
+  ${body}`;
+}
+
+function _sysPayGateways(){
+  const gws=sysPayment.gateways;
+  return `<div>
+    <p style="margin:0 0 14px;font-size:13.5px;color:var(--text-soft)">Cấu hình các cổng thanh toán. Chú ý: không chia sẻ Secret Key với bên thứ ba. Thông tin được lưu local.</p>
+    <div class="sys-gw-grid">
+      ${gws.map(gw=>`
+        <div class="sys-gw-card${gw.enabled?'':' disabled'}">
+          <div class="sys-gw-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:28px">${gw.icon}</span>
+              <div>
+                <div style="font-weight:700;font-size:15px;color:var(--ink-deep)">${gw.name}</div>
+                <div style="font-size:12.5px;color:var(--text-soft)">${gw.desc}</div>
+              </div>
+            </div>
+            <label class="sys-toggle">
+              <input type="checkbox" ${gw.enabled?'checked':''} onchange="doToggleGateway('${gw.id}')">
+              <span class="sys-toggle-slider"></span>
+            </label>
+          </div>
+          <div class="sys-gw-body">
+            <div class="sys-cred-row">
+              <span class="sys-cred-lbl">Client ID / App ID</span>
+              <span class="sys-cred-val">${escHtml(gw.clientId)}</span>
+            </div>
+            <div class="sys-cred-row">
+              <span class="sys-cred-lbl">Secret Key</span>
+              <span class="sys-cred-val sys-masked">••••••••••••</span>
+            </div>
+            <div class="sys-cred-row">
+              <span class="sys-cred-lbl">Môi trường</span>
+              <span style="font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;${gw.env==='production'?'background:#fff3cd;color:#856404':'background:#d4edda;color:#155724'}">${gw.env==='production'?'🔴 Production':'🟢 Sandbox'}</span>
+            </div>
+          </div>
+          <div class="sys-gw-footer">
+            <button class="adm-btn-sm" onclick="doEditGateway('${gw.id}')">⚙️ Cấu hình</button>
+            <span class="sys-gw-status ${gw.enabled?'on':'off'}">${gw.enabled?'Đang hoạt động':'Đã tắt'}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="sys-gw-info" style="margin-top:16px">
+      <div style="font-size:13px;color:var(--text-soft);background:var(--paper);border-left:3px solid var(--ink);padding:10px 14px;border-radius:0 8px 8px 0;line-height:1.7">
+        💡 <strong>Sandbox</strong>: dùng để kiểm thử, giao dịch không thực. <strong>Production</strong>: giao dịch thật, cần tài khoản merchant đã được duyệt bởi đối tác thanh toán.
+      </div>
+    </div>
+  </div>`;
+}
+
+function _sysPayShipping(){
+  const s=sysPayment.shipping;
+  return `<div class="adm-form-card" style="max-width:640px">
+    <h3 class="sys-card-title">🚚 Cấu hình phí vận chuyển</h3>
+    <div class="sys-form-group">
+      <label class="adm-form-lbl">Miễn phí vận chuyển cho đơn từ (VNĐ)</label>
+      <input id="shipFreeThreshold" class="cms-input" type="number" min="0" step="10000" value="${s.freeThreshold}" style="max-width:200px">
+      <div class="sys-hint">Đặt 0 để tắt chính sách miễn phí vận chuyển.</div>
+    </div>
+    <h4 style="margin:18px 0 10px;font-size:14px;color:var(--ink-deep)">Phí theo khu vực</h4>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Khu vực</th><th style="text-align:right;width:180px">Phí (VNĐ)</th></tr></thead>
+        <tbody>
+          ${s.regions.map((r,i)=>`<tr>
+            <td>${escHtml(r.name)}</td>
+            <td><input id="shipFee_${r.id}" class="cms-input" type="number" min="0" step="1000" value="${r.fee}" style="width:140px;text-align:right"></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px"><button class="adm-btn" onclick="doSaveShipping()">💾 Lưu phí vận chuyển</button></div>
+  </div>`;
+}
+
+function _sysPayTax(){
+  const t=sysPayment.tax;
+  return `<div class="adm-form-card" style="max-width:540px">
+    <h3 class="sys-card-title">📋 Cài đặt Thuế (VAT)</h3>
+    <div class="sys-form-group" style="display:flex;align-items:center;gap:12px">
+      <label class="adm-form-lbl" style="margin:0;width:auto">Bật tính VAT</label>
+      <label class="sys-toggle">
+        <input type="checkbox" id="vatEnabled" ${t.vatEnabled?'checked':''}>
+        <span class="sys-toggle-slider"></span>
+      </label>
+      <span style="font-size:13px;color:var(--text-soft)">${t.vatEnabled?'Đang áp dụng':'Không áp dụng'}</span>
+    </div>
+    <div class="sys-form-group">
+      <label class="adm-form-lbl">Thuế suất VAT (%)</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="vatRate" class="cms-input" type="number" min="0" max="100" step="1" value="${t.vatRate}" style="width:100px">
+        <span style="font-size:13.5px;color:var(--text-soft)">%</span>
+      </div>
+    </div>
+    <div class="sys-form-group" style="display:flex;align-items:center;gap:12px">
+      <label class="adm-form-lbl" style="margin:0;width:auto">Giá đã bao gồm VAT</label>
+      <label class="sys-toggle">
+        <input type="checkbox" id="vatIncluded" ${t.vatIncluded?'checked':''}>
+        <span class="sys-toggle-slider"></span>
+      </label>
+      <span style="font-size:13px;color:var(--text-soft)">${t.vatIncluded?'Giá hiển thị đã gồm VAT':'Giá hiển thị chưa gồm VAT'}</span>
+    </div>
+    <div style="border-top:1px solid var(--line);padding-top:14px;margin-top:6px">
+      <h4 style="margin:0 0 12px;font-size:13.5px;color:var(--ink-deep)">Thông tin doanh nghiệp (xuất hóa đơn)</h4>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Tên công ty</label>
+        <input id="taxCompany" class="cms-input" value="${escHtml(t.companyName)}">
+      </div>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Mã số thuế</label>
+        <input id="taxCode" class="cms-input" value="${escHtml(t.taxCode)}" placeholder="0312345678">
+      </div>
+      <div class="sys-form-group">
+        <label class="adm-form-lbl">Địa chỉ đăng ký kinh doanh</label>
+        <input id="taxAddress" class="cms-input" value="${escHtml(t.taxAddress)}">
+      </div>
+    </div>
+    <div style="margin-top:16px"><button class="adm-btn" onclick="doSaveTax()">💾 Lưu cài đặt thuế</button></div>
+  </div>`;
+}
+
+function doToggleGateway(id){
+  const gw=sysPayment.gateways.find(g=>g.id===id);if(!gw)return;
+  if(!gw.enabled&&(gw.clientId.includes('placeholder')||gw.secretKey.includes('***'))){
+    if(!confirm('Cổng này chưa được cấu hình đầy đủ. Vẫn bật?'))return;
+  }
+  gw.enabled=!gw.enabled;
+  saveSysPayment();renderAccount();
+  toast((gw.enabled?'✅ Đã bật ':'⚫ Đã tắt ')+gw.name);
+}
+
+function doEditGateway(id){
+  const gw=sysPayment.gateways.find(g=>g.id===id);if(!gw)return;
+  const clientId=prompt('Client ID / App ID cho '+gw.name+':',gw.clientId);
+  if(clientId===null)return;
+  const secretKey=prompt('Secret Key cho '+gw.name+'\n(Để trống giữ nguyên giá trị cũ):','');
+  const envOpt=prompt('Môi trường (sandbox / production):',gw.env);
+  if(clientId!==null)gw.clientId=clientId.trim()||gw.clientId;
+  if(secretKey&&secretKey.trim())gw.secretKey=secretKey.trim();
+  if(envOpt&&(envOpt==='sandbox'||envOpt==='production'))gw.env=envOpt;
+  saveSysPayment();renderAccount();toast('✅ Đã cập nhật cấu hình '+gw.name);
+}
+
+function doSaveShipping(){
+  const threshEl=document.getElementById('shipFreeThreshold');
+  if(threshEl)sysPayment.shipping.freeThreshold=Math.max(0,parseInt(threshEl.value)||0);
+  sysPayment.shipping.regions.forEach(r=>{
+    const el=document.getElementById('shipFee_'+r.id);
+    if(el)r.fee=Math.max(0,parseInt(el.value)||0);
+  });
+  saveSysPayment();renderAccount();toast('✅ Đã lưu phí vận chuyển');
+}
+
+function doSaveTax(){
+  const enabled=document.getElementById('vatEnabled');
+  const rate=document.getElementById('vatRate');
+  const included=document.getElementById('vatIncluded');
+  const company=document.getElementById('taxCompany');
+  const code=document.getElementById('taxCode');
+  const addr=document.getElementById('taxAddress');
+  if(rate&&(parseInt(rate.value)<0||parseInt(rate.value)>100)){toast('Thuế suất phải từ 0–100%');return;}
+  if(enabled)sysPayment.tax.vatEnabled=enabled.checked;
+  if(rate)sysPayment.tax.vatRate=parseInt(rate.value)||10;
+  if(included)sysPayment.tax.vatIncluded=included.checked;
+  if(company)sysPayment.tax.companyName=company.value.trim();
+  if(code)sysPayment.tax.taxCode=code.value.trim();
+  if(addr)sysPayment.tax.taxAddress=addr.value.trim();
+  saveSysPayment();renderAccount();toast('✅ Đã lưu cài đặt thuế');
+}
+
+/* ========== OAUTH ========== */
+function adminSettingsOAuth(){
+  const o=sysOAuth;
+  const providerCard=(key,title,icon,idLabel,secretLabel,idField,secretField)=>{
+    const p=o[key];
+    return `<div class="sys-oauth-card${p.enabled?'':' disabled'}">
+      <div class="sys-oauth-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:32px">${icon}</span>
+          <div>
+            <div style="font-weight:700;font-size:16px;color:var(--ink-deep)">${title}</div>
+            <div class="sys-gw-status ${p.enabled?'on':'off'}" style="margin-top:3px">${p.enabled?'✅ Đang bật':'⚫ Đã tắt'}</div>
+          </div>
+        </div>
+        <label class="sys-toggle">
+          <input type="checkbox" ${p.enabled?'checked':''} onchange="doToggleOAuth('${key}')">
+          <span class="sys-toggle-slider"></span>
+        </label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+        <div>
+          <label class="adm-form-lbl">${idLabel}</label>
+          <input id="oauth_${key}_id" class="cms-input" value="${escHtml(idField)}" placeholder="${idLabel}...">
+        </div>
+        <div>
+          <label class="adm-form-lbl">${secretLabel}</label>
+          <div style="display:flex;gap:8px">
+            <input id="oauth_${key}_secret" class="cms-input" type="password" value="${escHtml(secretField)}" placeholder="${secretLabel}..." style="flex:1">
+            <button class="adm-btn-sm" onclick="sysOAuthToggleSecret('oauth_${key}_secret',this)" title="Hiện/Ẩn">👁</button>
+          </div>
+        </div>
+        <div>
+          <label class="adm-form-lbl">Redirect URI</label>
+          <input id="oauth_${key}_redirect" class="cms-input" value="${escHtml(p.redirectUri)}" readonly style="background:var(--paper);cursor:default;color:var(--text-soft)">
+          <div class="sys-hint">Đăng ký URI này trong Developer Console của ${title}.</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="adm-btn" onclick="doSaveOAuth('${key}')">💾 Lưu cấu hình</button>
+        <button class="adm-btn-sm" onclick="doTestOAuth('${key}')">🧪 Kiểm tra kết nối</button>
+      </div>
+    </div>`;
+  };
+  return `<div>
+    <p style="margin:0 0 16px;font-size:13.5px;color:var(--text-soft)">Cấu hình đăng nhập qua tài khoản mạng xã hội. Cần đăng ký ứng dụng tại Developer Console của từng nhà cung cấp.</p>
+    <div class="sys-oauth-grid">
+      ${providerCard('google','Google OAuth','🔴','Client ID','Client Secret',o.google.clientId,o.google.clientSecret)}
+      ${providerCard('facebook','Facebook OAuth','🔵','App ID','App Secret',o.facebook.appId,o.facebook.appSecret)}
+    </div>
+    <div class="sys-oauth-note" style="margin-top:16px;padding:12px 16px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-soft);line-height:1.7">
+      🔐 <strong>Bảo mật:</strong> Không bao giờ commit Client Secret / App Secret vào source code. Trong môi trường production, lưu các giá trị này trong environment variables hoặc secret manager.
+    </div>
+  </div>`;
+}
+
+function sysOAuthToggleSecret(elId,btn){
+  const el=document.getElementById(elId);if(!el)return;
+  el.type=el.type==='password'?'text':'password';
+  btn.textContent=el.type==='password'?'👁':'🙈';
+}
+
+function doToggleOAuth(key){
+  const p=sysOAuth[key];if(!p)return;
+  const name=key==='google'?'Google':'Facebook';
+  if(!p.enabled){
+    const idVal=key==='google'?sysOAuth.google.clientId:sysOAuth.facebook.appId;
+    if(idVal.includes('placeholder')){
+      if(!confirm(name+' OAuth chưa được cấu hình. Vẫn bật?'))return;
+    }
+  }
+  p.enabled=!p.enabled;
+  saveSysOAuth();renderAccount();
+  toast((p.enabled?'✅ Đã bật ':'⚫ Đã tắt ')+name+' OAuth');
+}
+
+function doSaveOAuth(key){
+  const p=sysOAuth[key];if(!p)return;
+  const name=key==='google'?'Google':'Facebook';
+  const idEl=document.getElementById('oauth_'+key+'_id');
+  const secEl=document.getElementById('oauth_'+key+'_secret');
+  if(key==='google'){
+    if(idEl)p.clientId=idEl.value.trim()||p.clientId;
+    if(secEl&&secEl.value.trim())p.clientSecret=secEl.value.trim();
+  } else {
+    if(idEl)p.appId=idEl.value.trim()||p.appId;
+    if(secEl&&secEl.value.trim())p.appSecret=secEl.value.trim();
+  }
+  saveSysOAuth();renderAccount();toast('✅ Đã lưu cấu hình '+name+' OAuth');
+}
+
+function doTestOAuth(key){
+  const p=sysOAuth[key];if(!p)return;
+  const name=key==='google'?'Google':'Facebook';
+  if(!p.enabled){toast('⚠️ '+name+' OAuth đang tắt. Hãy bật trước khi kiểm tra.');return;}
+  const idVal=key==='google'?p.clientId:p.appId;
+  if(idVal.includes('placeholder')){toast('⚠️ Chưa nhập Client ID hợp lệ cho '+name);return;}
+  toast('🧪 Đang kiểm tra kết nối '+name+' OAuth... (Demo: kết nối thành công ✅)');
+}
+
+// =====================================================================
+// QUẢN LÝ EMAIL & THÔNG BÁO
+// =====================================================================
+const EMAIL_TARGET_GROUPS={all:'Tất cả người dùng',buyer:'Người mua',seller:'Nhà bán hàng',new:'Người dùng mới (30 ngày)'};
+const EMAIL_SOURCE_LBL={register:'Đăng ký',checkout:'Thanh toán',manual:'Thêm thủ công'};
+
+function adminNotif(){
+  const TABS=[['compose','✉ Soạn email'],['history','📊 Lịch sử gửi'],['newsletter','📋 Newsletter']];
+  const content=admNotifTab==='history'?adminNotifHistory():
+    admNotifTab==='newsletter'?adminNotifNewsletter():
+    adminNotifCompose();
+  return `<div class="adm-section">
+    <h2 class="adm-section-title">Quản lý Email & Thông báo</h2>
+    <div class="adm-shops-tabs">
+      ${TABS.map(([k,lbl])=>`<button class="adm-tab-btn${admNotifTab===k?' active':''}" onclick="admNotifTab='${k}';renderAccount()">${lbl}</button>`).join('')}
+    </div>
+    ${content}
+  </div>`;
+}
+
+/* ---------- SOẠN EMAIL ---------- */
+function adminNotifCompose(){
+  const totalUsers=15420;
+  const groupCounts={all:15420,buyer:11231,seller:892,new:2145};
+  return `
+    <div class="notif-compose-grid">
+      <div class="adm-form-card" style="display:flex;flex-direction:column;gap:16px">
+        <h3 style="margin:0 0 4px;font-size:15px;color:var(--ink-deep)">✉ Soạn email thông báo</h3>
+        <div>
+          <label class="adm-form-lbl">Tiêu đề email <span style="color:red">*</span></label>
+          <input id="emSubject" class="cms-input" style="width:100%" placeholder="Nhập tiêu đề email...">
+        </div>
+        <div>
+          <label class="adm-form-lbl">Gửi đến nhóm <span style="color:red">*</span></label>
+          <select id="emTarget" class="cms-input" style="width:100%" onchange="notifUpdateCount(this.value)">
+            ${Object.entries(EMAIL_TARGET_GROUPS).map(([k,lbl])=>`<option value="${k}">${lbl} (${(groupCounts[k]||0).toLocaleString('vi-VN')} người)</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="adm-form-lbl">Nội dung email <span style="color:red">*</span></label>
+          <div class="cms-toolbar">
+            <button class="cms-tb-btn" title="In đậm" onclick="notifFmt('bold')"><b>B</b></button>
+            <button class="cms-tb-btn" title="In nghiêng" onclick="notifFmt('italic')"><i>I</i></button>
+            <button class="cms-tb-btn" title="Gạch chân" onclick="notifFmt('underline')"><u>U</u></button>
+            <span class="cms-tb-sep"></span>
+            <button class="cms-tb-btn" onclick="notifFmt('formatBlock','H2')">H2</button>
+            <button class="cms-tb-btn" onclick="notifFmt('formatBlock','P')">¶</button>
+            <span class="cms-tb-sep"></span>
+            <button class="cms-tb-btn" onclick="notifFmt('insertUnorderedList')">≡</button>
+            <button class="cms-tb-btn" onclick="notifInsertLink()">🔗</button>
+          </div>
+          <div id="emContent" class="cms-editor notif-editor" contenteditable="true" placeholder="Nhập nội dung email..."><p>Xin chào,</p><p></p><p>Trân trọng,<br><strong>Đội ngũ EduMart</strong></p></div>
+        </div>
+        <div id="notifCountBanner" class="notif-count-banner">
+          📬 Email sẽ được gửi đến <strong id="notifCountNum">15.420</strong> người dùng
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="adm-btn" onclick="doSendEmail()">🚀 Gửi email ngay</button>
+          <button class="adm-btn-sm" onclick="doPreviewEmail()">👁 Xem trước</button>
+          <button class="adm-btn-sm" onclick="doClearCompose()">🗑 Xóa nháp</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="adm-form-card">
+          <h4 style="margin:0 0 12px;font-size:14px;color:var(--ink-deep)">📊 Thống kê nhanh</h4>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            ${Object.entries(EMAIL_TARGET_GROUPS).map(([k,lbl])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--paper);border-radius:8px;font-size:13.5px"><span>${lbl}</span><strong>${(groupCounts[k]||0).toLocaleString('vi-VN')}</strong></div>`).join('')}
+          </div>
+        </div>
+        <div class="adm-form-card">
+          <h4 style="margin:0 0 10px;font-size:14px;color:var(--ink-deep)">💡 Mẹo soạn thảo</h4>
+          <ul style="margin:0;padding-left:16px;font-size:13px;color:var(--text-soft);line-height:1.8">
+            <li>Tiêu đề nên ngắn gọn, dưới 60 ký tự</li>
+            <li>Bắt đầu bằng thông tin quan trọng nhất</li>
+            <li>Thêm lời kêu gọi hành động (CTA) rõ ràng</li>
+            <li>Kiểm tra kỹ trước khi gửi — không thể thu hồi</li>
+          </ul>
+        </div>
+        <div class="adm-form-card">
+          <h4 style="margin:0 0 10px;font-size:14px;color:var(--ink-deep)">📬 Gửi gần đây</h4>
+          ${emailCampaigns.slice(0,3).map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13px"><div style="font-weight:600;color:var(--ink-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(c.subject)}</div><div style="color:var(--text-soft);font-size:12px;margin-top:2px">${c.sentAt} · ${EMAIL_TARGET_GROUPS[c.targetGroup]||c.targetGroup}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function notifFmt(cmd,val){const el=document.getElementById('emContent');if(el){el.focus();document.execCommand(cmd,false,val||null);}}
+function notifInsertLink(){const url=prompt('Nhập URL liên kết:');if(url)notifFmt('createLink',url);}
+function notifUpdateCount(group){
+  const groupCounts={all:15420,buyer:11231,seller:892,new:2145};
+  const el=document.getElementById('notifCountNum');
+  if(el)el.textContent=(groupCounts[group]||0).toLocaleString('vi-VN');
+}
+
+function doSendEmail(){
+  const subject=((document.getElementById('emSubject')||{}).value||'').trim();
+  const target=(document.getElementById('emTarget')||{}).value||'all';
+  const contentEl=document.getElementById('emContent');
+  const content=contentEl?contentEl.innerHTML:'';
+  if(!subject){toast('Vui lòng nhập tiêu đề email');return;}
+  if(!content||content==='<br>'||content.replace(/<[^>]+>/g,'').trim()===''){toast('Vui lòng nhập nội dung email');return;}
+  if(!confirm('Xác nhận gửi email:\n"'+subject+'"\nđến '+EMAIL_TARGET_GROUPS[target]+'?\n\nHành động này không thể thu hồi.')){return;}
+  const groupCounts={all:15420,buyer:11231,seller:892,new:2145};
+  const targetCount=groupCounts[target]||0;
+  const newCampaign={
+    id:'EM-'+String(Date.now()).slice(-5),
+    subject,targetGroup:target,targetCount,
+    sentAt:todayStr(),sentBy:user?user.name:'Admin',
+    status:'sent',content,
+    stats:{sent:targetCount,opened:0,clicked:0,bounced:0,unsubscribed:0}
+  };
+  emailCampaigns.unshift(newCampaign);
+  saveEmailCampaigns();
+  admNotifTab='history';
+  renderAccount();
+  toast('✅ Đã gửi email đến '+targetCount.toLocaleString('vi-VN')+' người dùng!');
+}
+
+function doPreviewEmail(){
+  const subject=((document.getElementById('emSubject')||{}).value||'(Chưa có tiêu đề)').trim();
+  const contentEl=document.getElementById('emContent');
+  const html=contentEl?contentEl.innerHTML:'(Chưa có nội dung)';
+  const win=window.open('','_blank','width=650,height=600,scrollbars=yes');
+  if(!win)return;
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Preview: ${escHtml(subject)}</title><style>body{font-family:Georgia,serif;max-width:600px;margin:32px auto;color:#222;line-height:1.7;}.header{background:#c8362a;color:#fff;padding:20px 28px;border-radius:8px 8px 0 0;}.body{padding:24px 28px;background:#fffdf9;border:1px solid #eee;}.footer{background:#f7f2ea;padding:14px 28px;font-size:12px;color:#888;border-radius:0 0 8px 8px;text-align:center;}</style></head><body><div class="header"><h2 style="margin:0;font-size:18px">${escHtml(subject)}</h2><div style="font-size:13px;opacity:.85;margin-top:6px">Từ: EduMart &lt;noreply@edumart.vn&gt;</div></div><div class="body">${html}</div><div class="footer">© 2025 EduMart · <a href="#">Hủy đăng ký</a> · <a href="#">Chính sách bảo mật</a></div></body></html>`);
+  win.document.close();
+}
+
+function doClearCompose(){
+  if(!confirm('Xóa nội dung đang soạn?'))return;
+  const s=document.getElementById('emSubject');const c=document.getElementById('emContent');
+  if(s)s.value='';
+  if(c)c.innerHTML='<p>Xin chào,</p><p></p><p>Trân trọng,<br><strong>Đội ngũ EduMart</strong></p>';
+  toast('Đã xóa nháp');
+}
+
+/* ---------- LỊCH SỬ GỬI ---------- */
+function adminNotifHistory(){
+  const search=admEmailSearch.toLowerCase();
+  const list=emailCampaigns.filter(c=>!search||c.subject.toLowerCase().includes(search));
+  const PAGE=8,pages=Math.ceil(list.length/PAGE)||1;
+  if(admEmailPage>=pages)admEmailPage=Math.max(0,pages-1);
+  const page=list.slice(admEmailPage*PAGE,(admEmailPage+1)*PAGE);
+
+  const totalSent=emailCampaigns.reduce((s,c)=>s+c.stats.sent,0);
+  const avgOpen=emailCampaigns.length?Math.round(emailCampaigns.reduce((s,c)=>s+(c.stats.opened/c.stats.sent*100),0)/emailCampaigns.length):0;
+  const avgClick=emailCampaigns.length?Math.round(emailCampaigns.reduce((s,c)=>s+(c.stats.clicked/c.stats.sent*100),0)/emailCampaigns.length):0;
+
+  const rows=page.map(c=>{
+    const openRate=c.stats.sent>0?Math.round(c.stats.opened/c.stats.sent*100):0;
+    const clickRate=c.stats.sent>0?Math.round(c.stats.clicked/c.stats.sent*100):0;
+    const bounceRate=c.stats.sent>0?Math.round(c.stats.bounced/c.stats.sent*100):0;
+    const unsubRate=c.stats.sent>0?Math.round(c.stats.unsubscribed/c.stats.sent*100):0;
+    return `<tr>
+      <td style="max-width:260px">
+        <div style="font-weight:600;color:var(--ink-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px" title="${escHtml(c.subject)}">${escHtml(c.subject)}</div>
+        <div style="font-size:12px;color:var(--text-soft);margin-top:2px">${c.sentAt} · ${escHtml(c.sentBy||'Admin')}</div>
+      </td>
+      <td><span style="font-size:12.5px;background:var(--paper);padding:2px 8px;border-radius:4px">${EMAIL_TARGET_GROUPS[c.targetGroup]||c.targetGroup}</span></td>
+      <td style="text-align:right">${c.stats.sent.toLocaleString('vi-VN')}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-weight:600;color:${openRate>=40?'#27ae60':openRate>=25?'#e67e22':'#e74c3c'}">${openRate}%</span>
+          <div style="flex:1;background:#eee;border-radius:4px;height:6px;min-width:60px"><div style="background:${openRate>=40?'#27ae60':openRate>=25?'#e67e22':'#e74c3c'};border-radius:4px;height:6px;width:${openRate}%"></div></div>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-weight:600;color:${clickRate>=20?'#27ae60':clickRate>=10?'#e67e22':'#e74c3c'}">${clickRate}%</span>
+          <div style="flex:1;background:#eee;border-radius:4px;height:6px;min-width:40px"><div style="background:${clickRate>=20?'#27ae60':clickRate>=10?'#e67e22':'#e74c3c'};border-radius:4px;height:6px;width:${clickRate}%"></div></div>
+        </div>
+      </td>
+      <td style="text-align:center;font-size:13px;color:${bounceRate>3?'#e74c3c':'#27ae60'}">${bounceRate}%</td>
+      <td style="text-align:center;font-size:13px;color:${unsubRate>1?'#e74c3c':'#888'}">${unsubRate}%</td>
+      <td>
+        <button class="adm-btn-sm" onclick="doViewEmailDetail('${c.id}')">Xem</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const pageLinks=pages>1?`<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px">${Array.from({length:pages},(_,i)=>`<button class="adm-btn-sm${i===admEmailPage?' active':''}" onclick="admEmailPage=${i};renderAccount()">${i+1}</button>`).join('')}</div>`:'';
+
+  return `
+    <div class="adm-kpi-row" style="margin-bottom:18px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${emailCampaigns.length}</div><div class="adm-kpi-lbl">Chiến dịch đã gửi</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${fmtBig(totalSent)}</div><div class="adm-kpi-lbl">Tổng email đã gửi</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${avgOpen}%</div><div class="adm-kpi-lbl">Tỷ lệ mở TB</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${avgClick}%</div><div class="adm-kpi-lbl">Tỷ lệ click TB</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+      <input class="cms-input" placeholder="Tìm theo tiêu đề email..." value="${escHtml(admEmailSearch)}" oninput="admEmailSearch=this.value;admEmailPage=0;renderAccount()" style="width:280px">
+      <button class="adm-btn" onclick="admNotifTab='compose';renderAccount()">+ Tạo chiến dịch mới</button>
+    </div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Tiêu đề / Thời gian</th><th>Nhóm nhận</th><th style="text-align:right">Đã gửi</th><th>Tỷ lệ mở</th><th>Tỷ lệ click</th><th>Bounce</th><th>Hủy đăng ký</th><th></th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="8" style="text-align:center;color:#888;padding:24px">Chưa có chiến dịch nào</td></tr>'}</tbody>
+      </table>
+    </div>${pageLinks}`;
+}
+
+function doViewEmailDetail(id){
+  const c=emailCampaigns.find(x=>x.id===id);if(!c)return;
+  const openRate=c.stats.sent>0?Math.round(c.stats.opened/c.stats.sent*100):0;
+  const clickRate=c.stats.sent>0?Math.round(c.stats.clicked/c.stats.sent*100):0;
+  const win=window.open('','_blank','width=700,height=700,scrollbars=yes');
+  if(!win)return;
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escHtml(c.subject)}</title>
+  <style>body{font-family:Georgia,serif;max-width:680px;margin:24px auto;color:#222;line-height:1.7;}
+  .stat{display:inline-block;background:#f7f2ea;border-radius:8px;padding:12px 18px;margin:6px 6px 6px 0;text-align:center;}
+  .stat-val{font-size:22px;font-weight:700;color:#c8362a;}.stat-lbl{font-size:12px;color:#888;}
+  .email-body{padding:20px 24px;background:#fffdf9;border:1px solid #eee;border-radius:8px;margin-top:16px;}</style></head>
+  <body>
+    <h2 style="margin-bottom:4px">${escHtml(c.subject)}</h2>
+    <p style="color:#888;font-size:13px">Gửi lúc ${c.sentAt} · ${EMAIL_TARGET_GROUPS[c.targetGroup]} · ${c.stats.sent.toLocaleString('vi-VN')} người</p>
+    <div>
+      <div class="stat"><div class="stat-val">${c.stats.opened.toLocaleString('vi-VN')}</div><div class="stat-lbl">Đã mở (${openRate}%)</div></div>
+      <div class="stat"><div class="stat-val">${c.stats.clicked.toLocaleString('vi-VN')}</div><div class="stat-lbl">Click (${clickRate}%)</div></div>
+      <div class="stat"><div class="stat-val">${c.stats.bounced}</div><div class="stat-lbl">Bounce</div></div>
+      <div class="stat"><div class="stat-val">${c.stats.unsubscribed}</div><div class="stat-lbl">Hủy ĐK</div></div>
+    </div>
+    <div class="email-body">${c.content}</div>
+  </body></html>`);
+  win.document.close();
+}
+
+/* ---------- NEWSLETTER ---------- */
+function adminNotifNewsletter(){
+  const search=admSubsSearch.toLowerCase();
+  let list=newsletterSubs.filter(s=>{
+    if(search&&!s.email.toLowerCase().includes(search)&&!s.name.toLowerCase().includes(search))return false;
+    if(admSubsStatusFilter!=='all'&&s.status!==admSubsStatusFilter)return false;
+    if(admSubsSourceFilter!=='all'&&s.source!==admSubsSourceFilter)return false;
+    return true;
+  });
+  const total=list.length;
+  const PAGE=10,pages=Math.ceil(total/PAGE)||1;
+  if(admSubsPage>=pages)admSubsPage=Math.max(0,pages-1);
+  const page=list.slice(admSubsPage*PAGE,(admSubsPage+1)*PAGE);
+
+  const activeCount=newsletterSubs.filter(s=>s.status==='active').length;
+  const unsubCount=newsletterSubs.filter(s=>s.status==='unsubscribed').length;
+  const sourceCount={register:0,checkout:0,manual:0};
+  newsletterSubs.forEach(s=>{sourceCount[s.source]=(sourceCount[s.source]||0)+1;});
+
+  const rows=page.map(s=>`<tr>
+    <td>
+      <div style="font-weight:600;color:var(--ink-deep)">${escHtml(s.name)}</div>
+      <div style="font-size:12.5px;color:var(--text-soft)">${escHtml(s.email)}</div>
+    </td>
+    <td style="font-size:12.5px">${s.subscribedAt}</td>
+    <td><span style="font-size:12px;background:var(--paper);padding:2px 8px;border-radius:4px;color:var(--text-soft)">${EMAIL_SOURCE_LBL[s.source]||s.source}</span></td>
+    <td><span style="font-size:12.5px;font-weight:600;color:${s.status==='active'?'#27ae60':'#e74c3c'}">${s.status==='active'?'✅ Đang đăng ký':'❌ Đã hủy'}</span></td>
+    <td>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${s.status==='active'?`<button class="adm-btn-sm" style="background:#e67e22;color:#fff" onclick="doUnsubscribeNL('${s.id}')">Hủy đăng ký</button>`:`<button class="adm-btn-sm" style="background:#27ae60;color:#fff" onclick="doResubscribeNL('${s.id}')">Đăng ký lại</button>`}
+        <button class="adm-btn-sm danger" onclick="doDeleteSub('${s.id}')">Xóa</button>
+      </div>
+    </td>
+  </tr>`).join('');
+
+  const pageLinks=pages>1?`<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px">${Array.from({length:pages},(_,i)=>`<button class="adm-btn-sm${i===admSubsPage?' active':''}" onclick="admSubsPage=${i};renderAccount()">${i+1}</button>`).join('')}</div>`:'';
+
+  return `
+    <div class="adm-kpi-row" style="margin-bottom:18px">
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${newsletterSubs.length}</div><div class="adm-kpi-lbl">Tổng subscriber</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val" style="color:#27ae60">${activeCount}</div><div class="adm-kpi-lbl">Đang đăng ký</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val" style="color:#e74c3c">${unsubCount}</div><div class="adm-kpi-lbl">Đã hủy đăng ký</div></div>
+      <div class="adm-kpi-card"><div class="adm-kpi-val">${activeCount>0?Math.round(activeCount/newsletterSubs.length*100):0}%</div><div class="adm-kpi-lbl">Tỷ lệ duy trì</div></div>
+    </div>
+    <div class="notif-sub-source-bar" style="margin-bottom:16px">
+      <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">Nguồn subscriber:</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${Object.entries(EMAIL_SOURCE_LBL).map(([k,lbl])=>`<div style="display:flex;align-items:center;gap:6px;background:var(--paper);border-radius:8px;padding:7px 12px;font-size:13px"><span style="font-weight:600;color:var(--ink-deep)">${sourceCount[k]||0}</span><span style="color:var(--text-soft)">${lbl}</span></div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <input class="cms-input" placeholder="Tìm theo email hoặc tên..." value="${escHtml(admSubsSearch)}" oninput="admSubsSearch=this.value;admSubsPage=0;renderAccount()" style="width:220px">
+      <select class="cms-input" onchange="admSubsStatusFilter=this.value;admSubsPage=0;renderAccount()">
+        <option value="all"${admSubsStatusFilter==='all'?' selected':''}>Tất cả trạng thái</option>
+        <option value="active"${admSubsStatusFilter==='active'?' selected':''}>Đang đăng ký</option>
+        <option value="unsubscribed"${admSubsStatusFilter==='unsubscribed'?' selected':''}>Đã hủy</option>
+      </select>
+      <select class="cms-input" onchange="admSubsSourceFilter=this.value;admSubsPage=0;renderAccount()">
+        <option value="all"${admSubsSourceFilter==='all'?' selected':''}>Tất cả nguồn</option>
+        ${Object.entries(EMAIL_SOURCE_LBL).map(([k,lbl])=>`<option value="${k}"${admSubsSourceFilter===k?' selected':''}>${lbl}</option>`).join('')}
+      </select>
+      <div style="margin-left:auto;color:var(--text-soft);font-size:13.5px;align-self:center">${total} kết quả</div>
+    </div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Tên / Email</th><th>Ngày đăng ký</th><th>Nguồn</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:#888;padding:24px">Không tìm thấy subscriber nào</td></tr>'}</tbody>
+      </table>
+    </div>${pageLinks}`;
+}
+
+function doUnsubscribeNL(id){
+  const s=newsletterSubs.find(x=>x.id===id);if(!s)return;
+  if(!confirm('Hủy đăng ký newsletter của '+s.name+' ('+s.email+')?'))return;
+  s.status='unsubscribed';
+  saveNewsletterSubs();renderAccount();toast('Đã hủy đăng ký: '+s.email);
+}
+
+function doResubscribeNL(id){
+  const s=newsletterSubs.find(x=>x.id===id);if(!s)return;
+  s.status='active';
+  saveNewsletterSubs();renderAccount();toast('Đã khôi phục đăng ký: '+s.email);
+}
+
+function doDeleteSub(id){
+  const s=newsletterSubs.find(x=>x.id===id);if(!s)return;
+  if(!confirm('Xóa vĩnh viễn subscriber '+s.email+' khỏi danh sách?\nHành động không thể hoàn tác.'))return;
+  newsletterSubs=newsletterSubs.filter(x=>x.id!==id);
+  saveNewsletterSubs();renderAccount();toast('Đã xóa subscriber: '+s.email);
+}
+
 function navForRole(r){
   if(r==='admin'){
-    const adminTabs=[['dashboard','Tổng quan'],['adm-users','Người dùng'],['adm-products','Sản phẩm'],['adm-orders','Đơn hàng'],['adm-finance','Tài chính'],['adm-cms','Nội dung'],['adm-promo','Khuyến mãi'],['adm-shops','Shop / NCC']];
+    const adminTabs=[['dashboard','Tổng quan'],['adm-users','Người dùng'],['adm-products','Sản phẩm'],['adm-orders','Đơn hàng'],['adm-finance','Tài chính'],['adm-cms','Nội dung'],['adm-promo','Khuyến mãi'],['adm-notif','Thông báo'],['adm-settings','Cài đặt'],['adm-shops','Shop / NCC']];
     return adminTabs;
   }
   const nav=[['dashboard','Tổng quan'],['orders','Đơn hàng của tôi'],['returns','Đổi / Trả hàng']];
