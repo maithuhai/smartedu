@@ -985,13 +985,7 @@ function renderCollections(){
             '</select>'+
           '</div>'+
         '</div>'+
-        '<div class="cfb-row2">'+
-          '<span class="cfb-label">Đối tượng:</span>'+
-          '<div class="cfb-pills">'+
-            COLL_AUD_OPTS.map(o=>'<button class="cfb-pill'+(collAudFilter===o.k?' on':'')+'" onclick="collAudFilter='+(o.k===null?'null':'\''+o.k+'\'')+';renderCollections()">'+o.e+' '+o.l+'</button>').join('')+
-          '</div>'+
-          (hasFilter?'<button class="cfb-reset" onclick="resetCollFilters()">× Xóa bộ lọc</button>':'')+
-        '</div>'+
+        (hasFilter?'<div class="cfb-row2"><button class="cfb-reset" onclick="resetCollFilters()">× Xóa bộ lọc</button></div>':'')+
       '</div>'+
       (filtered.length===0?
         '<div class="colls-empty">'+
