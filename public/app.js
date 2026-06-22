@@ -928,9 +928,12 @@ function renderCollections(){
   const app=document.getElementById('app');
   app.innerHTML=
     '<div class="colls-page">'+
-      '<div class="colls-hero">'+
-        '<h1>Bộ sưu tập sách</h1>'+
-        '<p>Những tuyển tập được biên tập kỹ lưỡng theo từng chủ đề và đối tượng độc giả.</p>'+
+      '<div class="colls-hero" style="background-image:url('+uimg('1535688391459-479d308104f8',1600)+')">'+
+        '<div class="colls-hero-ov"></div>'+
+        '<div class="colls-hero-box">'+
+          '<h1>BỘ SƯU TẬP SÁCH</h1>'+
+          '<p>Những tuyển tập được biên tập kỹ lưỡng theo từng chủ đề và đối tượng độc giả</p>'+
+        '</div>'+
       '</div>'+
       '<div class="colls-grid">'+
         COLLS.map(c=>{
