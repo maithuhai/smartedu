@@ -104,6 +104,34 @@ const MOODS=[
   {e:'👶',l:'Sách cho bé',          k:'cho-be',    kw:['bé','thiếu nhi','trẻ em'],        fn:p=>p.genre==='thieunhi'},
 ];
 
+/* ---------------- Bộ sưu tập (global) ---------------- */
+const COLLS=[
+  {id:'bien-tap', tag:'Tuyển chọn biên tập', title:'100 cuốn sách nên đọc trong đời',
+   desc:'Hành trình văn học vượt thời gian, từ kinh điển đến hiện đại.',
+   img:'1771647287015-f30dbb239646', tint:'rgba(120,30,20,.6)',
+   bookIds:[4,5,3,20,23,24,2,42,43]},
+  {id:'hoc-duong', tag:'Học đường', title:'Sách kinh điển cho học sinh',
+   desc:'Những tác phẩm trong và ngoài chương trình nuôi dưỡng tâm hồn.',
+   img:'1535688391459-479d308104f8', tint:'rgba(30,50,80,.5)',
+   bookIds:[1,2,23,6,18,25]},
+  {id:'on-thi', tag:'Ôn thi', title:'Luyện thi THPT Quốc gia',
+   desc:'Tuyển tập đề và sách luyện thi tinh gọn theo từng môn học.',
+   img:'1514369118554-e20d93546b30', tint:'rgba(80,55,15,.55)',
+   bookIds:[6,18,38,17,36]},
+  {id:'nguoi-tre', tag:'Người trẻ', title:'Phát triển bản thân cho sinh viên',
+   desc:'Tư duy, kỹ năng và những thói quen tốt dành cho người trẻ.',
+   img:'1570945880236-10f34833a271', tint:'rgba(30,65,40,.52)',
+   bookIds:[5,3,17,37,39,15,41,43]},
+  {id:'thieu-nhi', tag:'Thiếu nhi', title:'Sách thiếu nhi hay nhất',
+   desc:'Thế giới diệu kỳ và những bài học đầu đời cho các bạn nhỏ.',
+   img:'1777639629798-e3e75d967d3d', tint:'rgba(80,25,55,.5)',
+   bookIds:[2,24,19,9,53,54]},
+  {id:'suu-tam', tag:'Sưu tầm', title:'Sách cũ & sách hiếm',
+   desc:'Những ấn bản đặc biệt và bản in đầu từ nhà cung cấp uy tín.',
+   img:'1644211492216-8a5e874023f4', tint:'rgba(40,28,18,.55)',
+   bookIds:[23,4,24,20,21,22]},
+];
+
 /* Mục lục (TOC) cho từng ebook, danh sách track cho audiobook */
 const EBOOK_TOC={
   15:['Lập trình là gì & tại sao học JavaScript?','Biến, kiểu dữ liệu và toán tử','Cấu trúc điều khiển & vòng lặp','Hàm, closure và scope','DOM, sự kiện và dự án thực tế'],
@@ -471,6 +499,7 @@ function render(){
   else if(view==='ebooks')renderEbookStore();
   else if(view==='stationery')renderVPPStore();
   else if(view==='equipment')renderTBGDStore();
+  else if(view==='collections')renderCollections();
 }
 
 /* ---------------- Cards ---------------- */
@@ -564,18 +593,21 @@ function hmCard(p,dark,rank){
       '<button class="hm-add" onclick="addToCart('+p.id+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Thêm vào giỏ</button>'+
     '</div></div>';
 }
-function hmHead(title,kicker,target){
+function hmHead(title,kicker,target,linkView){
+  const allLink=linkView
+    ?'<a class="all" onclick="go(\''+linkView+'\')">Xem tất cả '+ARR+'</a>'
+    :(target?'<a class="all" onclick="go(\'listing\',\''+target+'\')">Xem tất cả '+ARR+'</a>':'');
   return '<div class="hm-sechead"><div class="row"><div class="left">'+
     (kicker?'<span class="kick">'+kicker+'</span>':'')+'<h2>'+title+'</h2></div>'+
-    (target?'<a class="all" onclick="go(\'listing\',\''+target+'\')">Xem tất cả '+ARR+'</a>':'')+
+    allLink+
     '</div><div class="bar"></div></div>';
 }
 function hmColl(c,tall){
-  return '<div class="hm-coll'+(tall?' tall':'')+'" onclick="go(\'listing\',\''+c[5]+'\')">'+
-    '<img src="'+uimg(c[3],800)+'" alt="'+c[1]+'" loading="lazy">'+
-    '<div class="tint" style="background:'+c[4]+'"></div><div class="grad"></div>'+
-    '<span class="kick">'+c[0]+'</span>'+
-    '<div class="body"><h3>'+c[1]+'</h3><p>'+c[2]+'</p><span class="link">Xem danh sách '+ARR+'</span></div>'+
+  return '<div class="hm-coll'+(tall?' tall':'')+'" onclick="go(\'listing\',\'coll:'+c.id+'\')">'+
+    '<img src="'+uimg(c.img,800)+'" alt="'+c.title+'" loading="lazy">'+
+    '<div class="tint" style="background:'+c.tint+'"></div><div class="grad"></div>'+
+    '<span class="kick">'+c.tag+'</span>'+
+    '<div class="body"><h3>'+c.title+'</h3><p>'+c.desc+'</p><span class="link">Xem danh sách '+ARR+'</span></div>'+
   '</div>';
 }
 
@@ -665,14 +697,6 @@ function renderHome(){
   const flashItems=[7,4,1,5,9].map(id=>P.find(x=>x.id===id));
   const ebs=P.filter(p=>p.ebook||p.audio).slice(0,5);
 
-  const COLLS=[
-    ['Tuyển chọn biên tập','100 cuốn sách nên đọc trong đời','Hành trình văn học vượt thời gian, từ kinh điển đến hiện đại.','1771647287015-f30dbb239646','rgba(120,30,20,.6)','sach'],
-    ['Học đường','Sách kinh điển cho học sinh','Những tác phẩm trong và ngoài chương trình nuôi dưỡng tâm hồn.','1535688391459-479d308104f8','rgba(30,50,80,.5)','thpt'],
-    ['Ôn thi','Luyện thi THPT Quốc gia','Tuyển tập đề và sách luyện thi tinh gọn theo từng môn học.','1514369118554-e20d93546b30','rgba(80,55,15,.55)','thpt'],
-    ['Người trẻ','Phát triển bản thân cho sinh viên','Tư duy, kỹ năng và những thói quen tốt dành cho người trẻ.','1570945880236-10f34833a271','rgba(30,65,40,.52)','sinhvien'],
-    ['Thiếu nhi','Sách thiếu nhi hay nhất','Thế giới diệu kỳ và những bài học đầu đời cho các bạn nhỏ.','1777639629798-e3e75d967d3d','rgba(80,25,55,.5)','tieuhoc'],
-    ['Sưu tầm','Sách cũ & sách hiếm','Những ấn bản đặc biệt và bản in đầu từ nhà cung cấp uy tín.','1644211492216-8a5e874023f4','rgba(40,28,18,.55)','sach']
-  ];
   const AUDT=[
     ['Tiểu học','#e8f4e8','#2d5a2d','tieuhoc','<path d="M9 3 4 6v12l5 3 6-3 5 3V6l-5-3-6 3Z"/>'],
     ['THCS / THPT','#e8f0f8','#1e3a5a','thcs','<path d="M4 7l8-4 8 4-8 4-8-4Z M4 7v6l8 4 8-4V7"/>'],
@@ -762,7 +786,7 @@ function renderHome(){
   '</div>'+
 
   /* Collections */
-  hmHead('Bộ sưu tập tuyển chọn','sach')+
+  hmHead('Bộ sưu tập tuyển chọn','Tuyển chọn',null,'collections')+
   '<div class="hm-colls">'+
     '<div class="feat-slot">'+hmColl(COLLS[0],true)+'</div>'+
     hmColl(COLLS[1])+hmColl(COLLS[2])+
@@ -899,6 +923,40 @@ function renderHome(){
   },1000);
 }
 
+/* ---------------- Collections page ---------------- */
+function renderCollections(){
+  const app=document.getElementById('app');
+  app.innerHTML=
+    '<div class="colls-page">'+
+      '<div class="colls-hero">'+
+        '<h1>Bộ sưu tập sách</h1>'+
+        '<p>Những tuyển tập được biên tập kỹ lưỡng theo từng chủ đề và đối tượng độc giả.</p>'+
+      '</div>'+
+      '<div class="colls-grid">'+
+        COLLS.map(c=>{
+          const books=c.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);
+          const cnt=books.length;
+          const covers=books.slice(0,3).map(b=>'<img src="'+uimg(b.img,120)+'" alt="'+b.name+'">').join('');
+          return '<div class="coll-card" onclick="go(\'listing\',\'coll:'+c.id+'\')">'+
+            '<div class="coll-card-img" style="background-image:url('+uimg(c.img,800)+')">'+
+              '<div class="coll-card-tint" style="background:'+c.tint+'"></div>'+
+              '<span class="coll-card-tag">'+c.tag+'</span>'+
+            '</div>'+
+            '<div class="coll-card-body">'+
+              '<h3 class="coll-card-title">'+c.title+'</h3>'+
+              '<p class="coll-card-desc">'+c.desc+'</p>'+
+              '<div class="coll-card-foot">'+
+                '<div class="coll-card-covers">'+covers+'</div>'+
+                '<span class="coll-card-cnt">'+cnt+' cuốn</span>'+
+              '</div>'+
+              '<span class="coll-card-link">Xem bộ sưu tập '+ARR+'</span>'+
+            '</div>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>';
+}
+
 /* ---------------- Listing ---------------- */
 let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rating:null,sale:false,instock:false,q:'',priceMin:0,priceMax:0};
 let listView='grid';
@@ -941,6 +999,7 @@ function renderListing(){
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
     else if(arg.startsWith('mood:')){const mk=arg.slice(5);const mood=MOODS.find(m=>m.k===mk);if(mood){title=mood.e+' '+mood.l;base=P.filter(mood.fn);ctxKey='mood:'+mk;heroDesc='Gợi ý được chọn lọc theo tâm trạng của bạn.';}}
+    else if(arg.startsWith('coll:')){const ck=arg.slice(5);const coll=COLLS.find(c=>c.id===ck);if(coll){title=coll.title;base=coll.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);ctxKey='coll:'+ck;heroDesc=coll.desc;}}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
   if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';brandExpanded=false;}
 
