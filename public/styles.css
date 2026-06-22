@@ -118,8 +118,13 @@
   .section-head{display:flex;align-items:baseline;justify-content:space-between;margin:34px 0 16px;}
   .section-head h2{font-family:'Lora',serif;font-weight:600;font-size:23px;color:var(--ink-deep);margin:0;}
   .section-head a{font-size:13px;color:var(--ink);font-weight:500;}
-  .breadcrumb{font-size:13px;color:var(--text-soft);margin-bottom:8px;}
-  .breadcrumb b{color:var(--text);}
+  /* ---- Breadcrumb nav ---- */
+  .breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:2px;padding:10px 24px;background:var(--paper);border-bottom:1px solid var(--line);font-size:12.5px;margin:0;color:var(--text-soft);}
+  .breadcrumb a,.bc-a{color:#1a5fa5;text-decoration:none;cursor:pointer;padding:1px 0;transition:color .15s,text-decoration .15s;white-space:nowrap;}
+  .breadcrumb a:hover,.bc-a:hover{color:var(--ink);text-decoration:underline;}
+  .breadcrumb b,.bc-cur{color:var(--ink-deep);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;display:inline-block;}
+  .bc-sep{color:#bbb;padding:0 7px;font-size:10px;user-select:none;}
+  .breadcrumb>*{display:flex;align-items:center;}
 
   /* ---------- Hero ---------- */
   .hero{display:grid;grid-template-columns:1.7fr 1fr;gap:14px;margin-top:6px;}
@@ -1953,7 +1958,7 @@
 @media (max-width:680px){.colls-hero{height:280px;}.colls-hero-box{padding:28px 28px;}.colls-hero-box h1{font-size:28px;}}
 
 /* Filter bar — Feature 3 */
-.colls-filter-bar{max-width:1200px;margin:0 auto;padding:20px 20px 16px;border-bottom:1px solid var(--line);}
+.colls-filter-bar{max-width:1200px;margin:0 auto;padding:20px 20px 16px;}
 .cfb-row1{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
 .colls-search-wrap{position:relative;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:8px 16px;flex:1;min-width:0;transition:border-color .15s;}
 .colls-search-wrap:focus-within{border-color:var(--ink);}

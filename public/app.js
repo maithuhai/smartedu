@@ -971,6 +971,7 @@ function renderCollections(){
           '<p>Những tuyển tập được biên tập kỹ lưỡng theo từng chủ đề và đối tượng độc giả</p>'+
         '</div>'+
       '</div>'+
+      mkCrumb([['Trang chủ',"go('home')"],['Bộ sưu tập']])+
       '<div class="colls-filter-bar">'+
         '<div class="cfb-row1">'+
           '<div class="colls-search-wrap">'+
@@ -1125,6 +1126,16 @@ function renderListing(){
   if(filt.instock)chips.push(['instock','Còn hàng']);
   const chipHtml=chips.length?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="clearFilter(\''+c[0]+'\')">×</button></span>').join('')+'<button class="freset" onclick="resetFilters()">Xóa tất cả</button></div>':'';
 
+  /* Breadcrumb hierarchy */
+  const _home=["Trang chủ","go('home')"];
+  const _crumb=[_home];
+  if(collCtx){_crumb.push(["Bộ sưu tập","go('collections')"]);_crumb.push([collCtx.title]);}
+  else if(arg==='audiobook'){_crumb.push(["Ebook & Sách nói","go('listing','ebook')"]);_crumb.push(["Sách nói"]);}
+  else if(typeof arg==='string'&&GENRE[arg]){_crumb.push(["Sách","go('listing','sach')"]);_crumb.push([title]);}
+  else if(typeof arg==='string'&&arg.startsWith('mood:')){const _mk=arg.slice(5);const _md=MOODS.find(m=>m.k===_mk);_crumb.push([_md?_md.e+' '+_md.l:title]);}
+  else if(arg&&arg.q){_crumb.push(['Tìm kiếm: "'+arg.q+'"']);}
+  else{_crumb.push([title]);}
+
   document.getElementById('app').innerHTML=
   (collCtx?
     '<div class="coll-list-hero" style="background-image:url('+uimg(collCtx.img,1200)+')">'+
@@ -1140,8 +1151,9 @@ function renderListing(){
         '<span class="coll-list-cnt">'+base.length+' cuốn sách</span>'+
       '</div>'+
     '</div>':
-    '<div class="breadcrumb"><a onclick="go(\'home\')">Trang chủ</a> › <b>'+title+'</b></div>'
+    ''
   )+
+  mkCrumb(_crumb)+
   '<div class="listing">'+
     '<aside class="filters">'+
       '<div class="filt-head"><h4>Bộ lọc</h4>'+(chips.length?'<button class="freset-sm" onclick="resetFilters()">Đặt lại</button>':'')+'</div>'+
