@@ -926,6 +926,11 @@ function renderHome(){
 /* ---------------- Collections page ---------------- */
 function renderCollections(){
   const app=document.getElementById('app');
+  const tags=[...new Set(COLLS.map(c=>c.tag))];
+  let filtered=COLLS.slice();
+  if(collTagFilter)filtered=filtered.filter(c=>c.tag===collTagFilter);
+  if(collSearch){const q=collSearch.toLowerCase().trim();filtered=filtered.filter(c=>c.title.toLowerCase().includes(q)||c.tag.toLowerCase().includes(q)||c.desc.toLowerCase().includes(q));}
+
   app.innerHTML=
     '<div class="colls-page">'+
       '<div class="colls-hero" style="background-image:url('+uimg('1625053376622-e462848c453f',1600)+')">'+
@@ -935,25 +940,43 @@ function renderCollections(){
           '<p>Những tuyển tập được biên tập kỹ lưỡng theo từng chủ đề và đối tượng độc giả</p>'+
         '</div>'+
       '</div>'+
-      '<div class="colls-grid">'+
-        COLLS.map(c=>{
-          const cnt=c.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean).length;
-          return '<div class="coll-card" onclick="go(\'listing\',\'coll:'+c.id+'\')">'+
-            '<div class="coll-card-img" style="background-image:url('+uimg(c.img,800)+')">'+
-              '<div class="coll-card-tint" style="background:'+c.tint+'"></div>'+
-              '<div class="coll-card-badges">'+
-                '<span class="coll-card-tag">'+c.tag+'</span>'+
-                '<span class="coll-card-cnt">'+cnt+' cuốn</span>'+
-              '</div>'+
-            '</div>'+
-            '<div class="coll-card-body">'+
-              '<h3 class="coll-card-title">'+c.title+'</h3>'+
-              '<p class="coll-card-desc">'+c.desc+'</p>'+
-              '<span class="coll-card-link">Xem bộ sưu tập '+ARR+'</span>'+
-            '</div>'+
-          '</div>';
-        }).join('')+
+      '<div class="colls-filter-bar">'+
+        '<div class="colls-search-wrap">'+
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
+          '<input class="colls-search-input" type="text" placeholder="Tìm bộ sưu tập…" value="'+collSearch.replace(/"/g,'&quot;')+'" oninput="collSearch=this.value;renderCollections()">'+
+          (collSearch?'<button class="colls-search-clear" onclick="collSearch=\'\';renderCollections()">×</button>':'')+
+        '</div>'+
+        '<div class="colls-tag-pills">'+
+          '<button class="colls-tag-pill'+(collTagFilter===null?' on':'')+'" onclick="collTagFilter=null;renderCollections()">Tất cả</button>'+
+          tags.map(t=>'<button class="colls-tag-pill'+(collTagFilter===t?' on':'')+'" onclick="collTagFilter=\''+t.replace(/'/g,"\\'")+'\';renderCollections()">'+t+'</button>').join('')+
+        '</div>'+
       '</div>'+
+      (filtered.length===0?
+        '<div class="colls-empty">'+
+          '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>'+
+          '<p>Không tìm thấy bộ sưu tập nào phù hợp</p>'+
+          '<button onclick="collSearch=\'\';collTagFilter=null;renderCollections()">Xóa bộ lọc</button>'+
+        '</div>':
+        '<div class="colls-grid">'+
+          filtered.map(c=>{
+            const cnt=c.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean).length;
+            return '<div class="coll-card" onclick="go(\'listing\',\'coll:'+c.id+'\')">'+
+              '<div class="coll-card-img" style="background-image:url('+uimg(c.img,800)+')">'+
+                '<div class="coll-card-tint" style="background:'+c.tint+'"></div>'+
+                '<div class="coll-card-badges">'+
+                  '<span class="coll-card-tag">'+c.tag+'</span>'+
+                  '<span class="coll-card-cnt">'+cnt+' cuốn</span>'+
+                '</div>'+
+              '</div>'+
+              '<div class="coll-card-body">'+
+                '<h3 class="coll-card-title">'+c.title+'</h3>'+
+                '<p class="coll-card-desc">'+c.desc+'</p>'+
+                '<span class="coll-card-link">Xem bộ sưu tập '+ARR+'</span>'+
+              '</div>'+
+            '</div>';
+          }).join('')+
+        '</div>'
+      )+
     '</div>';
 }
 
@@ -962,6 +985,7 @@ let filt={aud:null,price:'all',sort:'sold',brand:null,fmt:null,bookfmt:null,rati
 let listView='grid';
 let _listCtx=null;
 let brandExpanded=false;
+let collSearch='',collTagFilter=null;
 const CATDESC={
   sach:'Sách giáo khoa, tham khảo, văn học và kỹ năng từ các nhà xuất bản uy tín.',
   ebook:'Sách số đọc ngay trên mọi thiết bị — mua hoặc thuê tiết kiệm.',
@@ -983,7 +1007,7 @@ function resetFilters(){filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt
 function applyCustomPrice(){const mn=document.getElementById('prMinI');const mx=document.getElementById('prMaxI');filt.priceMin=mn?+mn.value||0:0;filt.priceMax=mx?+mx.value||0:0;renderListing();}
 function setSearchQ(v){filt.q=(v||'').trim();renderListing();}
 function renderListing(){
-  let title='Tất cả sản phẩm', base=P.slice(), ctxKey='all', catKey=null, heroDesc='', audKey=null, ebSubTab=null, isVpp=false, isTbgd=false;
+  let title='Tất cả sản phẩm', base=P.slice(), ctxKey='all', catKey=null, heroDesc='', audKey=null, ebSubTab=null, isVpp=false, isTbgd=false, collCtx=null;
   if(typeof arg==='string'){
     if(arg==='ebook'||arg==='audiobook'){
       const isAudio=arg==='audiobook';
@@ -999,7 +1023,7 @@ function renderListing(){
     else if(CATLBL[arg]){title=CATLBL[arg];base=P.filter(p=>p.cat===arg);ctxKey='cat:'+arg;catKey=arg;heroDesc=CATDESC[arg]||'';}
     else if(GENRE[arg]){title=GENRE[arg];base=P.filter(p=>p.genre===arg);ctxKey='genre:'+arg;heroDesc=GENREDESC[arg]||'';}
     else if(arg.startsWith('mood:')){const mk=arg.slice(5);const mood=MOODS.find(m=>m.k===mk);if(mood){title=mood.e+' '+mood.l;base=P.filter(mood.fn);ctxKey='mood:'+mk;heroDesc='Gợi ý được chọn lọc theo tâm trạng của bạn.';}}
-    else if(arg.startsWith('coll:')){const ck=arg.slice(5);const coll=COLLS.find(c=>c.id===ck);if(coll){title=coll.title;base=coll.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);ctxKey='coll:'+ck;heroDesc=coll.desc;}}
+    else if(arg.startsWith('coll:')){const ck=arg.slice(5);const coll=COLLS.find(c=>c.id===ck);if(coll){title=coll.title;base=coll.bookIds.map(id=>P.find(p=>p.id===id)).filter(Boolean);ctxKey='coll:'+ck;heroDesc=coll.desc;collCtx=coll;}}
   } else if(arg&&arg.q){title='Kết quả cho "'+arg.q+'"';const q=arg.q.toLowerCase();base=P.filter(p=>p.name.toLowerCase().includes(q)||p.by.toLowerCase().includes(q));ctxKey='q:'+arg.q;}
   if(_listCtx!==ctxKey){_listCtx=ctxKey;filt.aud=null;filt.brand=null;filt.fmt=null;filt.bookfmt=null;filt.price='all';filt.priceMin=0;filt.priceMax=0;filt.rating=null;filt.sale=false;filt.instock=false;filt.q='';brandExpanded=false;}
 
@@ -1066,7 +1090,22 @@ function renderListing(){
   const chipHtml=chips.length?'<div class="active-chips">'+chips.map(c=>'<span class="achip">'+c[1]+'<button onclick="clearFilter(\''+c[0]+'\')">×</button></span>').join('')+'<button class="freset" onclick="resetFilters()">Xóa tất cả</button></div>':'';
 
   document.getElementById('app').innerHTML=
-  '<div class="breadcrumb"><a onclick="go(\'home\')">Trang chủ</a> › <b>'+title+'</b></div>'+
+  (collCtx?
+    '<div class="coll-list-hero" style="background-image:url('+uimg(collCtx.img,1200)+')">'+
+      '<div class="coll-list-hero-ov" style="background:'+collCtx.tint+'"></div>'+
+      '<div class="coll-list-hero-inner">'+
+        '<button class="coll-list-back" onclick="go(\'collections\')">'+
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>'+
+          'Bộ sưu tập'+
+        '</button>'+
+        '<span class="coll-list-tag">'+collCtx.tag+'</span>'+
+        '<h1>'+collCtx.title+'</h1>'+
+        '<p>'+collCtx.desc+'</p>'+
+        '<span class="coll-list-cnt">'+base.length+' cuốn sách</span>'+
+      '</div>'+
+    '</div>':
+    '<div class="breadcrumb"><a onclick="go(\'home\')">Trang chủ</a> › <b>'+title+'</b></div>'
+  )+
   '<div class="listing">'+
     '<aside class="filters">'+
       '<div class="filt-head"><h4>Bộ lọc</h4>'+(chips.length?'<button class="freset-sm" onclick="resetFilters()">Đặt lại</button>':'')+'</div>'+
@@ -1080,7 +1119,7 @@ function renderListing(){
       '<div class="fgroup"><div class="ftitle">Khác</div><label><input type="checkbox" '+(filt.sale?'checked':'')+' onchange="filt.sale=this.checked;renderListing()">Đang giảm giá</label><label><input type="checkbox" '+(filt.instock?'checked':'')+' onchange="filt.instock=this.checked;renderListing()">Chỉ còn hàng</label></div>'+
     '</aside>'+
     '<div>'+
-      (heroDesc?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+
+      (!collCtx&&heroDesc?'<div class="cat-hero"><h1>'+title+'</h1><p>'+heroDesc+'</p></div>':'')+
       (ebSubTab!==null?'<div class="eb-subtabs">'+
         ['all','ebook','audio'].map(k=>({all:'Tất cả',ebook:'📖 Ebook',audio:'🎧 Sách nói'})[k]).map((lbl,i)=>{const k=['all','ebook','audio'][i];return '<button class="eb-stab'+(ebSubTab===k?' active':'')+'" onclick="go(\'listing\','+(k==='all'?'\'ebook\'':k==='audio'?'\'audiobook\'':'\'ebook\'')+')">'+lbl+'</button>';}).join('')+
         '<a class="eb-lib-link" onclick="go(\'library\')">📚 Tủ sách của tôi</a>'+
