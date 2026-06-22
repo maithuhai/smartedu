@@ -928,7 +928,7 @@ function renderCollections(){
   const app=document.getElementById('app');
   app.innerHTML=
     '<div class="colls-page">'+
-      '<div class="colls-hero" style="background-image:url('+uimg('1535688391459-479d308104f8',1600)+')">'+
+      '<div class="colls-hero" style="background-image:url('+uimg('1625053376622-e462848c453f',1600)+')">'+
         '<div class="colls-hero-ov"></div>'+
         '<div class="colls-hero-box">'+
           '<h1>BỘ SƯU TẬP SÁCH</h1>'+
