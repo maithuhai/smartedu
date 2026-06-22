@@ -646,36 +646,30 @@ function renderHome(){
     '</div>'+
   '</section>'+
 
-  /* ── Danh mục (circle style) ── */
-  '<div class="catcirc-section">'+
-    '<h2 class="catcirc-title">Danh mục</h2>'+
-    '<div class="catcirc-wrap">'+
-      '<button class="catcirc-arr catcirc-arr-l" onclick="document.getElementById(\'catcircRow\').scrollBy({left:-340,behavior:\'smooth\'});setTimeout(updateCatCircArr,350)">‹</button>'+
-      '<div class="catcirc-row" id="catcircRow" onscroll="updateCatCircArr()">'+
-      (()=>{
-        const cats=[
-          {l:'Sách Văn học',c:'vanhoc',g:'#e8977a,#b8462a',id:4},
-          {l:'Sách Thiếu nhi',c:'thieunhi',g:'#6dcfa8,#206848',id:2},
-          {l:'Phát triển bản thân',c:'kynang',g:'#68c0d0,#1a6070',id:5},
-          {l:'Sách Giáo khoa',c:'sgk',g:'#6aaad8,#1a4888',id:1},
-          {l:'Luyện thi & Tham khảo',c:'thamkhao',g:'#8a9ad8,#202a7a',id:null},
-          {l:'Ngoại ngữ',c:'ngoaingu',g:'#60c8c0,#185858',id:3},
-          {l:'Văn phòng phẩm',c:'vpp',g:'#d888a8,#882040',id:7},
-          {l:'Thiết bị giáo dục',c:'tbgd',g:'#7aaac0,#1a3040',id:11},
-          {l:'Sách nói',c:'audiobook',g:'#a898d8,#3a1870',id:null},
-          {l:'Ebook',c:'ebook',g:'#68b098,#185038',id:null},
-        ];
-        return cats.map(n=>{
-          const slug=n.id?HIMG[n.id]:null;
-          const img=slug?'<img src="'+uimg(slug,220)+'" class="catcirc-book" loading="lazy">':'<span class="catcirc-ico">'+({'vanhoc':'📖','thieunhi':'🌟','kynang':'⚡','sgk':'📘','thamkhao':'📚','ngoaingu':'🌐','vpp':'🖊','tbgd':'🔬','audiobook':'🎧','ebook':'💻'}[n.c]||'📦')+'</span>';
-          return '<div class="catcirc-item" onclick="go(\'listing\',\''+n.c+'\')">'+
-            '<div class="catcirc-circle" style="background:linear-gradient(150deg,'+n.g+')">'+img+'</div>'+
-            '<div class="catcirc-lbl">'+n.l+'</div>'+
-          '</div>';
-        }).join('');
-      })()+
-      '</div>'+
-      '<button class="catcirc-arr catcirc-arr-r" onclick="document.getElementById(\'catcircRow\').scrollBy({left:340,behavior:\'smooth\'});setTimeout(updateCatCircArr,350)">›</button>'+
+  /* ── Danh mục (app-icon style) ── */
+  '<div class="qcat-section">'+
+    '<h2 class="qcat-title">Danh mục</h2>'+
+    '<div class="qcat-row">'+
+    (()=>{
+      const cats=[
+        {l:'Sách Văn học',    c:'vanhoc',    e:'📖', g:'#e8705a,#c8362a'},
+        {l:'Sách Thiếu nhi',  c:'thieunhi',  e:'🌟', g:'#4caf7d,#2d7a52'},
+        {l:'Phát triển bản thân',c:'kynang', e:'⚡', g:'#50b8d0,#1a6878'},
+        {l:'Sách Giáo khoa',  c:'sgk',       e:'📘', g:'#4a90d8,#1a5098'},
+        {l:'Luyện thi & Tham khảo',c:'thamkhao',e:'📝',g:'#7a6dd8,#302880'},
+        {l:'Ngoại ngữ',       c:'ngoaingu',  e:'🌐', g:'#40c8b8,#107868'},
+        {l:'Văn phòng phẩm',  c:'vpp',       e:'✏️', g:'#f0a050,#c87020'},
+        {l:'Thiết bị GD',     c:'tbgd',      e:'🔬', g:'#5898d8,#1a3880'},
+        {l:'Sách nói',        c:'audiobook', e:'🎧', g:'#9878d8,#3a1878'},
+        {l:'Ebook',           c:'ebook',     e:'💻', g:'#48b088,#105838'},
+      ];
+      return cats.map(n=>
+        '<div class="qcat-item" onclick="go(\'listing\',\''+n.c+'\')">'+
+          '<div class="qcat-icon" style="background:linear-gradient(135deg,'+n.g+')">'+n.e+'</div>'+
+          '<div class="qcat-lbl">'+n.l+'</div>'+
+        '</div>'
+      ).join('');
+    })()+
     '</div>'+
   '</div>'+
 
