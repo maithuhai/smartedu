@@ -674,7 +674,7 @@ function renderHome(){
   '</div>'+
 
   /* Collections */
-  hmHead('Bộ sưu tập tuyển chọn','Biên tập viên gợi ý','sach')+
+  hmHead('Bộ sưu tập tuyển chọn','sach')+
   '<div class="hm-colls">'+
     '<div class="feat-slot">'+hmColl(COLLS[0],true)+'</div>'+
     hmColl(COLLS[1])+hmColl(COLLS[2])+
@@ -703,11 +703,29 @@ function renderHome(){
     '</div>'+
   '</div>'+
 
+  /* Top sản phẩm bán chạy */
+  hmHead('Top sản phẩm bán chạy')+
+  '<div class="bsr-tabs">'+
+    [['all','Tất cả'],['giay','Sách giấy'],['ebook','Sách điện tử'],['audio','Sách nói']].map(([k,v])=>
+      '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
+    ).join('')+
+  '</div>'+
+  '<div class="bsr-grid">'+bsFiltBooks.map((p,i)=>bsRankCard(p,i+1)).join('')+'</div>'+
+
+  /* Nhà bán nổi bật */
+  hmHead('Nhà bán nổi bật')+
+  '<div class="sup-row">'+
+    topSupps.map(s=>'<div class="sup-card" onclick="go(\'listing\',\''+s.cat+'\')">'+
+      '<div class="sup-avatar"><div class="sup-av-in" style="background:'+s.c+'18;color:'+s.c+'">'+s.short+'</div></div>'+
+      '<div class="sup-name">'+s.name+'</div>'+
+      '<div class="sup-cnt">'+s.count+' sản phẩm</div>'+
+    '</div>').join('')+
+  '</div>'+
+
   /* ── Sách nổi bật — Bookshelf Row ── */
   '<div class="bs-section">'+
     '<div class="bs-section-hd">'+
       '<div class="bs-section-left">'+
-        '<span class="bs-kicker">Biên tập viên gợi ý</span>'+
         '<h2 class="bs-section-title">📚 Sách nổi bật</h2>'+
       '</div>'+
       '<div class="bs-section-right">'+
@@ -756,25 +774,6 @@ function renderHome(){
     '<button class="bs-arr bs-arr-r" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
     '</div>'+
   '</div>'+
-
-  /* Nhà bán nổi bật */
-  hmHead('Nhà bán nổi bật')+
-  '<div class="sup-row">'+
-    topSupps.map(s=>'<div class="sup-card" onclick="go(\'listing\',\''+s.cat+'\')">'+
-      '<div class="sup-avatar"><div class="sup-av-in" style="background:'+s.c+'18;color:'+s.c+'">'+s.short+'</div></div>'+
-      '<div class="sup-name">'+s.name+'</div>'+
-      '<div class="sup-cnt">'+s.count+' sản phẩm</div>'+
-    '</div>').join('')+
-  '</div>'+
-
-  /* Top sản phẩm bán chạy */
-  hmHead('Top sản phẩm bán chạy')+
-  '<div class="bsr-tabs">'+
-    [['all','Tất cả'],['giay','Sách giấy'],['ebook','Sách điện tử'],['audio','Sách nói']].map(([k,v])=>
-      '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
-    ).join('')+
-  '</div>'+
-  '<div class="bsr-grid">'+bsFiltBooks.map((p,i)=>bsRankCard(p,i+1)).join('')+'</div>'+
 
   /* Stationery */
   '<div class="vpp-banner">'+
