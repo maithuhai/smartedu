@@ -710,7 +710,7 @@ function renderHome(){
       '<button class="bsr-tab'+(bstabFmt===k?' on':'')+'" onclick="bstabFmt=\''+k+'\';renderHome()">'+v+'</button>'
     ).join('')+
   '</div>'+
-  '<div class="bsr-grid">'+bsFiltBooks.map((p,i)=>bsRankCard(p,i+1)).join('')+'</div>'+
+  '<div class="hm-grid g4">'+bsFiltBooks.map(p=>hmCard(p)).join('')+'</div>'+
 
   /* Nhà bán nổi bật */
   hmHead('Nhà bán nổi bật')+
@@ -722,58 +722,9 @@ function renderHome(){
     '</div>').join('')+
   '</div>'+
 
-  /* ── Sách nổi bật — Bookshelf Row ── */
-  '<div class="bs-section">'+
-    '<div class="bs-section-hd">'+
-      '<div class="bs-section-left">'+
-        '<h2 class="bs-section-title">📚 Sách nổi bật</h2>'+
-      '</div>'+
-      '<div class="bs-section-right">'+
-        '<a class="bs-viewall" onclick="go(\'listing\',\'sach\')">Xem tất cả <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>'+
-      '</div>'+
-    '</div>'+
-    '<div class="bs-carousel-wrap">'+
-      '<button class="bs-arr bs-arr-l" onclick="shelfScroll(-1)" aria-label="Trước"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>'+
-      '<div class="bs-track" id="shelfTrack" onscroll="updateShelfArrows()">'+
-      featBooks.map(p=>{
-        const slug=HIMG[p.id];
-        const disc=Math.round((1-p.price/p.old)*100);
-        const sold=p.sold>=1000?(p.sold/1000).toFixed(1)+'k':String(p.sold);
-        const tag=bsTagMap[p.id];
-        const cover=slug
-          ?'<img src="'+uimg(slug,400)+'" alt="'+p.name+'" loading="lazy" class="bs-img">'
-          :'<div class="bs-grad" style="background:linear-gradient(155deg,'+p.c+' 0%,rgba(0,0,0,.6) 100%)"><div class="bs-grad-nm">'+p.name+'</div><div class="bs-grad-by">'+p.by+'</div></div>';
-        return '<div class="bs-item" onclick="go(\'product\','+p.id+')">'+
-          '<div class="bs-cover">'+
-            cover+
-            (tag?'<span class="bs-tag" style="background:'+tag.c+'">'+tag.l+'</span>':'')+
-            (disc>0?'<span class="bs-disc">-'+disc+'%</span>':'')+
-            '<div class="bs-hover-panel">'+
-              '<button class="bs-cart-btn" onclick="event.stopPropagation();addToCart('+p.id+')">'+
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Thêm vào giỏ'+
-              '</button>'+
-            '</div>'+
-          '</div>'+
-          '<div class="bs-info">'+
-            '<div class="bs-nm">'+p.name+'</div>'+
-            '<div class="bs-by">'+p.by+'</div>'+
-            '<div class="bs-rating">'+
-              '<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9Z"/></svg>'+
-              '<span class="bs-rate-val">'+p.rate.toFixed(1)+'</span>'+
-              '<span class="bs-rate-sep">·</span>'+
-              '<span class="bs-rate-sold">'+sold+' bán</span>'+
-            '</div>'+
-            '<div class="bs-pr">'+
-              '<span class="bs-now">'+fmt(p.price)+'</span>'+
-              (disc>0?'<span class="bs-old">'+fmt(p.old)+'</span>':'')+
-            '</div>'+
-          '</div>'+
-        '</div>';
-      }).join('')+
-    '</div>'+
-    '<button class="bs-arr bs-arr-r" onclick="shelfScroll(1)" aria-label="Tiếp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>'+
-    '</div>'+
-  '</div>'+
+  /* ── Sách nổi bật ── */
+  hmHead('📚 Sách nổi bật','','sach')+
+  '<div class="hm-grid g4">'+featBooks.slice(0,4).map(p=>hmCard(p)).join('')+'</div>'+
 
   /* Stationery */
   '<div class="vpp-banner">'+

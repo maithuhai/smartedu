@@ -1582,7 +1582,8 @@
 .bs-section{padding:0 0 36px;max-width:var(--mw,1200px);margin:0 auto;}
 .bs-section-hd{display:flex;align-items:flex-end;justify-content:space-between;padding:0 0 18px;flex-wrap:wrap;gap:10px;}
 .bs-kicker{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;}
-.bs-section-title{margin:0;font-size:22px;font-weight:700;color:var(--ink-deep);}
+.bs-section-title{font-family:'Lora',serif;font-weight:600;font-size:24px;color:#1e1410;margin:0;letter-spacing:-.01em;}
+.bs-section .bar{height:2.5px;width:200px;border-radius:2px;background:linear-gradient(to right,#c8362a 0%,#e8c87a 50%,transparent 100%);margin-top:8px;}
 .bs-section-right{display:flex;align-items:center;gap:8px;}
 .bs-carousel-wrap{position:relative;padding:0 44px;}
 .bs-arr{position:absolute;top:126px;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.13);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:box-shadow .15s,transform .15s,opacity .2s;z-index:10;}
@@ -1637,7 +1638,7 @@
 
 /* Responsive */
 @media(max-width:900px){.bs-item{width:148px;}.bs-cover{width:148px;height:222px;}}
-@media(max-width:600px){.bs-section{padding:0 0 24px;}.bs-section-title{font-size:18px;}.bs-arr{display:none;}.bs-carousel-wrap{padding:0;}.bs-item{width:130px;}.bs-cover{width:130px;height:195px;}.bs-nm{font-size:12px;}.bs-now{font-size:13px;}}
+@media(max-width:600px){.bs-section{padding:0 0 24px;}.bs-section-title{font-size:20px;}.bs-arr{display:none;}.bs-carousel-wrap{padding:0;}.bs-item{width:130px;}.bs-cover{width:130px;height:195px;}.bs-nm{font-size:12px;}.bs-now{font-size:13px;}}
 
 /* ── Nhà bán nổi bật ── */
 .sup-row{display:flex;gap:18px;overflow-x:auto;padding:4px 0 20px;scrollbar-width:none;}
