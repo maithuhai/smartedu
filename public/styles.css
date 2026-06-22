@@ -2102,3 +2102,127 @@
 .adm-search-inp:focus{border-color:var(--ink);}
 @media (max-width:900px){.adm-kpi-row{gap:8px;}.adm-kpi-card{padding:12px 14px;}.adm-kpi-card .adm-kpi-val{font-size:20px;}}
 @media (max-width:600px){.adm-section-title{font-size:17px;}.adm-kpi-card{min-width:calc(50% - 8px);}.adm-btn{padding:8px 14px;font-size:13px;}.adm-tab-btn{padding:8px 12px;font-size:12.5px;}}
+
+/* ===== Admin Modern Redesign ===== */
+
+/* acct-card — used in adminOverview, adminOrderDetail etc. */
+.acct-card{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:20px 22px;}
+
+/* Admin-specific grid layout */
+.adm-layout{grid-template-columns:252px 1fr;gap:0;align-items:stretch;}
+
+/* ── Admin Dark Sidebar ───────────────────────── */
+.adm-side{background:#1f1b18;border:none;border-radius:0;border-right:1px solid rgba(255,255,255,.07);padding:18px 12px 32px;min-height:calc(100vh - 152px);box-shadow:2px 0 16px rgba(0,0,0,.1);}
+.adm-side .acct-user{border-bottom:1px solid rgba(255,255,255,.09);padding-bottom:14px;margin-bottom:14px;}
+.adm-side .acct-user .av{background:var(--ink);width:40px;height:40px;font-size:15px;font-weight:700;border-radius:50%;box-shadow:0 0 0 2px rgba(200,54,42,.35);}
+.adm-side .acct-user .nm{color:#fff;font-size:14px;font-weight:600;}
+.adm-side .acct-user .rl{color:rgba(255,255,255,.38);font-size:11.5px;margin-top:1px;}
+.adm-side .acct-nav button{color:rgba(255,255,255,.55);border-radius:9px;padding:8px 11px;font-size:13px;gap:9px;margin-bottom:2px;letter-spacing:.01em;line-height:1.35;}
+.adm-side .acct-nav button svg{opacity:.7;flex-shrink:0;transition:opacity .15s;}
+.adm-side .acct-nav button span{flex:1;}
+.adm-side .acct-nav button:hover:not(.on){background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+.adm-side .acct-nav button:hover:not(.on) svg{opacity:.95;}
+.adm-side .acct-nav button.on{background:rgba(200,54,42,.22);color:#ffc8c4;font-weight:600;box-shadow:inset 3px 0 0 var(--ink);}
+.adm-side .acct-nav button.on svg{opacity:1;}
+.adm-side .acct-nav button.danger{color:rgba(240,140,128,.6);}
+.adm-side .acct-nav button.danger:hover{background:rgba(200,54,42,.15);color:#f5a5a0;}
+
+/* ── Admin Content Area ───────────────────────── */
+.adm-content{background:#eae4db;padding:28px 30px;min-height:calc(100vh - 152px);}
+
+/* ── Card Elevation in Admin Context ─────────── */
+.adm-content .acct-card{background:#fff;border:1.5px solid #e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);border-radius:14px;}
+.adm-content .adm-detail-card{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);}
+.adm-content .adm-form-card{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.adm-content .panel{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);}
+
+/* ── KPI Cards ────────────────────────────────── */
+.adm-content .adm-kpi{background:#fff;border-color:#e3dcd3;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);transition:box-shadow .2s,transform .2s;}
+.adm-content .adm-kpi:hover{box-shadow:0 4px 12px rgba(0,0,0,.09),0 12px 32px rgba(0,0,0,.07);transform:translateY(-2px);}
+.adm-content .adm-kpi-ic{background:#f8f4f0;border:1.5px solid #ede7de;border-radius:10px;}
+.adm-content .adm-kpi-card{background:#fff;border-color:#e3dcd3;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.04);}
+
+/* ── Tables in Admin Context ─────────────────── */
+.adm-content .adm-table-wrap{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);}
+.adm-content .adm-usr-table thead tr,.adm-content .adm-table thead tr{background:#faf7f3;}
+.adm-content .adm-usr-row:hover,.adm-content .adm-table tbody tr:hover{background:#fdf7f5;}
+
+/* ── Typography & Spacing ────────────────────── */
+.adm-content .adm-title{font-size:22px;}
+.adm-content .adm-section-title{font-size:21px;}
+.adm-content .adm-sec-hd h4{font-size:15px;}
+.adm-content .adm-header{margin-bottom:26px;}
+
+/* ── Tab Switchers — Pill Style in Admin ──────── */
+.adm-content .adm-shops-tabs{background:rgba(0,0,0,.05);border-radius:10px;padding:3px;gap:2px;border-bottom:none;display:inline-flex;margin-bottom:18px;}
+.adm-content .adm-shops-tab{padding:7px 16px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;margin-bottom:0;}
+.adm-content .adm-shops-tab:hover{color:var(--ink-deep);}
+.adm-content .adm-shops-tab.on{background:#fff;color:var(--ink-deep);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.1);border-bottom-color:transparent;}
+
+/* ── Sub-tab buttons ─────────────────────────── */
+.adm-content .adm-tab-btn{font-size:13px;padding:9px 16px;}
+.adm-content .adm-tab-btn.active{color:var(--ink);border-bottom-color:var(--ink);}
+
+/* ── Row & Pager Buttons ─────────────────────── */
+.adm-content .adm-row-btn{background:#fff;border-color:#ddd7cf;border-radius:7px;}
+.adm-content .adm-row-btn:hover{background:#faf7f3;border-color:#bdb5ab;}
+.adm-content .adm-pager-btn{background:#fff;border-color:#ddd7cf;}
+.adm-content .adm-pager-btn:not(:disabled):hover{background:#faf7f3;}
+
+/* ── Detail & Action Buttons ────────────────── */
+.adm-content .adm-act-btn{background:#fff;border-color:#ddd7cf;}
+.adm-content .adm-act-btn:hover{background:#faf7f3;border-color:#bdb5ab;}
+.adm-content .adm-back-btn{color:var(--ink-deep);font-weight:600;}
+
+/* ── Level Cards ─────────────────────────────── */
+.adm-content .adm-level-card{background:#fff;border-color:#ddd7cf;}
+.adm-content .adm-level-card.on{border-color:var(--ink);background:#fff8f7;box-shadow:0 0 0 3px rgba(200,54,42,.08);}
+
+/* ── System Settings Cards ───────────────────── */
+.adm-content .sys-module-card,.adm-content .sys-gw-card,.adm-content .sys-oauth-card{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.adm-content .sys-sub-tabs{border-color:#e3dcd3;}
+.adm-content .sys-form-group input,.adm-content .sys-form-group select,.adm-content .sys-form-group textarea{background:#fff;}
+
+/* ── Notif & CMS Editors ─────────────────────── */
+.adm-content .notif-editor{background:#fff;}
+.adm-content .cms-editor{background:#fff;}
+.adm-content .adm-search-inp{background:#fff;border-color:#ddd7cf;}
+.adm-content .adm-usr-search,.adm-content .adm-usr-filter,.adm-content .adm-filter-sel{background:#fff;border-color:#ddd7cf;}
+
+/* ── Finance chart ───────────────────────────── */
+.adm-content .fin-bar{border-radius:4px 4px 0 0;}
+
+/* ── Section divider cards ───────────────────── */
+.adm-content .adm-detail-head{border-bottom-color:#f0ebe4;}
+.adm-content .adm-detail-actions{border-top-color:#f0ebe4;}
+.adm-content .adm-detail-section{border-top-color:#f0ebe4;}
+.adm-content .adm-detail-item{background:#f8f5f0;}
+
+/* ── Order & Promo Cards ─────────────────────── */
+.adm-content .adm-ord-section{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.adm-content .promo-fs-card{background:#fff;border-color:#e3dcd3;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.adm-content .promo-fs-card:hover{box-shadow:0 3px 12px rgba(0,0,0,.09);}
+.adm-content .adm-ncc-stat-grid .adm-detail-item{background:#f8f5f0;}
+
+/* ── Toolbar Inputs ──────────────────────────── */
+.adm-content .adm-usr-search:focus,.adm-content .adm-search-inp:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(200,54,42,.1);}
+.adm-content input[type="text"],.adm-content input[type="email"],.adm-content input[type="password"],.adm-content input[type="number"],.adm-content input[type="url"],.adm-content select,.adm-content textarea{transition:border-color .2s,box-shadow .2s;}
+.adm-content input:focus,.adm-content select:focus,.adm-content textarea:focus{outline:none;border-color:var(--ink)!important;box-shadow:0 0 0 3px rgba(200,54,42,.1);}
+
+/* ── Range Date Selector ─────────────────────── */
+.adm-content .adm-range{background:#fff;border-color:#ddd7cf;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.adm-content .adm-range-btn.on{background:var(--ink);color:#fff;box-shadow:0 1px 4px rgba(200,54,42,.3);}
+
+/* ── Pager info text ─────────────────────────── */
+.adm-content .adm-pager{background:#fff;border-top:1px solid #f0ebe4;border-radius:0 0 12px 12px;}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width:880px){
+  .adm-layout{grid-template-columns:1fr;}
+  .adm-side{min-height:auto;position:static;border-radius:var(--r);border:none;padding:14px 12px;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+  .adm-content{padding:18px 16px;min-height:auto;}
+}
+@media (max-width:600px){
+  .adm-content{padding:14px 12px;}
+  .adm-content .adm-shops-tabs{flex-wrap:wrap;}
+}
