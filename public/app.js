@@ -1762,6 +1762,10 @@ let sellerRevenuePeriod='month';
 let sellerPayTab='balance';
 let sellerAnalyticsTab='basic';
 let sellerAnalyticsPeriod='week';
+let sellerReviewFilter='all';
+let sellerReviewStarFilter=0;
+let sellerReviewProductFilter='all';
+let sellerReviewEditReplyId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3216,6 +3220,47 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
     weeklyOrders:    [8,14,9,21,16,28,19]
   };
   saveActiveSellers();
+})();
+
+/* ── Seed demo reviews for seller-sapp-001 products ── */
+(function(){
+  if(reviewsStore['_seller_sapp_001_seeded']) return;
+  const seed={
+    'slp-001':[
+      {name:'Phụ huynh Minh Anh',rate:5,text:'Sách rất đẹp, in ấn sắc nét. Con học rất thích bộ SGK này. Giao hàng nhanh, đóng gói cẩn thận.',date:'10/06/2025'},
+      {name:'Thầy Nguyễn Hùng',rate:4,text:'Sách chất lượng tốt. Bìa cứng, giấy dày. Chỉ có điều giá hơi cao so với bản thường.',date:'08/06/2025'},
+      {name:'Mẹ bé Hà',rate:3,text:'Nội dung đầy đủ nhưng giao hàng hơi chậm. Bộ sách bị lệch trang ở quyển Tiếng Việt.',date:'05/06/2025'}
+    ],
+    'slp-004':[
+      {name:'Lê Bảo Châu',rate:5,text:'Sách in đẹp, bìa cứng chắc chắn. Dế Mèn phiêu lưu ký bản bìa cứng này rất xứng đáng làm quà tặng!',date:'12/06/2025',reply:'Cảm ơn bạn đã tin tưởng shop! Chúc bạn và gia đình đọc sách vui vẻ 📚',replyDate:'13/06/2025'},
+      {name:'Trần Minh Khôi',rate:1,text:'Sản phẩm nhận được bị móp góc, bìa cứng bị trầy xước. Đóng gói quá sơ sài. Không hài lòng chút nào.',date:'09/06/2025'},
+      {name:'Nguyễn Thị Lan',rate:5,text:'Tuyệt vời! Đây là lần thứ ba tôi mua ở đây. Luôn tin tưởng shop.',date:'07/06/2025',reply:'Cảm ơn chị đã ủng hộ shop lần này nữa! Sẽ tiếp tục mang đến những sản phẩm tốt nhất 💙',replyDate:'07/06/2025'}
+    ],
+    'slp-005':[
+      {name:'Hoàng Gia Huy',rate:5,text:'Cuốn sách hay nhất tôi đọc năm nay. Dịch rất tốt, giữ được cái hồn của bản gốc.',date:'11/06/2025'},
+      {name:'Nguyễn Bảo Anh',rate:4,text:'Sách hay, nhiều kiến thức thực tế. Giao hàng nhanh trong 1 ngày.',date:'06/06/2025'},
+      {name:'Trung Hiếu',rate:2,text:'Sách bị ố vàng một số trang. Có vẻ là hàng tồn kho lâu. Cần cải thiện khâu bảo quản.',date:'04/06/2025'}
+    ],
+    'svp-001':[
+      {name:'Học sinh Minh Trí',rate:5,text:'Bút viết trơn, không bị tắc mực. Mua một hộp 10 cây cho cả lớp dùng. Giá rẻ hơn văn phòng phẩm ngoài.',date:'13/06/2025'},
+      {name:'Văn phòng ABC',rate:4,text:'Mua số lượng lớn, giá ổn. Giao hàng đúng hẹn. Sẽ mua tiếp.',date:'09/06/2025',reply:'Cảm ơn công ty đã lựa chọn shop! Hãy liên hệ shop nếu cần báo giá số lượng lớn nhé 😊',replyDate:'09/06/2025'}
+    ],
+    'std-001':[
+      {name:'Phụ huynh Thanh Tùng',rate:5,text:'Máy tính bảng cho con học online rất tốt. Pin trâu, màn hình sắc nét. Đặt hàng chiều tối, sáng hôm sau đã nhận được.',date:'14/06/2025'},
+      {name:'Giáo viên Hải Yến',rate:4,text:'Thiết bị học tốt, cài được nhiều app học tiếng Anh. Chỉ cần thêm bao da bảo vệ đi kèm thì hoàn hảo hơn.',date:'11/06/2025'}
+    ],
+    'sle-002':[
+      {name:'Nguyễn Văn Bình',rate:5,text:'Ebook format đẹp, phông chữ dễ đọc. Mình học được rất nhiều từ vựng thực tế. Rất đáng tiền!',date:'11/06/2025',reply:'Cảm ơn bạn đã trải nghiệm ebook của shop! Bạn có thể xem thêm series từ vựng nâng cao trong danh mục ebook nhé 📖',replyDate:'12/06/2025'},
+      {name:'Cao Thị Hoa',rate:3,text:'Nội dung ổn nhưng file PDF hơi nặng, mở hơi chậm trên điện thoại. Hy vọng shop tối ưu thêm.',date:'08/06/2025'},
+      {name:'Phan Đức Long',rate:1,text:'File ebook bị lỗi font chữ khi đọc trên Kindle. Không dùng được. Cần hỗ trợ gấp.',date:'06/06/2025'}
+    ]
+  };
+  Object.entries(seed).forEach(function(entry){
+    var pid=entry[0], revs=entry[1];
+    reviewsStore[pid]=(reviewsStore[pid]||[]).concat(revs);
+  });
+  reviewsStore['_seller_sapp_001_seeded']=true;
+  LS.set('reviews',reviewsStore);
 })();
 
 let commissionCfg=LS.get('commissionCfg',null);
@@ -7632,7 +7677,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-reviews','Đánh giá'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8526,6 +8571,7 @@ function sellerContent(){
   if(acctTab==='seller-warehouse')     return isApproved?sellerWarehouse():sellerAppStatus(myApp);
   if(acctTab==='seller-revenue')       return isApproved?sellerRevenueReport():sellerAppStatus(myApp);
   if(acctTab==='seller-analytics')     return isApproved?sellerAnalytics():sellerAppStatus(myApp);
+  if(acctTab==='seller-reviews')       return isApproved?sellerReviewCenter():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -11803,6 +11849,234 @@ function doSellerExportReport(fmt){
     win.document.close();
     toast('✓ Đã mở cửa sổ xuất PDF — nhấn "In" và chọn "Save as PDF".');
   }
+}
+
+/* ── 6j. Review Management ── */
+function sellerReviewCenter(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+
+  /* Build product map {pid -> {prodName, type}} */
+  const prodMap={};
+  (s.products||[]).forEach(function(p){prodMap[p.id]={prodName:p.name,type:'books'};});
+  (s.ebooks||[]).forEach(function(p){prodMap[p.id]={prodName:p.name,type:'ebook'};});
+  (s.vppProducts||[]).forEach(function(p){prodMap[p.id]={prodName:p.name,type:'vpp'};});
+  (s.tbgdProducts||[]).forEach(function(p){prodMap[p.id]={prodName:p.name,type:'tbgd'};});
+
+  /* Collect all reviews across seller's products */
+  const allRevs=[];
+  Object.keys(prodMap).forEach(function(pid){
+    const pInfo=prodMap[pid];
+    (reviewsStore[pid]||[]).forEach(function(rv,idx){
+      allRevs.push(Object.assign({pid:pid,idx:idx,prodName:pInfo.prodName,pType:pInfo.type},rv));
+    });
+  });
+
+  /* Sort newest first */
+  allRevs.sort(function(a,b){
+    function pd(ds){ if(!ds) return 0; var p=ds.split('/'); return new Date(+p[2],+p[1]-1,+p[0]).getTime(); }
+    return pd(b.date)-pd(a.date);
+  });
+
+  /* Stats */
+  const totalReplied=allRevs.filter(function(r){return !!r.reply;}).length;
+  const cnt={
+    all:allRevs.length,
+    unanswered:allRevs.filter(function(r){return !r.reply;}).length,
+    positive:allRevs.filter(function(r){return r.rate>=4;}).length,
+    negative:allRevs.filter(function(r){return r.rate<=2;}).length
+  };
+  const avgRate=allRevs.length?allRevs.reduce(function(a,r){return a+r.rate;},0)/allRevs.length:0;
+
+  /* Apply filters */
+  var filtered=allRevs;
+  if(sellerReviewFilter==='unanswered') filtered=filtered.filter(function(r){return !r.reply;});
+  if(sellerReviewFilter==='positive')   filtered=filtered.filter(function(r){return r.rate>=4;});
+  if(sellerReviewFilter==='negative')   filtered=filtered.filter(function(r){return r.rate<=2;});
+  if(sellerReviewStarFilter>0) filtered=filtered.filter(function(r){return r.rate===sellerReviewStarFilter;});
+  if(sellerReviewProductFilter!=='all') filtered=filtered.filter(function(r){return r.pid===sellerReviewProductFilter;});
+
+  /* Tab buttons */
+  function tabBtn(k,lbl){
+    var active=sellerReviewFilter===k;
+    return '<button onclick="sellerReviewFilter=\''+k+'\';renderAccount()" style="padding:8px 18px;border:none;border-bottom:2.5px solid '+(active?'#1565c0':'transparent')+';background:transparent;color:'+(active?'#1565c0':'var(--text-soft)')+';font-size:13.5px;font-weight:'+(active?'700':'400')+';cursor:pointer;white-space:nowrap;flex-shrink:0">'+lbl+
+      '<span style="margin-left:5px;padding:1px 7px;border-radius:10px;background:'+(active?'#1565c0':'#e0e0e0')+';color:'+(active?'#fff':'#666')+';font-size:11.5px">'+cnt[k]+'</span></button>';
+  }
+  const tabs='<div style="display:flex;border-bottom:1.5px solid var(--line);margin-bottom:16px;overflow-x:auto">'+
+    tabBtn('all','Tất cả')+tabBtn('unanswered','Chưa trả lời')+tabBtn('positive','Tích cực ≥4★')+tabBtn('negative','Tiêu cực ≤2★')+
+  '</div>';
+
+  /* Stats summary card */
+  const rateDist=[5,4,3,2,1].map(function(n){
+    var c=allRevs.filter(function(r){return r.rate===n;}).length;
+    var pct=allRevs.length?Math.round((c/allRevs.length)*100):0;
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
+      '<span style="font-size:12px;color:#f57f17;min-width:20px;text-align:right">'+n+'★</span>'+
+      '<div style="flex:1;background:#e0e0e0;border-radius:3px;height:7px"><div style="background:#f57f17;height:7px;border-radius:3px;width:'+pct+'%"></div></div>'+
+      '<span style="font-size:11.5px;color:var(--text-soft);min-width:24px">'+c+'</span>'+
+    '</div>';
+  }).join('');
+  const statBlock='<div style="display:flex;gap:20px;align-items:center;background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:16px 20px;margin-bottom:16px;flex-wrap:wrap;gap:16px">'+
+    '<div style="text-align:center;min-width:72px">'+
+      '<div style="font-size:38px;font-weight:800;color:#f57f17;line-height:1">'+avgRate.toFixed(1)+'</div>'+
+      '<div style="font-size:15px;color:#f57f17;margin:2px 0;letter-spacing:2px">'+'★'.repeat(Math.round(avgRate))+'</div>'+
+      '<div style="font-size:12px;color:var(--text-soft)">'+allRevs.length+' đánh giá</div>'+
+    '</div>'+
+    '<div style="flex:1;min-width:160px">'+rateDist+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:200px">'+
+      '<div style="background:#e8f5e9;border-radius:8px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:#2e7d32">'+cnt.positive+'</div><div style="font-size:11px;color:#2e7d32">Tích cực ≥4★</div></div>'+
+      '<div style="background:#fce4ec;border-radius:8px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:#c62828">'+cnt.negative+'</div><div style="font-size:11px;color:#c62828">Tiêu cực ≤2★</div></div>'+
+      '<div style="background:#fff8e1;border-radius:8px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:#f57f17">'+cnt.unanswered+'</div><div style="font-size:11px;color:#e65100">Chưa trả lời</div></div>'+
+      '<div style="background:#e8f4fd;border-radius:8px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:#1565c0">'+totalReplied+'</div><div style="font-size:11px;color:#1565c0">Đã trả lời</div></div>'+
+    '</div>'+
+  '</div>';
+
+  /* Filter bar */
+  const starBtns='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+
+    '<span style="font-size:12.5px;color:var(--text-soft)">Sao:</span>'+
+    '<button onclick="sellerReviewStarFilter=0;renderAccount()" style="padding:4px 11px;border-radius:14px;border:1.5px solid '+(sellerReviewStarFilter===0?'#1565c0':'var(--line)')+';background:'+(sellerReviewStarFilter===0?'#1565c0':'transparent')+';color:'+(sellerReviewStarFilter===0?'#fff':'var(--text-soft)')+';font-size:12px;cursor:pointer">Tất cả</button>'+
+    [5,4,3,2,1].map(function(n){return '<button onclick="sellerReviewStarFilter='+n+';renderAccount()" style="padding:4px 11px;border-radius:14px;border:1.5px solid '+(sellerReviewStarFilter===n?'#f57f17':'var(--line)')+';background:'+(sellerReviewStarFilter===n?'#fff8e1':'transparent')+';color:'+(sellerReviewStarFilter===n?'#f57f17':'var(--text-soft)')+';font-size:12px;cursor:pointer">'+n+'★</button>';}).join('')+
+  '</div>';
+  const prodOpts='<option value="all">Tất cả sản phẩm</option>'+
+    Object.keys(prodMap).map(function(pid){
+      return '<option value="'+pid+'" '+(sellerReviewProductFilter===pid?'selected':'')+'>'+escHtml(prodMap[pid].prodName)+'</option>';
+    }).join('');
+  const filterBar='<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px">'+
+    starBtns+
+    '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:12.5px;color:var(--text-soft)">Sản phẩm:</span>'+
+      '<select onchange="sellerReviewProductFilter=this.value;renderAccount()" style="padding:5px 10px;border-radius:8px;border:1.5px solid var(--line);font-size:13px;background:var(--paper)">'+prodOpts+'</select>'+
+    '</div>'+
+  '</div>';
+
+  /* Empty state */
+  if(!filtered.length){
+    return '<div class="panel">'+
+      '<div style="margin-bottom:16px"><h3 style="margin:0">Đánh giá sản phẩm</h3><p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">Quản lý và phản hồi đánh giá từ khách hàng.</p></div>'+
+      tabs+statBlock+filterBar+
+      '<div style="text-align:center;padding:40px 20px;color:var(--text-soft)"><div style="font-size:40px;margin-bottom:10px">🌟</div><p>Không có đánh giá nào phù hợp bộ lọc.</p></div>'+
+    '</div>';
+  }
+
+  const typeClr={books:'#1565c0',ebook:'#6a1b9a',vpp:'#2e7d32',tbgd:'#e65100'};
+  const typeLbl={books:'Sách giấy',ebook:'Ebook',vpp:'VPP',tbgd:'Thiết bị'};
+
+  const cards=filtered.map(function(rv){
+    const editKey=rv.pid+':'+rv.idx;
+    const isEditing=sellerReviewEditReplyId===editKey;
+    const stars='★'.repeat(rv.rate)+'☆'.repeat(5-rv.rate);
+    const starClr=rv.rate>=4?'#f57f17':rv.rate===3?'#ff8f00':'#e74c3c';
+    const borderClr=rv.rate<=2?'#ffcdd2':rv.rate>=4?'#c8e6c9':'var(--line)';
+    const avatarLetter=(rv.name||'K').charAt(0).toUpperCase();
+    const avatarClr=['#1565c0','#6a1b9a','#2e7d32','#e65100','#00838f'][avatarLetter.charCodeAt(0)%5];
+    const taId='srvReply_'+rv.pid.replace(/-/g,'_')+'_'+rv.idx;
+
+    /* Reply block */
+    var replyBlock='';
+    if(rv.reply&&!isEditing){
+      replyBlock='<div style="margin-top:12px;background:#e8f4fd;border-left:3px solid #1565c0;border-radius:0 8px 8px 0;padding:10px 14px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+          '<span style="font-size:12px;font-weight:700;color:#1565c0">💬 Phản hồi của shop</span>'+
+          '<span style="font-size:11.5px;color:var(--text-soft)">'+escHtml(rv.replyDate||'')+'</span>'+
+        '</div>'+
+        '<div style="font-size:13.5px;color:#333;white-space:pre-wrap;line-height:1.6">'+escHtml(rv.reply)+'</div>'+
+        '<div style="margin-top:8px;display:flex;gap:8px">'+
+          '<button onclick="sellerReviewEditReplyId=\''+editKey+'\';renderAccount()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #1565c0;background:transparent;color:#1565c0;font-size:12px;cursor:pointer">✏️ Sửa</button>'+
+          '<button onclick="doSellerDeleteReply(\''+rv.pid+'\','+rv.idx+')" style="padding:4px 12px;border-radius:6px;border:1.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12px;cursor:pointer">🗑 Xóa</button>'+
+        '</div>'+
+      '</div>';
+    } else if(isEditing){
+      replyBlock='<div style="margin-top:12px;background:#f0f7ff;border-radius:8px;padding:12px 14px;border:1.5px solid #90caf9">'+
+        '<div style="font-size:12.5px;font-weight:700;color:#1565c0;margin-bottom:8px">'+(rv.reply?'✏️ Chỉnh sửa phản hồi':'💬 Viết phản hồi')+'</div>'+
+        '<textarea id="'+taId+'" rows="3" placeholder="Nhập phản hồi của shop..." style="width:100%;padding:8px 10px;border:1.5px solid #90caf9;border-radius:8px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box">'+escHtml(rv.reply||'')+'</textarea>'+
+        '<div style="display:flex;gap:8px;margin-top:8px">'+
+          '<button onclick="doSellerSaveReply(\''+rv.pid+'\','+rv.idx+',\''+taId+'\')" style="padding:6px 16px;border-radius:8px;border:none;background:#1565c0;color:#fff;font-size:13px;font-weight:600;cursor:pointer">💾 Lưu phản hồi</button>'+
+          '<button onclick="sellerReviewEditReplyId=null;renderAccount()" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text-soft);font-size:13px;cursor:pointer">Hủy</button>'+
+        '</div>'+
+      '</div>';
+    } else {
+      replyBlock='<div style="margin-top:10px">'+
+        '<button onclick="sellerReviewEditReplyId=\''+editKey+'\';renderAccount()" style="padding:6px 14px;border-radius:8px;border:1.5px solid #1565c0;background:transparent;color:#1565c0;font-size:12.5px;cursor:pointer;font-weight:600">💬 Viết phản hồi</button>'+
+      '</div>';
+    }
+
+    /* Report badge or button */
+    const reportBlock=rv.reported
+      ?'<span style="padding:3px 8px;border-radius:5px;background:#fce4ec;color:#c62828;font-size:11px;font-weight:600">⚑ Đã báo cáo</span>'
+      :'<button onclick="doSellerReportReview(\''+rv.pid+'\','+rv.idx+')" style="padding:3px 10px;border-radius:6px;border:1.5px solid #e0e0e0;background:transparent;color:var(--text-soft);font-size:11.5px;cursor:pointer" title="Báo cáo đánh giá này lên quản trị viên">⚑ Báo cáo</button>';
+
+    return '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:16px 18px;margin-bottom:12px;border:1.5px solid '+borderClr+'">'+
+      /* Header row */
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">'+
+        '<div style="display:flex;align-items:center;gap:10px">'+
+          '<div style="width:38px;height:38px;border-radius:50%;background:'+avatarClr+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">'+avatarLetter+'</div>'+
+          '<div>'+
+            '<div style="font-weight:700;font-size:13.5px">'+escHtml(rv.name||'Ẩn danh')+'</div>'+
+            '<div style="font-size:14px;color:'+starClr+';letter-spacing:1px;margin-top:1px">'+stars+
+              ' <span style="color:var(--text-soft);font-size:11px">('+rv.rate+'/5)</span>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+          '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:'+(typeClr[rv.pType]||'#555')+'18;color:'+(typeClr[rv.pType]||'#555')+';font-weight:700">'+escHtml(typeLbl[rv.pType]||rv.pType)+'</span>'+
+          '<span style="font-size:11px;color:var(--text-soft)">'+escHtml(rv.date||'')+'</span>'+
+          reportBlock+
+        '</div>'+
+      '</div>'+
+      /* Product label */
+      '<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:6px">📦 '+escHtml(rv.prodName||'')+'</div>'+
+      /* Review text */
+      '<div style="font-size:14px;color:#333;line-height:1.7">'+escHtml(rv.text||'')+'</div>'+
+      replyBlock+
+    '</div>';
+  }).join('');
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">'+
+      '<div><h3 style="margin:0">Đánh giá sản phẩm</h3><p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">Quản lý và phản hồi đánh giá từ khách hàng.</p></div>'+
+    '</div>'+
+    tabs+statBlock+filterBar+
+    '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">Hiển thị '+filtered.length+' / '+allRevs.length+' đánh giá</div>'+
+    cards+
+  '</div>';
+}
+
+function doSellerSaveReply(pid,idx,taId){
+  var ta=document.getElementById(taId);
+  if(!ta){toast('Không tìm thấy ô nhập phản hồi.');return;}
+  var text=(ta.value||'').trim();
+  if(!text){toast('Vui lòng nhập nội dung phản hồi.');return;}
+  if(!reviewsStore[pid]||!reviewsStore[pid][idx]){toast('Không tìm thấy đánh giá.');return;}
+  reviewsStore[pid][idx].reply=text;
+  reviewsStore[pid][idx].replyDate=todayStr();
+  LS.set('reviews',reviewsStore);
+  sellerReviewEditReplyId=null;
+  toast('✓ Đã lưu phản hồi thành công!');
+  renderAccount();
+}
+
+function doSellerDeleteReply(pid,idx){
+  if(!confirm('Xóa phản hồi này?')) return;
+  if(!reviewsStore[pid]||!reviewsStore[pid][idx]) return;
+  delete reviewsStore[pid][idx].reply;
+  delete reviewsStore[pid][idx].replyDate;
+  LS.set('reviews',reviewsStore);
+  toast('✓ Đã xóa phản hồi.');
+  renderAccount();
+}
+
+function doSellerReportReview(pid,idx){
+  var reason=prompt('Lý do báo cáo đánh giá này lên quản trị viên:','');
+  if(reason===null) return;
+  reason=(reason||'').trim();
+  if(!reason){toast('Vui lòng nhập lý do báo cáo.');return;}
+  if(!reviewsStore[pid]||!reviewsStore[pid][idx]) return;
+  reviewsStore[pid][idx].reported=true;
+  reviewsStore[pid][idx].reportReason=reason;
+  reviewsStore[pid][idx].reportDate=todayStr();
+  LS.set('reviews',reviewsStore);
+  addNotif('⚑ Bạn đã báo cáo 1 đánh giá — quản trị viên sẽ xem xét trong 24–48 giờ.');
+  toast('✓ Đã báo cáo lên admin. Chúng tôi sẽ xem xét sớm!');
+  renderAccount();
 }
 
 /* ── 7. Shop Editor (edit business info) ── */
