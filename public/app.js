@@ -1744,6 +1744,12 @@ let sellerEditTbgdId=null;
 let sellerTbgdSearch='';
 let sellerTbgdStatusFilter='all';
 let sellerRestockTbgdId=null;
+let sellerOrderSearch='';
+let sellerOrderStatusFilter='all';
+let sellerOrderSelected=[];
+let sellerViewOrderId=null;
+let sellerCancelOrderId=null;
+let sellerTrackingOrderId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3080,6 +3086,23 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
     ];
     saveActiveSellers();
   }
+})();
+
+/* ── Seed seller-sapp-001 full orders ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx===-1||activeSellers[sIdx].orders) return;
+  activeSellers[sIdx].orders=[
+    {id:'ORD-2025-089',buyer:'Nguyễn Thị Hoa',buyerPhone:'0901 234 567',buyerAddress:'123 Nguyễn Trãi, P.3, Q.5, TP.HCM',items:[{name:'Bộ SGK Lớp 5 Kết nối tri thức',qty:2,price:185000,unit:'Bộ'},{name:'Bút bi Thiên Long TL-027',qty:10,price:4500,unit:'Cây'}],subtotal:415000,shippingFee:30000,total:445000,status:'pending',trackingNumber:'',note:'Giao hàng giờ hành chính, gọi trước 30 phút.',cancelReason:'',cancelledAt:'',date:'23/06/2025',updatedAt:'23/06/2025'},
+    {id:'ORD-2025-088',buyer:'Trần Văn Nam',buyerPhone:'0912 345 678',buyerAddress:'45 Lê Lợi, P.Bến Nghé, Q.1, TP.HCM',items:[{name:'Sách Tiếng Anh 7 Global Success',qty:1,price:35000,unit:'Quyển'}],subtotal:35000,shippingFee:20000,total:55000,status:'delivered',trackingNumber:'GHTK8834521',note:'',cancelReason:'',cancelledAt:'',date:'22/06/2025',updatedAt:'23/06/2025'},
+    {id:'ORD-2025-087',buyer:'Lê Thị Linh',buyerPhone:'0977 654 321',buyerAddress:'78 Trần Hưng Đạo, P.Cầu Ông Lãnh, Q.1, TP.HCM',items:[{name:'Dế Mèn Phiêu Lưu Ký (Bìa Cứng)',qty:1,price:88000,unit:'Quyển'},{name:'Atomic Habits – Thói Quen Nguyên Tử',qty:1,price:115000,unit:'Quyển'}],subtotal:203000,shippingFee:25000,total:228000,status:'shipping',trackingNumber:'VTP9921034',note:'Giao trước 17h',cancelReason:'',cancelledAt:'',date:'22/06/2025',updatedAt:'23/06/2025'},
+    {id:'ORD-2025-086',buyer:'Phạm Hoài Nam',buyerPhone:'0966 111 222',buyerAddress:'56 Đinh Tiên Hoàng, P.Đa Kao, Q.1, TP.HCM',items:[{name:'Bộ SGK Lớp 5 Kết nối tri thức',qty:1,price:185000,unit:'Bộ'},{name:'Vở ô ly Hồng Hà 96 trang',qty:5,price:8500,unit:'Quyển'},{name:'Kẹp bướm 19mm (Hộp 12 cái)',qty:2,price:12000,unit:'Hộp'}],subtotal:251500,shippingFee:25000,total:276500,status:'delivered',trackingNumber:'GHTK7734210',note:'',cancelReason:'',cancelledAt:'',date:'21/06/2025',updatedAt:'22/06/2025'},
+    {id:'ORD-2025-085',buyer:'Nguyễn Văn Tú',buyerPhone:'0888 999 000',buyerAddress:'12 Bà Triệu, P.Hàng Bài, Q.Hoàn Kiếm, Hà Nội',items:[{name:'Atomic Habits – Thói Quen Nguyên Tử',qty:1,price:115000,unit:'Quyển'}],subtotal:115000,shippingFee:35000,total:150000,status:'delivered',trackingNumber:'VTP8812099',note:'',cancelReason:'',cancelledAt:'',date:'20/06/2025',updatedAt:'21/06/2025'},
+    {id:'ORD-2025-084',buyer:'Vũ Thị Thanh',buyerPhone:'0933 456 789',buyerAddress:'90 Nguyễn Văn Cừ, P.An Khánh, Q.Ninh Kiều, Cần Thơ',items:[{name:'Sách GK Toán 6 Cánh Diều',qty:3,price:32000,unit:'Quyển'},{name:'Bút bi Thiên Long TL-027',qty:20,price:4500,unit:'Cây'}],subtotal:186000,shippingFee:30000,total:216000,status:'processing',trackingNumber:'',note:'',cancelReason:'',cancelledAt:'',date:'23/06/2025',updatedAt:'23/06/2025'},
+    {id:'ORD-2025-083',buyer:'Hoàng Minh Đức',buyerPhone:'0944 222 333',buyerAddress:'34 Lý Thường Kiệt, P.7, Q.Tân Bình, TP.HCM',items:[{name:'Màu sáp Faber-Castell 24 màu',qty:2,price:68000,unit:'Bộ'}],subtotal:136000,shippingFee:20000,total:156000,status:'cancelled',trackingNumber:'',note:'',cancelReason:'Khách hàng đổi ý, không có nhu cầu mua nữa.',cancelledAt:'19/06/2025',date:'18/06/2025',updatedAt:'19/06/2025'},
+    {id:'ORD-2025-082',buyer:'Đặng Thu Hà',buyerPhone:'0956 333 444',buyerAddress:'67 Pasteur, P.Bến Nghé, Q.1, TP.HCM',items:[{name:'Máy tính bảng Samsung Galaxy Tab A8',qty:1,price:6290000,unit:'Cái'}],subtotal:6290000,shippingFee:0,total:6290000,status:'delivered',trackingNumber:'GHTK6621088',note:'Miễn phí vận chuyển đơn trên 5tr',cancelReason:'',cancelledAt:'',date:'17/06/2025',updatedAt:'19/06/2025'}
+  ];
+  saveActiveSellers();
 })();
 
 let commissionCfg=LS.get('commissionCfg',null);
@@ -7496,7 +7519,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8385,6 +8408,8 @@ function sellerContent(){
   if(acctTab==='seller-vpp-form')      return isApproved?sellerVppForm(sellerEditVppId):sellerAppStatus(myApp);
   if(acctTab==='seller-tbgd')          return isApproved?sellerTbgdList():sellerAppStatus(myApp);
   if(acctTab==='seller-tbgd-form')     return isApproved?sellerTbgdForm(sellerEditTbgdId):sellerAppStatus(myApp);
+  if(acctTab==='seller-orders')        return isApproved?sellerOrderList():sellerAppStatus(myApp);
+  if(acctTab==='seller-order-detail')  return isApproved?sellerOrderDetail(sellerViewOrderId):sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -10197,6 +10222,450 @@ function doSellerRestockTbgd(id){
   toast('✓ Đã nhập thêm '+qty+' '+v.unit+' — tồn kho mới: '+v.stock);
   addNotif('Nhập hàng thành công: +'+qty+' "'+v.name+'" — tồn kho: '+v.stock);
   renderAccount();
+}
+
+/* ── 6e. Seller Order Management ── */
+const SELLER_ORDER_STATUS={
+  pending:    {lbl:'Chờ xác nhận', clr:'#f57f17', bg:'#fff8e1'},
+  processing: {lbl:'Đang xử lý',   clr:'#1565c0', bg:'#e8f4fd'},
+  shipping:   {lbl:'Đang giao',    clr:'#6a1b9a', bg:'#f3e5f5'},
+  delivered:  {lbl:'Đã giao',      clr:'#2e7d32', bg:'#e8f5e9'},
+  cancelled:  {lbl:'Đã hủy',       clr:'#b71c1c', bg:'#ffebee'}
+};
+
+function _orderStatusBadge(st){
+  const s=SELLER_ORDER_STATUS[st]||{lbl:st,clr:'#555',bg:'#eee'};
+  return '<span style="font-size:11px;padding:2px 9px;border-radius:6px;background:'+s.bg+';color:'+s.clr+';font-weight:600">'+s.lbl+'</span>';
+}
+
+function sellerOrderList(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const all=s.orders||[];
+  let list=all.slice();
+  if(sellerOrderSearch){
+    const q=sellerOrderSearch.toLowerCase();
+    list=list.filter(o=>o.id.toLowerCase().includes(q)||o.buyer.toLowerCase().includes(q));
+  }
+  if(sellerOrderStatusFilter!=='all') list=list.filter(o=>o.status===sellerOrderStatusFilter);
+
+  const cnt=k=>k==='all'?all.length:all.filter(o=>o.status===k).length;
+  const filterTabs=[['all','Tất cả'],['pending','Chờ xác nhận'],['processing','Đang xử lý'],['shipping','Đang giao'],['delivered','Đã giao'],['cancelled','Đã hủy']];
+
+  const selAll=list.length>0&&list.filter(o=>o.status!=='delivered'&&o.status!=='cancelled').every(o=>sellerOrderSelected.includes(o.id));
+  const selectableList=list.filter(o=>o.status!=='delivered'&&o.status!=='cancelled');
+
+  const bulkBar=sellerOrderSelected.length
+    ?'<div style="background:#f5f0eb;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span style="font-weight:600;font-size:13.5px">✓ Đã chọn '+sellerOrderSelected.length+' đơn</span>'+
+        '<button onclick="doSellerBulkConfirmOrders()" style="padding:5px 13px;border-radius:6px;background:#1565c020;color:#1565c0;border:1.5px solid #1565c040;cursor:pointer;font-size:12.5px">✓ Xác nhận đơn</button>'+
+        '<button onclick="doSellerBulkPrintOrders()" style="padding:5px 13px;border-radius:6px;background:#6a1b9a20;color:#6a1b9a;border:1.5px solid #6a1b9a40;cursor:pointer;font-size:12.5px">🖨 In hàng loạt</button>'+
+        '<div style="margin-left:auto"><button onclick="sellerOrderSelected=[];renderAccount()" style="padding:5px 12px;border-radius:6px;background:transparent;color:var(--text-soft);border:1.5px solid var(--line);cursor:pointer;font-size:12.5px">Bỏ chọn</button></div>'+
+      '</div>'
+    :'';
+
+  const rows=list.length
+    ?list.map(o=>{
+      const isSel=sellerOrderSelected.includes(o.id);
+      const canSel=o.status!=='delivered'&&o.status!=='cancelled';
+      const total=o.total||((o.subtotal||0)+(o.shippingFee||0));
+      return '<tr style="border-top:1px solid var(--line);background:'+(isSel?'#f5f0eb':'transparent')+'">'+
+        '<td style="padding:10px 8px;width:34px">'+
+          (canSel?'<input type="checkbox" '+(isSel?'checked':'')+' onclick="doSellerToggleOrderSelect(\''+o.id+'\')" style="cursor:pointer;width:15px;height:15px">':'<span style="color:var(--line)">—</span>')+
+        '</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<div style="font-weight:700;font-size:13px;color:var(--ink-deep)">#'+escHtml(o.id)+'</div>'+
+          '<div style="font-size:11.5px;color:var(--text-soft)">'+escHtml(o.date)+'</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px">'+
+          '<div style="font-weight:600;font-size:13px">'+escHtml(o.buyer)+'</div>'+
+          (o.buyerPhone?'<div style="font-size:11.5px;color:var(--text-soft)">'+escHtml(o.buyerPhone)+'</div>':'')+
+        '</td>'+
+        '<td style="padding:10px 8px">'+
+          '<div style="font-size:12.5px;color:var(--text-soft)">'+
+            (o.items||[]).slice(0,2).map(it=>escHtml(it.name)+' ×'+it.qty).join('<br>')+
+            ((o.items||[]).length>2?'<br><em style="color:#999">+'+((o.items||[]).length-2)+' sản phẩm nữa</em>':'')+
+          '</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:right;white-space:nowrap">'+
+          '<div style="font-weight:700;color:var(--coral)">'+fmtBig(total)+'đ</div>'+
+          (o.shippingFee?'<div style="font-size:11px;color:var(--text-soft)">Ship: '+fmtBig(o.shippingFee)+'đ</div>':'')+
+        '</td>'+
+        '<td style="padding:10px 8px">'+_orderStatusBadge(o.status)+'</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<button onclick="sellerViewOrderId=\''+o.id+'\';acctTab=\'seller-order-detail\';renderAccount()" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px" title="Xem chi tiết">👁</button>'+
+          (o.status==='pending'?'<button onclick="doSellerConfirmOrder(\''+o.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #1565c040;border-radius:6px;background:#e8f4fd;cursor:pointer;margin-right:3px;color:#1565c0" title="Xác nhận">✓</button>':'')+
+          (o.status==='processing'?'<button onclick="doSellerStartShipping(\''+o.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #6a1b9a40;border-radius:6px;background:#f3e5f5;cursor:pointer;margin-right:3px;color:#6a1b9a" title="Giao hàng">🚚</button>':'')+
+          (o.status==='shipping'?'<button onclick="doSellerMarkDelivered(\''+o.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #2e7d3240;border-radius:6px;background:#e8f5e9;cursor:pointer;margin-right:3px;color:#2e7d32" title="Đã giao">✅</button>':'')+
+          (o.status!=='delivered'&&o.status!=='cancelled'?'<button onclick="doSellerOpenCancel(\''+o.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;cursor:pointer;color:#e74c3c" title="Hủy đơn">✕</button>':'')+
+        '</td>'+
+      '</tr>';
+    }).join('')
+    :'<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-soft);font-size:13.5px">Không tìm thấy đơn hàng nào.</td></tr>';
+
+  const cancelPanel=sellerCancelOrderId
+    ?'<div style="background:#fff5f5;border:2px solid #ffcdd2;border-radius:10px;padding:16px 20px;margin-bottom:16px">'+
+        '<h4 style="margin:0 0 10px;color:#b71c1c;font-size:14px">🚫 Hủy đơn #'+escHtml(sellerCancelOrderId)+'</h4>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+          '<input id="cancelReasonInput" placeholder="Nhập lý do hủy đơn... (bắt buộc)" style="flex:1;min-width:240px;padding:8px 12px;border:1.5px solid #ffcdd2;border-radius:8px;font-size:13.5px">'+
+          '<button onclick="doSellerConfirmCancel()" style="padding:7px 16px;background:#b71c1c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13.5px">Xác nhận hủy</button>'+
+          '<button onclick="sellerCancelOrderId=null;renderAccount()" style="padding:7px 14px;border:1.5px solid var(--line);background:transparent;border-radius:8px;cursor:pointer;font-size:13.5px">Hủy bỏ</button>'+
+        '</div>'+
+      '</div>'
+    :'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<div>'+
+        '<h3 style="margin:0">Quản lý Đơn hàng</h3>'+
+        '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">'+all.length+' đơn · '+cnt('pending')+' chờ xác nhận · '+cnt('processing')+' đang xử lý · '+cnt('shipping')+' đang giao</p>'+
+      '</div>'+
+      '<button onclick="doSellerBulkPrintOrders()" style="padding:7px 16px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-size:13px">🖨 In đơn đã chọn</button>'+
+    '</div>'+
+    cancelPanel+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">'+
+      '<input placeholder="🔍 Tìm mã đơn, tên khách..." value="'+escHtml(sellerOrderSearch)+'" oninput="sellerOrderSearch=this.value;renderAccount()" style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+    '</div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">'+
+      filterTabs.map(([k,lbl])=>
+        '<button onclick="sellerOrderStatusFilter=\''+k+'\';renderAccount()" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(sellerOrderStatusFilter===k?'var(--ink)':'var(--line)')+';background:'+(sellerOrderStatusFilter===k?'var(--ink)':'transparent')+';color:'+(sellerOrderStatusFilter===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+lbl+' ('+cnt(k)+')</button>'
+      ).join('')+
+    '</div>'+
+    bulkBar+
+    '<div style="overflow-x:auto">'+
+      '<table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr style="background:var(--paper-alt,#f8f6f3)">'+
+          '<th style="padding:9px 8px;width:34px">'+
+            (selectableList.length?'<input type="checkbox" '+(selAll?'checked':'')+' onclick="doSellerToggleSelectAllOrders()" style="cursor:pointer;width:15px;height:15px">':'')+'</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Mã đơn</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Khách hàng</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Sản phẩm</th>'+
+          '<th style="padding:9px 8px;text-align:right;font-size:12px;color:var(--text-soft);font-weight:600">Tổng tiền</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Hành động</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
+
+function sellerOrderDetail(orderId){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const o=(s.orders||[]).find(x=>x.id===orderId);
+  if(!o) return '<div class="panel"><button onclick="acctTab=\'seller-orders\';renderAccount()" class="btn-ghost" style="margin-bottom:16px;padding:5px 12px;font-size:13px">← Quay lại</button><p>Không tìm thấy đơn hàng.</p></div>';
+
+  const total=o.total||((o.subtotal||0)+(o.shippingFee||0));
+  const st=SELLER_ORDER_STATUS[o.status]||{lbl:o.status,clr:'#555',bg:'#eee'};
+  const timeline=[
+    {st:'pending',    label:'Chờ xác nhận', icon:'📋'},
+    {st:'processing', label:'Đang xử lý',   icon:'⚙️'},
+    {st:'shipping',   label:'Đang giao',    icon:'🚚'},
+    {st:'delivered',  label:'Đã giao',      icon:'✅'}
+  ];
+  const stOrder=['pending','processing','shipping','delivered'];
+  const curIdx=stOrder.indexOf(o.status);
+
+  const timelineHtml=o.status==='cancelled'
+    ?'<div style="display:flex;align-items:center;gap:8px;padding:14px 0;border-top:1px solid var(--line)"><span style="font-size:20px">🚫</span><span style="font-weight:600;color:#b71c1c">Đơn đã bị hủy vào '+escHtml(o.cancelledAt||o.updatedAt)+'</span>'+(o.cancelReason?'<span style="color:var(--text-soft);margin-left:8px">— '+escHtml(o.cancelReason)+'</span>':'')+'</div>'
+    :'<div style="display:flex;align-items:flex-start;gap:0;margin-top:16px;border-top:1px solid var(--line);padding-top:16px">'+
+      timeline.map((t,i)=>{
+        const done=i<=curIdx;
+        const active=i===curIdx;
+        return '<div style="flex:1;text-align:center;position:relative">'+
+          (i>0?'<div style="position:absolute;top:13px;left:-50%;right:50%;height:2px;background:'+(done?'#2e7d32':'#e0e0e0')+'"></div>':'')+
+          '<div style="width:28px;height:28px;border-radius:50%;background:'+(active?'#1565c0':done?'#2e7d32':'#e0e0e0')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;margin:0 auto;position:relative;z-index:1;border:2px solid '+(active?'#1565c0':done?'#2e7d32':'#ccc')+'">'+
+            (done&&!active?'✓':t.icon.replace('✅','✓'))+
+          '</div>'+
+          '<div style="font-size:11.5px;margin-top:6px;font-weight:'+(active?'700':'400')+';color:'+(active?'#1565c0':done?'#2e7d32':'var(--text-soft)')+'">'+t.label+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+
+  const trackingPanel=(o.status==='processing'||o.status==='shipping')
+    ?'<div style="background:#f3e5f5;border:1.5px solid #ce93d8;border-radius:8px;padding:12px 16px;margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span style="font-size:13px;font-weight:600;color:#6a1b9a">🚚 Mã vận đơn:</span>'+
+        (o.trackingNumber
+          ?'<span style="font-size:13.5px;font-weight:700;font-family:monospace;color:#4a148c">'+escHtml(o.trackingNumber)+'</span>'+
+            '<button onclick="sellerTrackingOrderId=\''+o.id+'\';renderAccount()" style="padding:4px 12px;border:1.5px solid #ce93d8;border-radius:6px;font-size:12px;cursor:pointer;background:transparent;color:#6a1b9a">Cập nhật</button>'
+          :'<span style="color:#999;font-size:12.5px">Chưa nhập</span>'+
+            '<button onclick="sellerTrackingOrderId=\''+o.id+'\';renderAccount()" style="padding:5px 14px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:#6a1b9a;color:#fff;font-weight:600">+ Nhập mã</button>'
+        )+
+      '</div>'
+    :(o.trackingNumber?'<div style="background:#f3e5f5;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;color:#6a1b9a"><strong>🚚 Mã vận đơn:</strong> <span style="font-family:monospace;font-weight:700">'+escHtml(o.trackingNumber)+'</span></div>':'');
+
+  const trackingInputPanel=sellerTrackingOrderId===o.id
+    ?'<div style="background:#fff;border:1.5px solid #ce93d8;border-radius:8px;padding:12px 16px;margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<input id="trackingInput" placeholder="Nhập mã vận đơn..." value="'+escHtml(o.trackingNumber||'')+'" style="flex:1;min-width:200px;padding:7px 12px;border:1.5px solid #ce93d8;border-radius:6px;font-size:13.5px;font-family:monospace">'+
+        '<button onclick="doSellerSaveTracking(\''+o.id+'\')" style="padding:7px 16px;background:#6a1b9a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13.5px">Lưu</button>'+
+        '<button onclick="sellerTrackingOrderId=null;renderAccount()" style="padding:7px 12px;border:1.5px solid var(--line);background:transparent;border-radius:6px;cursor:pointer;font-size:13.5px">Hủy</button>'+
+      '</div>'
+    :'';
+
+  const cancelPanel=sellerCancelOrderId===o.id
+    ?'<div style="background:#fff5f5;border:2px solid #ffcdd2;border-radius:10px;padding:14px 16px;margin-top:12px">'+
+        '<h4 style="margin:0 0 10px;color:#b71c1c;font-size:14px">🚫 Xác nhận hủy đơn hàng này</h4>'+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+          '<input id="cancelReasonInput" placeholder="Nhập lý do hủy đơn... (bắt buộc)" style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid #ffcdd2;border-radius:8px;font-size:13.5px">'+
+          '<button onclick="doSellerConfirmCancel()" style="padding:7px 16px;background:#b71c1c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">Xác nhận hủy</button>'+
+          '<button onclick="sellerCancelOrderId=null;renderAccount()" style="padding:7px 14px;border:1.5px solid var(--line);background:transparent;border-radius:8px;cursor:pointer">Hủy bỏ</button>'+
+        '</div>'+
+      '</div>'
+    :'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">'+
+      '<button onclick="acctTab=\'seller-orders\';sellerViewOrderId=null;renderAccount()" class="btn-ghost" style="padding:5px 12px;font-size:13px">← Danh sách đơn</button>'+
+      '<h3 style="margin:0">Đơn hàng #'+escHtml(o.id)+'</h3>'+
+      '<div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">'+
+        (o.status==='pending'?'<button onclick="doSellerConfirmOrder(\''+o.id+'\')" style="padding:6px 16px;background:#1565c0;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px">✓ Xác nhận đơn</button>':'')+
+        (o.status==='processing'?'<button onclick="doSellerStartShipping(\''+o.id+'\')" style="padding:6px 16px;background:#6a1b9a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px">🚚 Bắt đầu giao</button>':'')+
+        (o.status==='shipping'?'<button onclick="doSellerMarkDelivered(\''+o.id+'\')" style="padding:6px 16px;background:#2e7d32;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px">✅ Đã giao xong</button>':'')+
+        '<button onclick="doSellerPrintOrder(\''+o.id+'\')" style="padding:6px 16px;background:transparent;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:13px">🖨 In phiếu</button>'+
+        (o.status!=='delivered'&&o.status!=='cancelled'?'<button onclick="doSellerOpenCancel(\''+o.id+'\')" style="padding:6px 16px;background:#fff5f5;border:1.5px solid #ffcdd2;border-radius:8px;cursor:pointer;font-size:13px;color:#b71c1c">✕ Hủy đơn</button>':'')+
+      '</div>'+
+    '</div>'+
+
+    /* Timeline */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:16px 20px;margin-bottom:16px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+        '<div><span style="font-size:13px;color:var(--text-soft)">Ngày đặt:</span> <strong>'+escHtml(o.date)+'</strong></div>'+
+        '<div>'+_orderStatusBadge(o.status)+'</div>'+
+      '</div>'+
+      timelineHtml+
+    '</div>'+
+
+    /* Tracking */
+    (o.status!=='pending'&&o.status!=='cancelled'?
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:14px 20px;margin-bottom:16px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:4px">📦 Thông tin vận chuyển</div>'+
+        trackingPanel+trackingInputPanel+
+      '</div>'
+    :'')+
+
+    /* Cancel input */
+    (o.status!=='delivered'&&o.status!=='cancelled'?cancelPanel:'')+
+
+    /* Customer */
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'+
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:14px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:10px">👤 Thông tin khách hàng</div>'+
+        '<div style="font-size:13.5px;line-height:1.8">'+
+          '<div><strong>'+escHtml(o.buyer)+'</strong></div>'+
+          (o.buyerPhone?'<div style="color:var(--text-soft)">📞 '+escHtml(o.buyerPhone)+'</div>':'')+
+          (o.buyerAddress?'<div style="color:var(--text-soft)">📍 '+escHtml(o.buyerAddress)+'</div>':'')+
+          (o.note?'<div style="margin-top:6px;padding:6px 10px;background:#fff8e1;border-radius:6px;font-size:12.5px;color:#795548">📝 '+escHtml(o.note)+'</div>':'')+
+        '</div>'+
+      '</div>'+
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:14px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:10px">💰 Thanh toán</div>'+
+        '<div style="font-size:13.5px;line-height:2">'+
+          '<div style="display:flex;justify-content:space-between"><span style="color:var(--text-soft)">Tạm tính:</span><span>'+fmtBig(o.subtotal||0)+'đ</span></div>'+
+          '<div style="display:flex;justify-content:space-between"><span style="color:var(--text-soft)">Phí vận chuyển:</span><span>'+(o.shippingFee?fmtBig(o.shippingFee)+'đ':'Miễn phí')+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;border-top:1.5px solid var(--line);padding-top:6px;margin-top:6px"><span style="font-weight:700">Tổng cộng:</span><span style="font-weight:700;color:var(--coral);font-size:15px">'+fmtBig(total)+'đ</span></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Items */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:14px 20px">'+
+      '<div style="font-weight:700;font-size:13.5px;margin-bottom:12px">🛒 Sản phẩm ('+(o.items||[]).length+')</div>'+
+      '<table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr style="border-bottom:1.5px solid var(--line)">'+
+          '<th style="text-align:left;padding:6px 8px;font-size:12px;color:var(--text-soft);font-weight:600">Tên sản phẩm</th>'+
+          '<th style="text-align:center;padding:6px 8px;font-size:12px;color:var(--text-soft);font-weight:600">Số lượng</th>'+
+          '<th style="text-align:right;padding:6px 8px;font-size:12px;color:var(--text-soft);font-weight:600">Đơn giá</th>'+
+          '<th style="text-align:right;padding:6px 8px;font-size:12px;color:var(--text-soft);font-weight:600">Thành tiền</th>'+
+        '</tr></thead>'+
+        '<tbody>'+
+          (o.items||[]).map(it=>'<tr style="border-bottom:1px solid var(--line)">'+
+            '<td style="padding:8px;font-size:13.5px">'+escHtml(it.name)+(it.unit?' <span style="font-size:11.5px;color:var(--text-soft)">/ '+escHtml(it.unit)+'</span>':'')+'</td>'+
+            '<td style="text-align:center;padding:8px;font-size:13.5px">'+it.qty+'</td>'+
+            '<td style="text-align:right;padding:8px;font-size:13.5px">'+fmtBig(it.price)+'đ</td>'+
+            '<td style="text-align:right;padding:8px;font-size:13.5px;font-weight:600">'+fmtBig(it.price*it.qty)+'đ</td>'+
+          '</tr>').join('')+
+        '</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
+
+function doSellerToggleOrderSelect(id){
+  const i=sellerOrderSelected.indexOf(id);
+  if(i===-1)sellerOrderSelected.push(id);else sellerOrderSelected.splice(i,1);
+  renderAccount();
+}
+
+function doSellerToggleSelectAllOrders(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  const all=s?s.orders||[]:[];
+  let list=all.filter(o=>o.status!=='delivered'&&o.status!=='cancelled');
+  if(sellerOrderSearch){const q=sellerOrderSearch.toLowerCase();list=list.filter(o=>o.id.toLowerCase().includes(q)||o.buyer.toLowerCase().includes(q));}
+  if(sellerOrderStatusFilter!=='all')list=list.filter(o=>o.status===sellerOrderStatusFilter);
+  const ids=list.map(o=>o.id);
+  const allSel=ids.every(id=>sellerOrderSelected.includes(id));
+  sellerOrderSelected=allSel?sellerOrderSelected.filter(id=>!ids.includes(id)):[...new Set([...sellerOrderSelected,...ids])];
+  renderAccount();
+}
+
+function _findOrder(id){
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+  if(sIdx===-1)return{sIdx:-1,oIdx:-1};
+  const oIdx=(activeSellers[sIdx].orders||[]).findIndex(x=>x.id===id);
+  return{sIdx,oIdx};
+}
+
+function doSellerConfirmOrder(id){
+  const {sIdx,oIdx}=_findOrder(id);if(oIdx===-1)return;
+  activeSellers[sIdx].orders[oIdx].status='processing';
+  activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  toast('✓ Đã xác nhận đơn #'+id+' — chuyển sang Đang xử lý');
+  addNotif('Đơn hàng #'+id+' đã được xác nhận và đang xử lý.');
+  renderAccount();
+}
+
+function doSellerStartShipping(id){
+  const {sIdx,oIdx}=_findOrder(id);if(oIdx===-1)return;
+  activeSellers[sIdx].orders[oIdx].status='shipping';
+  activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  toast('🚚 Đơn #'+id+' đang được giao');
+  renderAccount();
+}
+
+function doSellerMarkDelivered(id){
+  const {sIdx,oIdx}=_findOrder(id);if(oIdx===-1)return;
+  activeSellers[sIdx].orders[oIdx].status='delivered';
+  activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  toast('✅ Đơn #'+id+' đã giao xong!');
+  addNotif('Đơn hàng #'+id+' đã được giao thành công.');
+  renderAccount();
+}
+
+function doSellerSaveTracking(id){
+  const val=((document.getElementById('trackingInput')||{}).value||'').trim();
+  if(!val){toast('Vui lòng nhập mã vận đơn.');return;}
+  const {sIdx,oIdx}=_findOrder(id);if(oIdx===-1)return;
+  activeSellers[sIdx].orders[oIdx].trackingNumber=val;
+  activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  sellerTrackingOrderId=null;
+  toast('✓ Đã lưu mã vận đơn: '+val);
+  renderAccount();
+}
+
+function doSellerOpenCancel(id){
+  sellerCancelOrderId=id;
+  sellerTrackingOrderId=null;
+  renderAccount();
+}
+
+function doSellerConfirmCancel(){
+  const reason=((document.getElementById('cancelReasonInput')||{}).value||'').trim();
+  if(!reason){toast('Vui lòng nhập lý do hủy đơn.');return;}
+  const id=sellerCancelOrderId;
+  const {sIdx,oIdx}=_findOrder(id);if(oIdx===-1)return;
+  activeSellers[sIdx].orders[oIdx].status='cancelled';
+  activeSellers[sIdx].orders[oIdx].cancelReason=reason;
+  activeSellers[sIdx].orders[oIdx].cancelledAt=todayStr();
+  activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  sellerCancelOrderId=null;
+  sellerOrderSelected=sellerOrderSelected.filter(x=>x!==id);
+  toast('Đơn #'+id+' đã bị hủy.');
+  addNotif('Đơn hàng #'+id+' đã bị hủy — lý do: '+reason);
+  renderAccount();
+}
+
+function doSellerBulkConfirmOrders(){
+  if(!sellerOrderSelected.length)return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  let confirmed=0;
+  sellerOrderSelected.forEach(id=>{
+    const oIdx=(activeSellers[sIdx].orders||[]).findIndex(x=>x.id===id);
+    if(oIdx!==-1&&activeSellers[sIdx].orders[oIdx].status==='pending'){
+      activeSellers[sIdx].orders[oIdx].status='processing';
+      activeSellers[sIdx].orders[oIdx].updatedAt=todayStr();
+      confirmed++;
+    }
+  });
+  saveActiveSellers();
+  sellerOrderSelected=[];
+  toast('✓ Đã xác nhận '+confirmed+' đơn hàng.');
+  renderAccount();
+}
+
+function doSellerPrintOrder(orderId){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s)return;
+  const o=(s.orders||[]).find(x=>x.id===orderId);
+  if(!o){toast('Không tìm thấy đơn hàng.');return;}
+  _sellerOpenPrintWindow([o],s);
+}
+
+function doSellerBulkPrintOrders(){
+  if(!sellerOrderSelected.length){toast('Vui lòng chọn ít nhất 1 đơn hàng để in.');return;}
+  const s=activeSellers.find(x=>x.email===user.email);if(!s)return;
+  const orders=(s.orders||[]).filter(o=>sellerOrderSelected.includes(o.id));
+  _sellerOpenPrintWindow(orders,s);
+}
+
+function _sellerOrderSlipHtml(o,shopName){
+  const total=o.total||((o.subtotal||0)+(o.shippingFee||0));
+  const rows=(o.items||[]).map(it=>
+    '<tr><td style="padding:4px 6px;border:1px solid #ccc">'+it.name+'</td>'+
+    '<td style="padding:4px 6px;border:1px solid #ccc;text-align:center">'+it.qty+(it.unit?' '+it.unit:'')+'</td>'+
+    '<td style="padding:4px 6px;border:1px solid #ccc;text-align:right">'+fmtBig(it.price)+'đ</td>'+
+    '<td style="padding:4px 6px;border:1px solid #ccc;text-align:right">'+fmtBig(it.price*it.qty)+'đ</td></tr>'
+  ).join('');
+  return '<div style="border:2px solid #333;border-radius:8px;padding:20px 24px;margin-bottom:24px;page-break-inside:avoid;font-family:Arial,sans-serif">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #333;padding-bottom:12px;margin-bottom:12px">'+
+      '<div><div style="font-size:18px;font-weight:700">PHIẾU GIAO HÀNG</div><div style="font-size:12px;color:#555;margin-top:4px">'+shopName+'</div></div>'+
+      '<div style="text-align:right"><div style="font-size:15px;font-weight:700">#'+o.id+'</div><div style="font-size:12px;color:#555">'+o.date+'</div>'+
+        (o.trackingNumber?'<div style="font-size:11px;background:#f3e5f5;padding:2px 8px;border-radius:4px;margin-top:4px;color:#6a1b9a">🚚 '+o.trackingNumber+'</div>':'')+
+      '</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;font-size:13px">'+
+      '<div><strong>Người nhận:</strong><br>'+o.buyer+'<br>'+(o.buyerPhone||'')+'<br><span style="color:#555">'+(o.buyerAddress||'')+'</span></div>'+
+      '<div style="text-align:right"><strong>Trạng thái:</strong><br><span style="font-weight:700">'+((SELLER_ORDER_STATUS[o.status]||{}).lbl||o.status)+'</span>'+
+        (o.note?'<br><span style="font-size:11px;color:#795548">📝 '+o.note+'</span>':'')+
+      '</div>'+
+    '</div>'+
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px">'+
+      '<thead><tr style="background:#f5f5f5">'+
+        '<th style="padding:4px 6px;border:1px solid #ccc;text-align:left">Sản phẩm</th>'+
+        '<th style="padding:4px 6px;border:1px solid #ccc;text-align:center">SL</th>'+
+        '<th style="padding:4px 6px;border:1px solid #ccc;text-align:right">Đơn giá</th>'+
+        '<th style="padding:4px 6px;border:1px solid #ccc;text-align:right">Thành tiền</th>'+
+      '</tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>'+
+    '<div style="text-align:right;font-size:13px">'+
+      (o.shippingFee?'<div>Phí vận chuyển: '+fmtBig(o.shippingFee)+'đ</div>':'')+
+      '<div style="font-size:15px;font-weight:700;margin-top:4px">Tổng cộng: '+fmtBig(total)+'đ</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;font-size:12px;text-align:center">'+
+      '<div style="border-top:1px dashed #999;padding-top:8px;color:#555">Chữ ký người giao</div>'+
+      '<div style="border-top:1px dashed #999;padding-top:8px;color:#555">Chữ ký người nhận</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function _sellerOpenPrintWindow(orders,s){
+  const shopName=s.shopName||'Gian hàng';
+  const slips=orders.map(o=>_sellerOrderSlipHtml(o,shopName)).join('');
+  const win=window.open('','_blank','width=800,height=900');
+  if(!win){toast('Trình duyệt chặn popup. Vui lòng cho phép popup để in phiếu.');return;}
+  win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Phiếu giao hàng — '+shopName+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;margin:20px}@media print{body{margin:0}}</style></head>'+
+    '<body>'+
+      '<div style="text-align:right;margin-bottom:16px;font-size:13px"><button onclick="window.print()" style="padding:8px 20px;background:#1565c0;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600">🖨 In ngay</button></div>'+
+      slips+
+    '</body></html>');
+  win.document.close();
 }
 
 /* ── 7. Shop Editor (edit business info) ── */
