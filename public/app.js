@@ -1766,6 +1766,12 @@ let sellerReviewFilter='all';
 let sellerReviewStarFilter=0;
 let sellerReviewProductFilter='all';
 let sellerReviewEditReplyId=null;
+let sellerPromoTab='vouchers';
+let sellerVoucherShowForm=false;
+let sellerVoucherEditId=null;
+let sellerVoucherStatsId=null;
+let sellerFlashShowForm=false;
+let sellerFlashEditId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3261,6 +3267,27 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
   });
   reviewsStore['_seller_sapp_001_seeded']=true;
   LS.set('reviews',reviewsStore);
+})();
+
+/* ── Seed promotionsData for seller-sapp-001 ── */
+(function(){
+  var sIdx=activeSellers.findIndex(function(s){return s.id==='seller-sapp-001';});
+  if(sIdx===-1||activeSellers[sIdx].promotionsData) return;
+  activeSellers[sIdx].promotionsData={
+    vouchers:[
+      {id:'sv-001',code:'MINHLONG10',type:'pct',value:10,minOrder:150000,maxUses:200,usedCount:87,startDate:'01/06/2025',endDate:'30/06/2025',status:'active',desc:'Giảm 10% cho đơn hàng từ 150.000đ',createdAt:'01/06/2025'},
+      {id:'sv-002',code:'SACHRE50K',type:'fixed',value:50000,minOrder:300000,maxUses:50,usedCount:50,startDate:'01/05/2025',endDate:'31/05/2025',status:'expired',desc:'Giảm 50.000đ cho đơn từ 300.000đ',createdAt:'01/05/2025'},
+      {id:'sv-003',code:'SALE20PCT',type:'pct',value:20,minOrder:200000,maxUses:100,usedCount:34,startDate:'15/06/2025',endDate:'15/07/2025',status:'active',desc:'Giảm 20% cho đơn từ 200.000đ — Hè 2025',createdAt:'15/06/2025'},
+      {id:'sv-004',code:'FREESHIP30K',type:'fixed',value:30000,minOrder:80000,maxUses:500,usedCount:142,startDate:'01/01/2025',endDate:'31/12/2025',status:'paused',desc:'Giảm 30.000đ phí ship cho đơn từ 80.000đ',createdAt:'01/01/2025'}
+    ],
+    flashSales:[
+      {id:'sf-001',productId:'slp-004',productName:'Dế Mèn Phiêu Lưu Ký (Bìa Cứng)',originalPrice:88000,flashPrice:55000,qty:50,soldQty:50,startDate:'01/06/2025',endDate:'01/06/2025',startTime:'20:00',endTime:'22:00'},
+      {id:'sf-002',productId:'slp-005',productName:'Atomic Habits – Thói Quen Nguyên Tử',originalPrice:115000,flashPrice:79000,qty:30,soldQty:28,startDate:'08/06/2025',endDate:'08/06/2025',startTime:'12:00',endTime:'14:00'},
+      {id:'sf-003',productId:'svp-005',productName:'Màu sáp Faber-Castell 24 màu',originalPrice:68000,flashPrice:45000,qty:100,soldQty:67,startDate:'15/06/2025',endDate:'15/06/2025',startTime:'20:00',endTime:'22:00'},
+      {id:'sf-004',productId:'slp-001',productName:'Bộ SGK Lớp 5 Kết nối tri thức',originalPrice:185000,flashPrice:129000,qty:20,soldQty:0,startDate:'30/06/2025',endDate:'30/06/2025',startTime:'20:00',endTime:'22:00'}
+    ]
+  };
+  saveActiveSellers();
 })();
 
 let commissionCfg=LS.get('commissionCfg',null);
@@ -7677,7 +7704,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-reviews','Đánh giá'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-reviews','Đánh giá'],['seller-promo','Khuyến mãi'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8572,6 +8599,7 @@ function sellerContent(){
   if(acctTab==='seller-revenue')       return isApproved?sellerRevenueReport():sellerAppStatus(myApp);
   if(acctTab==='seller-analytics')     return isApproved?sellerAnalytics():sellerAppStatus(myApp);
   if(acctTab==='seller-reviews')       return isApproved?sellerReviewCenter():sellerAppStatus(myApp);
+  if(acctTab==='seller-promo')         return isApproved?sellerPromoCenter():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -12076,6 +12104,413 @@ function doSellerReportReview(pid,idx){
   LS.set('reviews',reviewsStore);
   addNotif('⚑ Bạn đã báo cáo 1 đánh giá — quản trị viên sẽ xem xét trong 24–48 giờ.');
   toast('✓ Đã báo cáo lên admin. Chúng tôi sẽ xem xét sớm!');
+  renderAccount();
+}
+
+/* ── 6k. Promotions — Vouchers & Flash Sale ── */
+function _dmy2ymd(dmy){
+  if(!dmy) return '';
+  var p=dmy.split('/');
+  return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:'';
+}
+function _ymd2dmy(ymd){
+  if(!ymd) return '';
+  var p=ymd.split('-');
+  return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:'';
+}
+function _parseFlashDate(ds){
+  if(!ds) return null;
+  var p=ds.split('/');
+  return new Date(+p[2],+p[1]-1,+p[0]);
+}
+function _flashLiveStatus(fs){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var sd=_parseFlashDate(fs.startDate);
+  var ed=_parseFlashDate(fs.endDate);
+  if(ed&&ed<today) return 'ended';
+  if(sd&&sd>today) return 'upcoming';
+  return 'active';
+}
+
+function sellerPromoCenter(){
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  var pd=s.promotionsData||{vouchers:[],flashSales:[]};
+  function tabBtn(k,lbl,icon){
+    var active=sellerPromoTab===k;
+    return '<button onclick="sellerPromoTab=\''+k+'\';sellerVoucherShowForm=false;sellerFlashShowForm=false;sellerVoucherEditId=null;sellerFlashEditId=null;sellerVoucherStatsId=null;renderAccount()" style="padding:9px 22px;border:none;border-bottom:2.5px solid '+(active?'#1565c0':'transparent')+';background:transparent;color:'+(active?'#1565c0':'var(--text-soft)')+';font-size:13.5px;font-weight:'+(active?'700':'400')+';cursor:pointer">'+icon+' '+lbl+'</button>';
+  }
+  var tabs='<div style="display:flex;border-bottom:1.5px solid var(--line);margin-bottom:20px">'+
+    tabBtn('vouchers','Voucher giảm giá','🏷')+tabBtn('flashsale','Flash Sale','⚡')+
+  '</div>';
+  var content=sellerPromoTab==='flashsale'?_sellerFlashSaleTab(s,pd):_sellerVoucherTab(s,pd);
+  return '<div class="panel">'+
+    '<div style="margin-bottom:16px"><h3 style="margin:0">Khuyến mãi gian hàng</h3>'+
+      '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">Tạo voucher và đăng ký Flash Sale để tăng doanh số.</p></div>'+
+    tabs+content+
+  '</div>';
+}
+
+/* ── Voucher Tab ── */
+function _sellerVoucherTab(s,pd){
+  if(sellerVoucherShowForm) return _sellerVoucherForm(s,pd);
+  var vouchers=pd.vouchers||[];
+  var today=new Date(); today.setHours(0,0,0,0);
+  function vStatus(v){
+    if(v.status==='paused') return 'paused';
+    var ed=_parseFlashDate(v.endDate);
+    if(ed&&ed<today) return 'expired';
+    return 'active';
+  }
+  var addBtn='<button onclick="sellerVoucherEditId=null;sellerVoucherShowForm=true;renderAccount()" style="padding:8px 18px;border-radius:8px;border:none;background:#1565c0;color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">+ Tạo voucher mới</button>';
+  if(!vouchers.length){
+    return '<div style="text-align:center;padding:40px 20px"><div style="font-size:48px;margin-bottom:10px">🏷</div>'+
+      '<p style="font-size:15px;color:var(--text-soft)">Chưa có voucher nào. Tạo voucher đầu tiên để thu hút khách hàng!</p>'+addBtn+'</div>';
+  }
+  var activeV=vouchers.filter(function(v){return vStatus(v)==='active';}).length;
+  var totalUsed=vouchers.reduce(function(a,v){return a+(v.usedCount||0);},0);
+  var statsBar='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">'+
+    '<div style="background:#e8f4fd;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:700;color:#1565c0">'+vouchers.length+'</div><div style="font-size:12px;color:var(--text-soft)">Tổng voucher</div></div>'+
+    '<div style="background:#e8f5e9;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:700;color:#2e7d32">'+activeV+'</div><div style="font-size:12px;color:var(--text-soft)">Đang hoạt động</div></div>'+
+    '<div style="background:#fff8e1;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f57f17">'+totalUsed+'</div><div style="font-size:12px;color:var(--text-soft)">Lượt dùng tổng cộng</div></div>'+
+  '</div>';
+  var stLbl={
+    active:{lbl:'Đang hoạt động',clr:'#2e7d32',bg:'#e8f5e9',border:'#c8e6c9'},
+    paused:{lbl:'Tạm dừng',clr:'#f57f17',bg:'#fff8e1',border:'#ffe082'},
+    expired:{lbl:'Hết hạn',clr:'#888',bg:'#f5f5f5',border:'#e0e0e0'}
+  };
+  var cards=vouchers.map(function(v){
+    var st=stLbl[vStatus(v)]||stLbl.expired;
+    var isStats=sellerVoucherStatsId===v.id;
+    var usedPct=v.maxUses?Math.min(100,Math.round(((v.usedCount||0)/v.maxUses)*100)):0;
+    var discDisplay=v.type==='pct'?('-'+v.value+'%'):('-'+fmtBig(v.value)+'đ');
+    var estImpact=v.type==='pct'
+      ?Math.round((v.usedCount||0)*(v.minOrder||0)*(v.value/100))
+      :(v.usedCount||0)*(v.value||0);
+    var statsBlock='';
+    if(isStats){
+      statsBlock='<div style="background:#f0f7ff;border-radius:8px;padding:14px;margin-top:12px;border:1.5px solid #90caf9">'+
+        '<div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:10px">📊 Thống kê sử dụng</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;text-align:center">'+
+          '<div><div style="font-size:20px;font-weight:700;color:#1565c0">'+(v.usedCount||0)+'</div><div style="font-size:11.5px;color:var(--text-soft)">Lượt đã dùng</div></div>'+
+          '<div><div style="font-size:20px;font-weight:700;color:#6a1b9a">'+(v.maxUses||'∞')+'</div><div style="font-size:11.5px;color:var(--text-soft)">Giới hạn tối đa</div></div>'+
+          '<div><div style="font-size:20px;font-weight:700;color:#e65100">'+usedPct+'%</div><div style="font-size:11.5px;color:var(--text-soft)">Tỷ lệ dùng</div></div>'+
+        '</div>'+
+        '<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--text-soft);margin-bottom:4px">Tiến độ sử dụng</div>'+
+          '<div style="background:#e0e0e0;border-radius:4px;height:10px"><div style="background:linear-gradient(90deg,#1565c0,#42a5f5);height:10px;border-radius:4px;width:'+usedPct+'%;transition:width .4s"></div></div>'+
+        '</div>'+
+        '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12.5px;color:#333">'+
+          '<span>Tổng chiết khấu ước tính: <strong style="color:#e74c3c">~'+fmtBig(estImpact)+'đ</strong></span>'+
+          '<span style="color:var(--text-soft)">Đơn tối thiểu: '+fmtBig(v.minOrder||0)+'đ</span>'+
+        '</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:4px">Hiệu lực: '+escHtml(v.startDate)+' → '+escHtml(v.endDate)+'</div>'+
+      '</div>';
+    }
+    return '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:16px 18px;margin-bottom:12px;border:1.5px solid '+st.border+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">'+
+        '<div style="display:flex;align-items:center;gap:12px">'+
+          '<div style="background:'+(v.type==='pct'?'#e8f4fd':'#e8f5e9')+';border-radius:10px;padding:10px 14px;text-align:center;min-width:60px">'+
+            '<div style="font-size:18px;font-weight:800;color:'+(v.type==='pct'?'#1565c0':'#2e7d32')+'">'+discDisplay+'</div>'+
+            '<div style="font-size:10.5px;color:var(--text-soft);margin-top:2px">'+(v.type==='pct'?'Phần trăm':'Cố định')+'</div>'+
+          '</div>'+
+          '<div>'+
+            '<div style="font-size:16px;font-weight:800;font-family:monospace;letter-spacing:2px;color:#1565c0">'+escHtml(v.code)+'</div>'+
+            '<div style="font-size:12.5px;color:var(--text-soft);margin-top:2px">'+escHtml(v.desc||'')+'</div>'+
+            '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">Đơn tối thiểu: '+fmtBig(v.minOrder||0)+'đ</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'+
+          '<span style="padding:3px 10px;border-radius:12px;background:'+st.bg+';color:'+st.clr+';font-size:12px;font-weight:600">'+st.lbl+'</span>'+
+          '<div style="font-size:11.5px;color:var(--text-soft)">'+escHtml(v.startDate)+' → '+escHtml(v.endDate)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="margin-top:10px">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px;color:var(--text-soft)">'+
+          '<span>Lượt đã dùng</span><span style="font-weight:600">'+(v.usedCount||0)+(v.maxUses?' / '+v.maxUses:'')+' lượt</span>'+
+        '</div>'+
+        '<div style="background:#e0e0e0;border-radius:4px;height:7px"><div style="background:'+(usedPct>=90?'#e74c3c':'#1565c0')+';height:7px;border-radius:4px;width:'+usedPct+'%;transition:width .3s"></div></div>'+
+      '</div>'+
+      statsBlock+
+      '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button onclick="doSellerToggleVoucher(\''+v.id+'\')" style="padding:5px 14px;border-radius:7px;border:1.5px solid '+(vStatus(v)==='active'?'#e65100':'#2e7d32')+';background:transparent;color:'+(vStatus(v)==='active'?'#e65100':'#2e7d32')+';font-size:12.5px;cursor:pointer;font-weight:600">'+(vStatus(v)==='active'?'⏸ Tạm dừng':'▶ Bật lại')+'</button>'+
+        '<button onclick="sellerVoucherEditId=\''+v.id+'\';sellerVoucherShowForm=true;renderAccount()" style="padding:5px 14px;border-radius:7px;border:1.5px solid #1565c0;background:transparent;color:#1565c0;font-size:12.5px;cursor:pointer">✏️ Chỉnh sửa</button>'+
+        '<button onclick="sellerVoucherStatsId=(sellerVoucherStatsId===\''+v.id+'\'?null:\''+v.id+'\');renderAccount()" style="padding:5px 14px;border-radius:7px;border:1.5px solid #6a1b9a;background:'+(isStats?'#f3e5f5':'transparent')+';color:#6a1b9a;font-size:12.5px;cursor:pointer">📊 Thống kê</button>'+
+        '<button onclick="doSellerDeleteVoucher(\''+v.id+'\')" style="padding:5px 14px;border-radius:7px;border:1.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12.5px;cursor:pointer">🗑 Xóa</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  return statsBar+'<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'+addBtn+'</div>'+cards;
+}
+
+/* ── Voucher Form ── */
+function _sellerVoucherForm(s,pd){
+  var vouchers=pd.vouchers||[];
+  var v=sellerVoucherEditId?vouchers.find(function(x){return x.id===sellerVoucherEditId;}):null;
+  var isEdit=!!v;
+  return '<div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">'+
+      '<button onclick="sellerVoucherShowForm=false;sellerVoucherEditId=null;renderAccount()" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text-soft);cursor:pointer;font-size:13px">← Quay lại</button>'+
+      '<h4 style="margin:0;font-size:15px">'+(isEdit?'Chỉnh sửa voucher':'Tạo voucher mới')+'</h4>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Mã voucher <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sv_code" value="'+escHtml(v?v.code:'')+'" placeholder="VD: SALE20PCT" maxlength="20" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,\'\')" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;font-family:monospace;font-weight:700;letter-spacing:2px;box-sizing:border-box">'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">Chỉ chữ hoa và số, tối đa 20 ký tự</div></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Mô tả hiển thị cho khách</label>'+
+        '<input id="sv_desc" value="'+escHtml(v?v.desc:'')+'" placeholder="VD: Giảm 10% cho đơn từ 150k" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px">Loại giảm giá <span style="color:#e74c3c">*</span></label>'+
+        '<div style="display:flex;gap:20px">'+
+          '<label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13.5px"><input type="radio" name="sv_type" value="pct" '+((!v||v.type==='pct')?'checked':'')+' style="accent-color:#1565c0;width:16px;height:16px"> Phần trăm (%)</label>'+
+          '<label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13.5px"><input type="radio" name="sv_type" value="fixed" '+(v&&v.type==='fixed'?'checked':'')+' style="accent-color:#1565c0;width:16px;height:16px"> Số tiền cố định (đ)</label>'+
+        '</div></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giá trị giảm <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sv_value" type="number" min="1" value="'+(v?v.value:'')+'" placeholder="VD: 10 hoặc 50000" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box">'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">Nhập số (%) cho giảm %, hoặc số đ cho cố định</div></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Đơn hàng tối thiểu (đ)</label>'+
+        '<input id="sv_minorder" type="number" min="0" value="'+(v?v.minOrder||0:0)+'" placeholder="0 = không yêu cầu" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Số lượt dùng tối đa</label>'+
+        '<input id="sv_maxuses" type="number" min="1" value="'+(v&&v.maxUses?v.maxUses:'')+'" placeholder="Để trống = không giới hạn" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ngày bắt đầu <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sv_start" type="date" value="'+_dmy2ymd(v?v.startDate:'')+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ngày kết thúc <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sv_end" type="date" value="'+_dmy2ymd(v?v.endDate:'')+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+    '</div>'+
+    '<div style="margin-top:20px;display:flex;gap:10px">'+
+      '<button onclick="doSellerSaveVoucher()" style="padding:9px 22px;border-radius:8px;border:none;background:#1565c0;color:#fff;font-size:14px;font-weight:600;cursor:pointer">💾 '+(isEdit?'Lưu thay đổi':'Tạo voucher')+'</button>'+
+      '<button onclick="sellerVoucherShowForm=false;sellerVoucherEditId=null;renderAccount()" style="padding:9px 18px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text-soft);font-size:14px;cursor:pointer">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── Flash Sale Tab ── */
+function _sellerFlashSaleTab(s,pd){
+  if(sellerFlashShowForm) return _sellerFlashSaleForm(s,pd);
+  var fsList=pd.flashSales||[];
+  var activeFl=fsList.filter(function(f){return _flashLiveStatus(f)==='active';});
+  var upcomingFl=fsList.filter(function(f){return _flashLiveStatus(f)==='upcoming';});
+  var endedFl=fsList.filter(function(f){return _flashLiveStatus(f)==='ended';});
+  var totalFlSold=endedFl.reduce(function(a,f){return a+(f.soldQty||0);},0);
+  var totalFlRev=endedFl.reduce(function(a,f){return a+((f.soldQty||0)*(f.flashPrice||0));},0);
+  var addBtn='<button onclick="sellerFlashEditId=null;sellerFlashShowForm=true;renderAccount()" style="padding:8px 18px;border-radius:8px;border:none;background:#e65100;color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">⚡ Đăng ký Flash Sale</button>';
+  if(!fsList.length){
+    return '<div style="text-align:center;padding:40px 20px"><div style="font-size:48px;margin-bottom:10px">⚡</div>'+
+      '<p style="font-size:15px;color:var(--text-soft)">Chưa có Flash Sale nào. Đăng ký để tăng mạnh doanh số!</p>'+addBtn+'</div>';
+  }
+  var statsBar='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">'+
+    '<div style="background:#fff8e1;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:#e65100">'+fsList.length+'</div><div style="font-size:11.5px;color:var(--text-soft)">Tổng Flash Sale</div></div>'+
+    '<div style="background:#e8f5e9;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">'+(activeFl.length+upcomingFl.length)+'</div><div style="font-size:11.5px;color:var(--text-soft)">Đang / Sắp diễn ra</div></div>'+
+    '<div style="background:#fce4ec;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:#c62828">'+totalFlSold+'</div><div style="font-size:11.5px;color:var(--text-soft)">SP đã bán Flash Sale</div></div>'+
+    '<div style="background:#e8f4fd;border-radius:10px;padding:12px;text-align:center"><div style="font-size:18px;font-weight:700;color:#1565c0">'+fmtMil(totalFlRev)+'đ</div><div style="font-size:11.5px;color:var(--text-soft)">Doanh thu Flash Sale</div></div>'+
+  '</div>';
+
+  function fsCard(fs){
+    var st=_flashLiveStatus(fs);
+    var stCfg={
+      active:{lbl:'⚡ Đang diễn ra',clr:'#e65100',bg:'#fff8e1',border:'#ffcc80'},
+      upcoming:{lbl:'🕐 Sắp diễn ra',clr:'#1565c0',bg:'#e8f4fd',border:'#90caf9'},
+      ended:{lbl:'✓ Đã kết thúc',clr:'#888',bg:'#f5f5f5',border:'#e0e0e0'}
+    };
+    var sc=stCfg[st];
+    var soldPct=fs.qty?Math.min(100,Math.round(((fs.soldQty||0)/fs.qty)*100)):0;
+    var discPct=fs.originalPrice?Math.round(((fs.originalPrice-fs.flashPrice)/fs.originalPrice)*100):0;
+    var resultBlock='';
+    if(st==='ended'){
+      resultBlock='<div style="background:#f5f5f5;border-radius:8px;padding:12px 14px;margin-top:10px">'+
+        '<div style="font-size:12.5px;font-weight:700;color:#333;margin-bottom:8px">📋 Kết quả Flash Sale</div>'+
+        '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px">'+
+          '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">'+(fs.soldQty||0)+'/'+fs.qty+'</div><div style="font-size:11px;color:var(--text-soft)">Đã bán / Tổng</div></div>'+
+          '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">'+soldPct+'%</div><div style="font-size:11px;color:var(--text-soft)">Tỷ lệ bán</div></div>'+
+          '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#e65100">'+fmtMil((fs.soldQty||0)*(fs.flashPrice||0))+'đ</div><div style="font-size:11px;color:var(--text-soft)">Doanh thu</div></div>'+
+        '</div>'+
+        '<div style="background:#e0e0e0;border-radius:4px;height:8px"><div style="background:'+(soldPct>=80?'#2e7d32':'#1565c0')+';height:8px;border-radius:4px;width:'+soldPct+'%"></div></div>'+
+        (soldPct>=90?'<div style="font-size:12px;color:#2e7d32;margin-top:6px;font-weight:600">🏆 Bán rất tốt! Nên tổ chức lại.</div>':
+         soldPct>=50?'<div style="font-size:12px;color:#1565c0;margin-top:6px">✓ Kết quả khả quan. Cân nhắc tăng số lượng lần sau.</div>':
+         '<div style="font-size:12px;color:#f57f17;margin-top:6px">💡 Tỷ lệ thấp. Thử giảm giá sâu hơn hoặc chọn khung giờ khác.</div>')+
+      '</div>';
+    } else {
+      resultBlock='<div style="margin-top:10px">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px;color:var(--text-soft)">'+
+          '<span>Số lượng bán</span><span style="font-weight:600">'+(fs.soldQty||0)+' / '+fs.qty+'</span>'+
+        '</div>'+
+        '<div style="background:#e0e0e0;border-radius:4px;height:7px"><div style="background:#e65100;height:7px;border-radius:4px;width:'+soldPct+'%"></div></div>'+
+      '</div>';
+    }
+    return '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:16px 18px;margin-bottom:12px;border:1.5px solid '+sc.border+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px">'+
+        '<div>'+
+          '<div style="font-weight:700;font-size:14px">'+escHtml(fs.productName||'')+'</div>'+
+          '<div style="display:flex;align-items:center;gap:10px;margin-top:5px">'+
+            '<span style="font-size:13px;text-decoration:line-through;color:var(--text-soft)">'+fmtBig(fs.originalPrice)+'đ</span>'+
+            '<span style="font-size:17px;font-weight:700;color:#e65100">'+fmtBig(fs.flashPrice)+'đ</span>'+
+            '<span style="padding:2px 8px;border-radius:10px;background:#e65100;color:#fff;font-size:11.5px;font-weight:700">-'+discPct+'%</span>'+
+          '</div>'+
+        '</div>'+
+        '<span style="padding:4px 12px;border-radius:12px;background:'+sc.bg+';color:'+sc.clr+';font-size:12.5px;font-weight:700">'+sc.lbl+'</span>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--text-soft)">📅 '+escHtml(fs.startDate)+'  '+escHtml(fs.startTime||'')+'–'+escHtml(fs.endTime||'')+'  &nbsp;|&nbsp;  📦 '+fmtBig(fs.qty)+' sản phẩm</div>'+
+      resultBlock+
+      (st!=='ended'?
+        '<div style="margin-top:10px;display:flex;gap:8px">'+
+          '<button onclick="sellerFlashEditId=\''+fs.id+'\';sellerFlashShowForm=true;renderAccount()" style="padding:5px 14px;border-radius:7px;border:1.5px solid #1565c0;background:transparent;color:#1565c0;font-size:12.5px;cursor:pointer">✏️ Sửa</button>'+
+          '<button onclick="doSellerDeleteFlashSale(\''+fs.id+'\')" style="padding:5px 14px;border-radius:7px;border:1.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12.5px;cursor:pointer">🗑 Hủy</button>'+
+        '</div>':'')+
+    '</div>';
+  }
+
+  var out=statsBar+'<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'+addBtn+'</div>';
+  if(activeFl.length) out+='<div style="font-weight:700;font-size:13.5px;margin-bottom:10px;color:#e65100">⚡ Đang diễn ra</div>'+activeFl.map(fsCard).join('');
+  if(upcomingFl.length) out+='<div style="font-weight:700;font-size:13.5px;margin:14px 0 10px;color:#1565c0">🕐 Sắp diễn ra</div>'+upcomingFl.map(fsCard).join('');
+  if(endedFl.length) out+='<div style="font-weight:700;font-size:13.5px;margin:14px 0 10px;color:#888">✓ Đã kết thúc</div>'+endedFl.map(fsCard).join('');
+  return out;
+}
+
+/* ── Flash Sale Form ── */
+function _sellerFlashSaleForm(s,pd){
+  var fsList=pd.flashSales||[];
+  var fs=sellerFlashEditId?fsList.find(function(x){return x.id===sellerFlashEditId;}):null;
+  var isEdit=!!fs;
+  var allProds=[];
+  (s.products||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price,t:'Sách'});});
+  (s.ebooks||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price,t:'Ebook'});});
+  (s.vppProducts||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price,t:'VPP'});});
+  (s.tbgdProducts||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price,t:'Thiết bị'});});
+  var prodOpts=allProds.map(function(p){
+    return '<option value="'+p.id+'" '+(fs&&fs.productId===p.id?'selected':'')+'>'+escHtml('['+p.t+'] '+p.name+' — '+fmtBig(p.price)+'đ')+'</option>';
+  }).join('');
+  return '<div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">'+
+      '<button onclick="sellerFlashShowForm=false;sellerFlashEditId=null;renderAccount()" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text-soft);cursor:pointer;font-size:13px">← Quay lại</button>'+
+      '<h4 style="margin:0;font-size:15px">'+(isEdit?'Chỉnh sửa Flash Sale':'Đăng ký sản phẩm Flash Sale')+'</h4>'+
+    '</div>'+
+    '<div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;border-left:3px solid #e65100">'+
+      '<div style="font-size:13px;color:#e65100;font-weight:700">⚡ Lưu ý Flash Sale</div>'+
+      '<div style="font-size:12.5px;color:#555;margin-top:4px">Flash Sale giúp tăng lượt hiển thị sản phẩm lên đến 5×. Giá Flash Sale phải thấp hơn giá gốc ít nhất 10%. Số lượng giới hạn tạo tính khan hiếm và thúc đẩy mua ngay.</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'+
+      '<div style="grid-column:1/-1"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Sản phẩm tham gia Flash Sale <span style="color:#e74c3c">*</span></label>'+
+        '<select id="sf_pid" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;background:var(--paper)">'+
+          '<option value="">-- Chọn sản phẩm --</option>'+prodOpts+'</select></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giá Flash Sale (đ) <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sf_price" type="number" min="1" value="'+(fs?fs.flashPrice:'')+'" placeholder="Thấp hơn giá gốc ≥10%" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Số lượng giới hạn <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sf_qty" type="number" min="1" value="'+(fs?fs.qty:'')+'" placeholder="VD: 50" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ngày Flash Sale <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sf_sdate" type="date" value="'+_dmy2ymd(fs?fs.startDate:'')+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giờ bắt đầu <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sf_stime" type="time" value="'+(fs?fs.startTime||'20:00':'20:00')+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giờ kết thúc <span style="color:#e74c3c">*</span></label>'+
+        '<input id="sf_etime" type="time" value="'+(fs?fs.endTime||'22:00':'22:00')+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;box-sizing:border-box"></div>'+
+    '</div>'+
+    '<div style="margin-top:20px;display:flex;gap:10px">'+
+      '<button onclick="doSellerSaveFlashSale()" style="padding:9px 22px;border-radius:8px;border:none;background:#e65100;color:#fff;font-size:14px;font-weight:600;cursor:pointer">⚡ '+(isEdit?'Lưu thay đổi':'Đăng ký Flash Sale')+'</button>'+
+      '<button onclick="sellerFlashShowForm=false;sellerFlashEditId=null;renderAccount()" style="padding:9px 18px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text-soft);font-size:14px;cursor:pointer">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── Action handlers ── */
+function doSellerSaveVoucher(){
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s) return;
+  if(!s.promotionsData) s.promotionsData={vouchers:[],flashSales:[]};
+  var vouchers=s.promotionsData.vouchers;
+  var code=(document.getElementById('sv_code').value||'').trim().toUpperCase();
+  var desc=(document.getElementById('sv_desc').value||'').trim();
+  var typeEl=document.querySelector('input[name="sv_type"]:checked');
+  var value=parseFloat(document.getElementById('sv_value').value||0);
+  var minOrder=parseInt(document.getElementById('sv_minorder').value||0,10);
+  var maxUsesRaw=parseInt(document.getElementById('sv_maxuses').value||0,10);
+  var startDate=_ymd2dmy(document.getElementById('sv_start').value);
+  var endDate=_ymd2dmy(document.getElementById('sv_end').value);
+  if(!code){toast('Vui lòng nhập mã voucher.');return;}
+  if(!typeEl){toast('Vui lòng chọn loại giảm giá.');return;}
+  if(!value||value<=0){toast('Giá trị giảm phải lớn hơn 0.');return;}
+  if(typeEl.value==='pct'&&value>100){toast('Phần trăm giảm không thể vượt 100%.');return;}
+  if(!startDate||!endDate){toast('Vui lòng chọn ngày bắt đầu và kết thúc.');return;}
+  var dup=vouchers.find(function(v){return v.code===code&&v.id!==sellerVoucherEditId;});
+  if(dup){toast('Mã voucher "'+code+'" đã tồn tại. Hãy chọn mã khác.');return;}
+  if(sellerVoucherEditId){
+    var idx=vouchers.findIndex(function(v){return v.id===sellerVoucherEditId;});
+    if(idx>=0) Object.assign(vouchers[idx],{code:code,desc:desc,type:typeEl.value,value:value,minOrder:minOrder,maxUses:maxUsesRaw||null,startDate:startDate,endDate:endDate});
+    toast('✓ Đã cập nhật voucher '+code+'!');
+  } else {
+    vouchers.push({id:'sv-'+Date.now().toString(36),code:code,desc:desc,type:typeEl.value,value:value,minOrder:minOrder,maxUses:maxUsesRaw||null,usedCount:0,startDate:startDate,endDate:endDate,status:'active',createdAt:todayStr()});
+    toast('✓ Đã tạo voucher '+code+' thành công!');
+  }
+  saveActiveSellers();
+  sellerVoucherShowForm=false; sellerVoucherEditId=null;
+  renderAccount();
+}
+
+function doSellerToggleVoucher(vid){
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s||!s.promotionsData) return;
+  var v=s.promotionsData.vouchers.find(function(x){return x.id===vid;});
+  if(!v) return;
+  v.status=v.status==='active'?'paused':'active';
+  saveActiveSellers();
+  toast(v.status==='active'?'▶ Đã bật lại voucher '+v.code:v.code+' đã được tạm dừng.');
+  renderAccount();
+}
+
+function doSellerDeleteVoucher(vid){
+  if(!confirm('Bạn có chắc muốn xóa voucher này?')) return;
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s||!s.promotionsData) return;
+  s.promotionsData.vouchers=s.promotionsData.vouchers.filter(function(v){return v.id!==vid;});
+  saveActiveSellers();
+  toast('✓ Đã xóa voucher.');
+  renderAccount();
+}
+
+function doSellerSaveFlashSale(){
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s) return;
+  if(!s.promotionsData) s.promotionsData={vouchers:[],flashSales:[]};
+  var fsList=s.promotionsData.flashSales;
+  var pidEl=document.getElementById('sf_pid');
+  var pid=(pidEl?pidEl.value:'').trim();
+  var flashPrice=parseInt(document.getElementById('sf_price').value||0,10);
+  var qty=parseInt(document.getElementById('sf_qty').value||0,10);
+  var startDate=_ymd2dmy(document.getElementById('sf_sdate').value);
+  var startTime=(document.getElementById('sf_stime').value||'').trim();
+  var endTime=(document.getElementById('sf_etime').value||'').trim();
+  if(!pid){toast('Vui lòng chọn sản phẩm.');return;}
+  if(!flashPrice||flashPrice<=0){toast('Vui lòng nhập giá Flash Sale.');return;}
+  if(!qty||qty<=0){toast('Vui lòng nhập số lượng giới hạn.');return;}
+  if(!startDate){toast('Vui lòng chọn ngày Flash Sale.');return;}
+  if(!startTime||!endTime){toast('Vui lòng chọn giờ bắt đầu và kết thúc.');return;}
+  var allProds=[];
+  (s.products||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price});});
+  (s.ebooks||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price});});
+  (s.vppProducts||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price});});
+  (s.tbgdProducts||[]).forEach(function(p){allProds.push({id:p.id,name:p.name,price:p.price});});
+  var prod=allProds.find(function(p){return p.id===pid;});
+  if(!prod){toast('Không tìm thấy sản phẩm.');return;}
+  if(flashPrice>=prod.price){toast('Giá Flash Sale phải thấp hơn giá gốc ('+fmtBig(prod.price)+'đ).');return;}
+  var discPct=Math.round(((prod.price-flashPrice)/prod.price)*100);
+  if(discPct<10){toast('Cần giảm ít nhất 10% so với giá gốc (hiện tại: -'+discPct+'%).');return;}
+  if(sellerFlashEditId){
+    var idx=fsList.findIndex(function(f){return f.id===sellerFlashEditId;});
+    if(idx>=0) Object.assign(fsList[idx],{productId:pid,productName:prod.name,originalPrice:prod.price,flashPrice:flashPrice,qty:qty,startDate:startDate,endDate:startDate,startTime:startTime,endTime:endTime});
+    toast('✓ Đã cập nhật Flash Sale!');
+  } else {
+    fsList.push({id:'sf-'+Date.now().toString(36),productId:pid,productName:prod.name,originalPrice:prod.price,flashPrice:flashPrice,qty:qty,soldQty:0,startDate:startDate,endDate:startDate,startTime:startTime,endTime:endTime});
+    addNotif('⚡ Flash Sale mới: "'+prod.name+'" vào '+startDate+' '+startTime+'–'+endTime);
+    toast('✓ Đã đăng ký Flash Sale thành công!');
+  }
+  saveActiveSellers();
+  sellerFlashShowForm=false; sellerFlashEditId=null;
+  renderAccount();
+}
+
+function doSellerDeleteFlashSale(fid){
+  if(!confirm('Hủy Flash Sale này?')) return;
+  var s=activeSellers.find(function(x){return x.email===user.email;});
+  if(!s||!s.promotionsData) return;
+  s.promotionsData.flashSales=s.promotionsData.flashSales.filter(function(f){return f.id!==fid;});
+  saveActiveSellers();
+  toast('✓ Đã hủy Flash Sale.');
   renderAccount();
 }
 
