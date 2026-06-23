@@ -1760,6 +1760,8 @@ let sellerReceiptNote='';
 let sellerReceiptStatus='';
 let sellerRevenuePeriod='month';
 let sellerPayTab='balance';
+let sellerAnalyticsTab='basic';
+let sellerAnalyticsPeriod='week';
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3168,6 +3170,50 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
       {id:'WD-002',amount:8000000,bankName:'Techcombank',bankAcc:'****5678',bankHolder:'NGUYEN VAN LONG',status:'completed',note:'Rút tháng 5/2025',requestedAt:'31/05/2025',completedAt:'02/06/2025'},
       {id:'WD-001',amount:9350000,bankName:'Techcombank',bankAcc:'****5678',bankHolder:'NGUYEN VAN LONG',status:'completed',note:'Rút tháng 4/2025',requestedAt:'30/04/2025',completedAt:'03/05/2025'}
     ]
+  };
+  saveActiveSellers();
+})();
+
+/* ── Seed seller-sapp-001 analytics data ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx===-1||activeSellers[sIdx].analyticsData) return;
+  activeSellers[sIdx].analyticsData={
+    salesTrend:{
+      daily:  [185000,420000,310000,680000,240000,890000,520000],
+      weekly: [1850000,2340000,1620000,3100000,2580000,1940000,2720000],
+      monthly:[3800000,4200000,3500000,5100000,4800000,4200000,4600000,3900000,5300000,4700000,5800000,4900000]
+    },
+    topProducts:[
+      {id:'slp-004',name:'Dế Mèn Phiêu Lưu Ký (Bìa Cứng)',type:'books',sold:156,revenue:13728000,views:4200,convRate:3.7},
+      {id:'svp-001',name:'Bút bi Thiên Long TL-027',type:'vpp',sold:520,revenue:2340000,views:3100,convRate:16.8},
+      {id:'slp-005',name:'Atomic Habits – Thói Quen Nguyên Tử',type:'books',sold:89,revenue:10235000,views:2800,convRate:3.2},
+      {id:'std-001',name:'Samsung Galaxy Tab A8',type:'tbgd',sold:42,revenue:264180000,views:1940,convRate:2.2},
+      {id:'slp-001',name:'Bộ SGK Lớp 5 Kết nối tri thức',type:'books',sold:24,revenue:4440000,views:1560,convRate:1.5},
+      {id:'svp-005',name:'Màu sáp Faber-Castell 24 màu',type:'vpp',sold:73,revenue:4964000,views:1420,convRate:5.1},
+      {id:'sle-002',name:'Sổ Tay Từ Vựng Tiếng Anh 2000 Từ',type:'ebook',sold:512,revenue:17920000,views:6800,convRate:7.5}
+    ],
+    categoryTrends:[
+      {k:'books', lbl:'Sách giấy', clr:'#1565c0',thisMonth:4900000,lastMonth:4200000},
+      {k:'ebook', lbl:'Ebook',     clr:'#6a1b9a',thisMonth:5800000,lastMonth:4900000},
+      {k:'vpp',   lbl:'VPP',       clr:'#2e7d32',thisMonth:2100000,lastMonth:2400000},
+      {k:'tbgd',  lbl:'Thiết bị',  clr:'#e65100',thisMonth:3800000,lastMonth:3100000}
+    ],
+    funnel:{views:12400,addToCart:3120,checkout:1840,purchased:1382},
+    trafficSources:[
+      {src:'search',   lbl:'Tìm kiếm nội bộ', visits:5840, pct:47, clr:'#1565c0'},
+      {src:'recommend',lbl:'Gợi ý / Đề xuất', visits:2980, pct:24, clr:'#6a1b9a'},
+      {src:'category', lbl:'Duyệt danh mục',  visits:1980, pct:16, clr:'#2e7d32'},
+      {src:'direct',   lbl:'Truy cập trực tiếp',visits:990,pct:8,  clr:'#e65100'},
+      {src:'external', lbl:'Nguồn bên ngoài',  visits:610, pct:5,  clr:'#795548'}
+    ],
+    behavior:{avgTimeOnPage:185,bounceRate:34.2,avgPagesPerSession:3.4,avgSessionDuration:312},
+    customerMix:{
+      labels:['T2','T3','T4','T5','T6','T7','CN'],
+      newCustomers:   [12,18,9,24,15,31,22],
+      returning:      [8, 14,11,19,12,24,18]
+    },
+    weeklyOrders:    [8,14,9,21,16,28,19]
   };
   saveActiveSellers();
 })();
@@ -7586,7 +7632,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8479,6 +8525,7 @@ function sellerContent(){
   if(acctTab==='seller-order-detail')  return isApproved?sellerOrderDetail(sellerViewOrderId):sellerAppStatus(myApp);
   if(acctTab==='seller-warehouse')     return isApproved?sellerWarehouse():sellerAppStatus(myApp);
   if(acctTab==='seller-revenue')       return isApproved?sellerRevenueReport():sellerAppStatus(myApp);
+  if(acctTab==='seller-analytics')     return isApproved?sellerAnalytics():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -11440,6 +11487,322 @@ function doSellerRequestWithdrawal(){
   toast('✓ Yêu cầu rút '+fmtMil(amount)+'đ đã được gửi — xử lý trong 1–3 ngày làm việc.');
   addNotif('Yêu cầu rút tiền '+fmtMil(amount)+'đ đã được ghi nhận (#'+wdId+').');
   renderAccount();
+}
+
+/* ── 6i. Analytics & Sales Analysis ── */
+function sellerAnalytics(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const ad=s.analyticsData||{};
+  const tabBtn=(k,lbl,icon)=>'<button onclick="sellerAnalyticsTab=\''+k+'\';renderAccount()" style="padding:8px 20px;border:none;border-bottom:2.5px solid '+(sellerAnalyticsTab===k?'#1565c0':'transparent')+';background:transparent;color:'+(sellerAnalyticsTab===k?'#1565c0':'var(--text-soft)')+';font-size:13.5px;font-weight:'+(sellerAnalyticsTab===k?'700':'400')+';cursor:pointer">'+icon+' '+lbl+'</button>';
+  const tabNav='<div style="display:flex;border-bottom:1.5px solid var(--line);margin-bottom:20px;flex-wrap:wrap">'+
+    tabBtn('basic','Phân tích cơ bản','📊')+
+    tabBtn('advanced','Phân tích nâng cao','🔬')+
+  '</div>';
+  const content=sellerAnalyticsTab==='advanced'?_analyticsAdvancedTab(s,ad):_analyticsBasicTab(s,ad);
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">'+
+      '<div><h3 style="margin:0">Phân tích Bán hàng</h3><p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">Insights chi tiết về hiệu suất gian hàng.</p></div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button onclick="doSellerExportReport(\'excel\')" style="padding:7px 14px;border:1.5px solid #2e7d32;border-radius:8px;background:#e8f5e9;color:#2e7d32;cursor:pointer;font-size:13px;font-weight:600">📥 Excel</button>'+
+        '<button onclick="doSellerExportReport(\'pdf\')" style="padding:7px 14px;border:1.5px solid #1565c0;border-radius:8px;background:#e8f4fd;color:#1565c0;cursor:pointer;font-size:13px;font-weight:600">📄 PDF</button>'+
+      '</div>'+
+    '</div>'+
+    tabNav+content+
+  '</div>';
+}
+
+function _analyticsBasicTab(s,ad){
+  const trendData={
+    day:  {chart:(ad.salesTrend||{}).daily||[],  labels:['T2','T3','T4','T5','T6','T7','CN'], lbl:'7 ngày qua'},
+    week: {chart:(ad.salesTrend||{}).weekly||[], labels:['W-6','W-5','W-4','W-3','W-2','W-1','Tuần này'], lbl:'7 tuần qua'},
+    month:{chart:(ad.salesTrend||{}).monthly||[],labels:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],lbl:'12 tháng'}
+  };
+  const cfg=trendData[sellerAnalyticsPeriod]||trendData.week;
+  const chart=cfg.chart; const maxVal=Math.max(...chart,1);
+  const periodBtns=[['day','Ngày'],['week','Tuần'],['month','Tháng']].map(([k,l])=>
+    '<button onclick="sellerAnalyticsPeriod=\''+k+'\';renderAccount()" style="padding:5px 14px;border-radius:16px;border:1.5px solid '+(sellerAnalyticsPeriod===k?'#1565c0':'var(--line)')+';background:'+(sellerAnalyticsPeriod===k?'#1565c0':'transparent')+';color:'+(sellerAnalyticsPeriod===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+l+'</button>'
+  ).join('');
+
+  const typeClr={books:'#1565c0',ebook:'#6a1b9a',vpp:'#2e7d32',tbgd:'#e65100'};
+  const typeLbl={books:'Sách',ebook:'Ebook',vpp:'VPP',tbgd:'Thiết bị'};
+  const topProds=(ad.topProducts||[]);
+
+  const catTrends=(ad.categoryTrends||[]).map(c=>{
+    const g=c.lastMonth>0?Math.round(((c.thisMonth-c.lastMonth)/c.lastMonth)*100):0;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)">'+
+      '<div style="width:10px;height:10px;border-radius:50%;background:'+c.clr+';flex-shrink:0"></div>'+
+      '<div style="flex:1;font-size:13.5px;font-weight:600">'+escHtml(c.lbl)+'</div>'+
+      '<div style="text-align:right;min-width:90px"><div style="font-size:13.5px;font-weight:700;color:'+c.clr+'">'+fmtMil(c.thisMonth)+'đ</div>'+
+        '<div style="font-size:11px;color:'+(g>=0?'#2e7d32':'#e74c3c')+'">'+(g>=0?'▲ +':' ▼ ')+Math.abs(g)+'% so kỳ trước</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  const barChart='<div style="display:flex;align-items:flex-end;gap:5px;height:150px;padding-bottom:24px">'+
+    chart.map((val,i)=>{
+      const h=Math.round((val/maxVal)*120);
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">'+
+        (val>0?'<div style="font-size:9px;color:#1565c0;margin-bottom:2px;font-weight:600">'+fmtMil(val)+'</div>':'')+
+        '<div style="width:100%;background:linear-gradient(180deg,#1565c0,#42a5f5);border-radius:4px 4px 0 0;height:'+(val>0?h:2)+'px;opacity:'+(val>0?'1':'0.2')+';transition:height .3s"></div>'+
+        '<div style="font-size:10px;color:#888;margin-top:5px">'+escHtml(cfg.labels[i]||'')+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  /* Dual-color bar for new vs returning */
+  const mix=ad.customerMix||{labels:[],newCustomers:[],returning:[]};
+  const newArr=mix.newCustomers||[];
+  const retArr=mix.returning||[];
+  const maxMix=Math.max(...newArr,...retArr,1);
+  const orderArr=ad.weeklyOrders||[];
+  const maxOrd=Math.max(...orderArr,1);
+
+  const topRows=topProds.slice(0,7).map((p,i)=>{
+    const bar=Math.round((p.sold/(topProds[0].sold||1))*100);
+    return '<tr style="border-top:1px solid var(--line)">'+
+      '<td style="padding:9px 8px;font-size:13px;font-weight:600;color:var(--text-soft)">'+(i+1)+'</td>'+
+      '<td style="padding:9px 8px">'+
+        '<div style="font-weight:600;font-size:13.5px">'+escHtml(p.name)+'</div>'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'+
+          '<span style="font-size:10.5px;padding:1px 6px;border-radius:4px;background:'+(typeClr[p.type]||'#555')+'15;color:'+(typeClr[p.type]||'#555')+';font-weight:600">'+escHtml(typeLbl[p.type]||p.type)+'</span>'+
+          '<div style="flex:1;background:#f0f0f0;border-radius:3px;height:5px;max-width:120px"><div style="background:'+(typeClr[p.type]||'#555')+';height:5px;border-radius:3px;width:'+bar+'%"></div></div>'+
+        '</div>'+
+      '</td>'+
+      '<td style="padding:9px 8px;text-align:center;font-weight:700;font-size:14px;color:#1565c0">'+p.sold+'</td>'+
+      '<td style="padding:9px 8px;text-align:right;font-weight:700;color:#2e7d32;font-size:13.5px">'+fmtMil(p.revenue)+'đ</td>'+
+      '<td style="padding:9px 8px;text-align:center;font-size:13px;color:var(--text-soft)">'+fmtBig(p.views||0)+'</td>'+
+      '<td style="padding:9px 8px;text-align:center;font-size:13.5px;font-weight:600;color:'+(p.convRate>=5?'#2e7d32':p.convRate>=2?'#f57f17':'#e74c3c')+'">'+p.convRate+'%</td>'+
+    '</tr>';
+  }).join('');
+
+  return '<div style="display:flex;gap:8px;margin-bottom:16px">'+periodBtns+'</div>'+
+    /* Sales trend chart */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px;margin-bottom:16px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
+        '<div style="font-weight:700;font-size:13.5px">📈 Biểu đồ doanh số — '+escHtml(cfg.lbl)+'</div>'+
+        '<div style="font-size:13px;color:#2e7d32;font-weight:600">Tổng: '+fmtMil(chart.reduce((a,b)=>a+b,0))+'đ</div>'+
+      '</div>'+
+      barChart+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">'+
+      /* Top products table */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:14px">🏆 Top sản phẩm bán chạy</div>'+
+        '<table style="width:100%;border-collapse:collapse">'+
+          '<thead><tr style="background:#fff">'+
+            '<th style="padding:8px;font-size:11px;color:var(--text-soft);font-weight:600">#</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11px;color:var(--text-soft);font-weight:600">Sản phẩm</th>'+
+            '<th style="padding:8px;text-align:center;font-size:11px;color:var(--text-soft);font-weight:600">Đã bán</th>'+
+            '<th style="padding:8px;text-align:right;font-size:11px;color:var(--text-soft);font-weight:600">Doanh thu</th>'+
+            '<th style="padding:8px;text-align:center;font-size:11px;color:var(--text-soft);font-weight:600">Lượt xem</th>'+
+            '<th style="padding:8px;text-align:center;font-size:11px;color:var(--text-soft);font-weight:600">Conv.</th>'+
+          '</tr></thead>'+
+          '<tbody>'+topRows+'</tbody>'+
+        '</table>'+
+      '</div>'+
+      /* Category trend */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:6px">📦 Xu hướng danh mục</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:10px">Tháng này so với tháng trước</div>'+
+        catTrends+
+      '</div>'+
+    '</div>';
+}
+
+function _analyticsAdvancedTab(s,ad){
+  /* Conversion Funnel */
+  const fn=ad.funnel||{views:0,addToCart:0,checkout:0,purchased:0};
+  const fSteps=[
+    {lbl:'Lượt xem sản phẩm', val:fn.views,   clr:'#1565c0', icon:'👁'},
+    {lbl:'Thêm vào giỏ',      val:fn.addToCart,clr:'#6a1b9a', icon:'🛒'},
+    {lbl:'Tiến hành thanh toán',val:fn.checkout,clr:'#e65100', icon:'💳'},
+    {lbl:'Đã mua thành công',  val:fn.purchased,clr:'#2e7d32', icon:'✅'}
+  ];
+  const fMax=fn.views||1;
+  const funnelHtml=fSteps.map((f,i)=>{
+    const pct=Math.round((f.val/fMax)*100);
+    const dropPct=i>0?Math.round(((fSteps[i-1].val-f.val)/fSteps[i-1].val)*100):0;
+    return '<div style="margin-bottom:12px">'+
+      (i>0?'<div style="text-align:center;font-size:11.5px;color:#e74c3c;margin-bottom:4px">▼ Mất '+dropPct+'%</div>':'')+
+      '<div style="display:flex;align-items:center;gap:10px">'+
+        '<div style="width:24px;text-align:center;font-size:16px">'+f.icon+'</div>'+
+        '<div style="flex:1">'+
+          '<div style="display:flex;justify-content:space-between;margin-bottom:3px">'+
+            '<span style="font-size:12.5px;font-weight:600">'+f.lbl+'</span>'+
+            '<span style="font-size:13px;font-weight:700;color:'+f.clr+'">'+fmtBig(f.val)+' ('+pct+'%)</span>'+
+          '</div>'+
+          '<div style="background:#e0e0e0;border-radius:4px;height:12px">'+
+            '<div style="background:'+f.clr+';height:12px;border-radius:4px;width:'+pct+'%;transition:width .4s"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  /* Traffic sources */
+  const trafSrc=ad.trafficSources||[];
+  const trafRows=trafSrc.map(t=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)">'+
+    '<div style="width:10px;height:10px;border-radius:50%;background:'+t.clr+';flex-shrink:0"></div>'+
+    '<div style="flex:1;font-size:13px">'+escHtml(t.lbl)+'</div>'+
+    '<div style="min-width:60px;text-align:right;font-size:13px;font-weight:600">'+fmtBig(t.visits)+'</div>'+
+    '<div style="min-width:44px;text-align:right;font-size:12px;color:'+t.clr+';font-weight:700">'+t.pct+'%</div>'+
+    '<div style="width:80px;background:#e0e0e0;border-radius:4px;height:7px">'+
+      '<div style="background:'+t.clr+';height:7px;border-radius:4px;width:'+t.pct+'%"></div>'+
+    '</div>'+
+  '</div>').join('');
+
+  /* Behavior metrics */
+  const beh=ad.behavior||{avgTimeOnPage:0,bounceRate:0,avgPagesPerSession:0,avgSessionDuration:0};
+  const fmt2min=s=>Math.floor(s/60)+'p '+(s%60)+'s';
+  const behaviorCards=[
+    {lbl:'Thời gian xem trang TB',val:fmt2min(beh.avgTimeOnPage||0),icon:'⏱',clr:'#1565c0',sub:'mỗi trang sản phẩm'},
+    {lbl:'Tỷ lệ thoát (Bounce)',   val:(beh.bounceRate||0)+'%',      icon:'↩',clr:beh.bounceRate>50?'#e74c3c':'#2e7d32',sub:beh.bounceRate>50?'Cần cải thiện mô tả SP':'Tốt'},
+    {lbl:'Trang/Phiên TB',         val:(beh.avgPagesPerSession||0)+'',icon:'📄',clr:'#6a1b9a',sub:'trang mỗi lần truy cập'},
+    {lbl:'Thời lượng phiên TB',    val:fmt2min(beh.avgSessionDuration||0),icon:'🕐',clr:'#e65100',sub:'mỗi lần vào gian hàng'}
+  ].map(c=>'<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:16px 18px;text-align:center">'+
+    '<div style="font-size:28px;margin-bottom:6px">'+c.icon+'</div>'+
+    '<div style="font-size:22px;font-weight:700;color:'+c.clr+'">'+c.val+'</div>'+
+    '<div style="font-size:12px;font-weight:600;color:var(--text-soft);margin-top:4px">'+c.lbl+'</div>'+
+    '<div style="font-size:11px;color:'+c.clr+';margin-top:2px">'+c.sub+'</div>'+
+  '</div>').join('');
+
+  /* New vs Returning chart — stacked bar */
+  const mix=ad.customerMix||{labels:[],newCustomers:[],returning:[]};
+  const nArr=mix.newCustomers||[];
+  const rArr=mix.returning||[];
+  const mMax=Math.max(...nArr.map((v,i)=>v+(rArr[i]||0)),1);
+  const custChart='<div style="display:flex;align-items:flex-end;gap:6px;height:120px;padding-bottom:22px">'+
+    (mix.labels||[]).map((lbl,i)=>{
+      const n=nArr[i]||0; const r=rArr[i]||0; const tot=n+r;
+      const hN=Math.round((n/mMax)*90); const hR=Math.round((r/mMax)*90);
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">'+
+        '<div style="width:100%;display:flex;flex-direction:column;align-items:stretch">'+
+          '<div style="background:#6a1b9a;border-radius:3px 3px 0 0;height:'+hN+'px" title="Mới: '+n+'"></div>'+
+          '<div style="background:#1565c0;border-radius:0 0 0 0;height:'+hR+'px" title="Quay lại: '+r+'"></div>'+
+        '</div>'+
+        '<div style="font-size:10px;color:#888;margin-top:4px">'+escHtml(lbl)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>'+
+  '<div style="display:flex;gap:16px;justify-content:center;margin-top:4px">'+
+    '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:2px;background:#6a1b9a"></div><span style="font-size:12px">Khách mới</span></div>'+
+    '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:2px;background:#1565c0"></div><span style="font-size:12px">Khách quay lại</span></div>'+
+  '</div>';
+
+  const totalNew=nArr.reduce((a,b)=>a+b,0);
+  const totalRet=rArr.reduce((a,b)=>a+b,0);
+  const totalCust=totalNew+totalRet||1;
+
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'+
+      /* Conversion Funnel */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:6px">🔄 Phễu chuyển đổi</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:14px">Từ lượt xem → thêm giỏ → thanh toán → mua</div>'+
+        funnelHtml+
+        '<div style="margin-top:10px;background:#e8f5e9;border-radius:8px;padding:10px 14px;text-align:center">'+
+          '<span style="font-size:13.5px;font-weight:700;color:#2e7d32">Tỷ lệ chuyển đổi cuối: '+Math.round((fn.purchased/fMax)*100)+'%</span>'+
+          '<div style="font-size:11.5px;color:#555;margin-top:2px">'+fmtBig(fn.purchased)+' đơn từ '+fmtBig(fn.views)+' lượt xem</div>'+
+        '</div>'+
+      '</div>'+
+      /* Traffic Sources */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:6px">🌐 Nguồn traffic</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:10px">Tổng '+fmtBig(trafSrc.reduce((a,t)=>a+t.visits,0))+' lượt truy cập</div>'+
+        trafRows+
+      '</div>'+
+    '</div>'+
+    /* Behavior */
+    '<div style="font-weight:700;font-size:13.5px;margin-bottom:12px">🧠 Hành vi khách hàng</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">'+behaviorCards+'</div>'+
+    /* New vs Returning */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">'+
+        '<div>'+
+          '<div style="font-weight:700;font-size:13.5px">👥 Khách hàng mới vs Quay lại (7 ngày)</div>'+
+          '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">Tổng '+totalCust+' lượt — Mới: '+Math.round((totalNew/totalCust)*100)+'% / Quay lại: '+Math.round((totalRet/totalCust)*100)+'%</div>'+
+        '</div>'+
+        '<div style="display:flex;gap:12px;font-size:13px">'+
+          '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#6a1b9a">'+totalNew+'</div><div style="font-size:11px;color:#555">Khách mới</div></div>'+
+          '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">'+totalRet+'</div><div style="font-size:11px;color:#555">Quay lại</div></div>'+
+        '</div>'+
+      '</div>'+
+      custChart+
+    '</div>';
+}
+
+function doSellerExportReport(fmt){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s){toast('Không tìm thấy dữ liệu gian hàng.');return;}
+  const ad=s.analyticsData||{};
+  const rd=s.revenueData||{};
+  const shopName=s.shopName||'Gian hàng';
+  const today=todayStr();
+
+  if(fmt==='excel'){
+    /* Build CSV content */
+    const lines=[
+      ['BÁO CÁO PHÂN TÍCH BÁN HÀNG — '+shopName,'','',''],
+      ['Ngày xuất: '+today,'','',''],
+      ['','','',''],
+      ['=== DOANH THU THEO THÁNG ===','','',''],
+      ['Tháng','Doanh thu (đ)','',''],
+      ...((ad.salesTrend||{}).monthly||[]).map((v,i)=>['Tháng '+(i+1),v,'','']),
+      ['','','',''],
+      ['=== TOP SẢN PHẨM BÁN CHẠY ===','','',''],
+      ['Tên sản phẩm','Loại','Đã bán','Doanh thu (đ)'],
+      ...(ad.topProducts||[]).map(p=>[p.name,p.type==='books'?'Sách':p.type==='vpp'?'VPP':p.type==='tbgd'?'Thiết bị':'Ebook',p.sold,p.revenue]),
+      ['','','',''],
+      ['=== CHI TIẾT GIAO DỊCH ===','','',''],
+      ['Mã TXN','Mã đơn','Khách hàng','Doanh thu (đ)','Phí nền tảng (đ)','Thực nhận (đ)','Trạng thái','Ngày'],
+      ...(rd.transactions||[]).map(tx=>[tx.id,tx.orderId,tx.buyer,tx.orderTotal,tx.commissionAmt,tx.netAmt,tx.status,tx.date])
+    ];
+    const csv=lines.map(row=>row.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const bom='﻿';
+    const blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='bao-cao-phan-tich-'+today.replace(/\//g,'-')+'.csv';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    toast('✓ Đã xuất file Excel (CSV) thành công!');
+  } else {
+    /* PDF via print window */
+    const topTable=(ad.topProducts||[]).slice(0,7).map((p,i)=>
+      '<tr><td>'+(i+1)+'</td><td>'+p.name+'</td><td>'+(p.type==='books'?'Sách':p.type==='vpp'?'VPP':p.type==='tbgd'?'Thiết bị':'Ebook')+'</td><td style="text-align:right">'+p.sold+'</td><td style="text-align:right">'+fmtBig(p.revenue)+'đ</td><td style="text-align:center">'+p.convRate+'%</td></tr>'
+    ).join('');
+    const txTable=(rd.transactions||[]).map(tx=>
+      '<tr><td>#'+tx.id+'</td><td>#'+tx.orderId+'</td><td>'+tx.buyer+'</td><td style="text-align:right">'+fmtBig(tx.orderTotal)+'đ</td><td style="text-align:right">'+tx.commissionRate+'% ('+fmtBig(tx.commissionAmt)+'đ)</td><td style="text-align:right;font-weight:700;color:#2e7d32">'+fmtBig(tx.netAmt)+'đ</td><td>'+tx.date+'</td></tr>'
+    ).join('');
+    const beh=ad.behavior||{};
+    const fn=ad.funnel||{};
+    const win=window.open('','_blank','width=900,height=900');
+    if(!win){toast('Trình duyệt chặn popup. Vui lòng cho phép popup để xuất PDF.');return;}
+    win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Báo cáo Phân tích — '+shopName+'</title>'+
+      '<style>body{font-family:Arial,sans-serif;margin:24px;color:#333}h1{color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:8px}h2{color:#1565c0;font-size:14px;margin-top:20px}table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}th{background:#e8f4fd;padding:6px 8px;text-align:left;border:1px solid #ccc}td{padding:5px 8px;border:1px solid #ddd}.meta{font-size:12px;color:#666;margin-bottom:16px}.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}.kpi-card{background:#f8f9ff;border-radius:6px;padding:12px;text-align:center;border:1px solid #ddd}.kpi-val{font-size:18px;font-weight:700;color:#1565c0}.kpi-lbl{font-size:11px;color:#666;margin-top:4px}@media print{body{margin:0}}</style>'+
+      '</head><body>'+
+      '<h1>Báo cáo Phân tích Bán hàng</h1>'+
+      '<div class="meta"><strong>Gian hàng:</strong> '+shopName+' &nbsp;|&nbsp; <strong>Ngày xuất:</strong> '+today+'</div>'+
+      '<div class="kpi">'+
+        '<div class="kpi-card"><div class="kpi-val">'+fmtMil((rd.balance||{}).totalEarned||0)+'đ</div><div class="kpi-lbl">Tổng doanh thu</div></div>'+
+        '<div class="kpi-card"><div class="kpi-val">'+(s.orders||[]).filter(o=>o.status==='delivered').length+'</div><div class="kpi-lbl">Đơn hoàn thành</div></div>'+
+        '<div class="kpi-card"><div class="kpi-val">'+Math.round((fn.purchased/Math.max(fn.views,1))*100)+'%</div><div class="kpi-lbl">Tỷ lệ chuyển đổi</div></div>'+
+        '<div class="kpi-card"><div class="kpi-val">'+(beh.bounceRate||0)+'%</div><div class="kpi-lbl">Tỷ lệ thoát</div></div>'+
+      '</div>'+
+      '<h2>Top sản phẩm bán chạy</h2>'+
+      '<table><thead><tr><th>#</th><th>Tên sản phẩm</th><th>Loại</th><th>Đã bán</th><th>Doanh thu</th><th>Conv.</th></tr></thead><tbody>'+topTable+'</tbody></table>'+
+      '<h2>Chi tiết giao dịch</h2>'+
+      '<table><thead><tr><th>Mã TXN</th><th>Đơn hàng</th><th>Khách</th><th>Doanh thu</th><th>Phí nền tảng</th><th>Thực nhận</th><th>Ngày</th></tr></thead><tbody>'+txTable+'</tbody></table>'+
+      '<h2>Hành vi khách hàng</h2>'+
+      '<table><thead><tr><th>Chỉ số</th><th>Giá trị</th></tr></thead><tbody>'+
+        '<tr><td>Thời gian xem trang TB</td><td>'+Math.floor((beh.avgTimeOnPage||0)/60)+'p '+(beh.avgTimeOnPage||0)%60+'s</td></tr>'+
+        '<tr><td>Tỷ lệ thoát</td><td>'+(beh.bounceRate||0)+'%</td></tr>'+
+        '<tr><td>Trang/Phiên TB</td><td>'+(beh.avgPagesPerSession||0)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div style="margin-top:20px;text-align:right"><button onclick="window.print()" style="padding:8px 20px;background:#1565c0;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">🖨 In / Lưu PDF</button></div>'+
+      '</body></html>');
+    win.document.close();
+    toast('✓ Đã mở cửa sổ xuất PDF — nhấn "In" và chọn "Save as PDF".');
+  }
 }
 
 /* ── 7. Shop Editor (edit business info) ── */
