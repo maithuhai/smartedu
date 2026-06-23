@@ -1728,6 +1728,11 @@ let admNotifTab='compose';
 // Seller Portal
 let sellerRegStep=1;
 let sellerDashPeriod='month';
+let sellerEditProductId=null;
+let sellerProductSearch='';
+let sellerProductStatusFilter='all';
+let sellerSelectedProds=[];
+let sellerRestockProductId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3002,6 +3007,23 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
         {id:'sn-007',type:'review',t:'Đánh giá mới 4★ từ Thanh Hoa: "Sản phẩm tốt, đúng mô tả. Giao hàng hơi chậm nhưng đóng gói kỹ."',time:'3 ngày trước',read:true}
       ],
       violations:[],commissionOverride:null,warnings:0});
+    saveActiveSellers();
+  }
+})();
+
+/* ── Migrate seller-sapp-001 products to full struct ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx!==-1&&activeSellers[sIdx].products&&!activeSellers[sIdx].products[0].genre){
+    activeSellers[sIdx].products=[
+      {id:'slp-001',name:'Bộ SGK Lớp 5 Kết nối tri thức (2024-2025)',by:'Bộ GD&ĐT',nxb:'NXB Giáo dục Việt Nam',isbn:'978-604-0-12345-6',year:2024,pages:240,lang:'vi',genre:'sgk',aud:['tieuhoc'],desc:'Bộ sách giáo khoa lớp 5 theo chương trình GDPT 2018 bộ Kết nối tri thức với cuộc sống. Gồm 8 môn học, in ấn sắc nét, bìa cứng chống thấm.',price:185000,oldPrice:210000,stock:3,sold:24,rating:4.5,ratingCount:12,status:'active',imageCount:3,createdAt:'15/06/2025',updatedAt:'23/06/2025',restockHistory:[]},
+      {id:'slp-002',name:'Sách GK Toán 6 Cánh Diều',by:'Đỗ Đức Thái (CB)',nxb:'NXB Đại học Sư phạm',isbn:'978-604-0-98765-4',year:2024,pages:168,lang:'vi',genre:'sgk',aud:['thcs'],desc:'Sách giáo khoa Toán lớp 6 bộ Cánh Diều theo chương trình GDPT mới. Bài tập phong phú, hình ảnh minh họa sinh động.',price:32000,oldPrice:0,stock:28,sold:67,rating:4.6,ratingCount:23,status:'active',imageCount:2,createdAt:'15/05/2025',updatedAt:'18/06/2025',restockHistory:[]},
+      {id:'slp-003',name:'Sách Tiếng Anh 7 Global Success',by:'Nguyễn Thị Chi (CB)',nxb:'NXB Giáo dục Việt Nam',isbn:'978-604-0-11111-1',year:2024,pages:192,lang:'bilingual',genre:'sgk',aud:['thcs'],desc:'Sách giáo khoa Tiếng Anh lớp 7 bộ Global Success theo chương trình mới. Song ngữ Anh-Việt với các bài đọc, nghe, nói và viết.',price:35000,oldPrice:0,stock:45,sold:53,rating:4.8,ratingCount:18,status:'active',imageCount:2,createdAt:'15/05/2025',updatedAt:'15/06/2025',restockHistory:[]},
+      {id:'slp-004',name:'Dế Mèn Phiêu Lưu Ký (Bìa Cứng Kỷ Niệm)',by:'Tô Hoài',nxb:'NXB Kim Đồng',isbn:'978-604-2-17890-1',year:2023,pages:208,lang:'vi',genre:'thieunhi',aud:['tieuhoc','thcs'],desc:'Tác phẩm văn học kinh điển Việt Nam dành cho thiếu nhi, bản bìa cứng kỷ niệm 75 năm. Minh họa màu sắc của họa sĩ Tạ Huy Long.',price:88000,oldPrice:110000,stock:0,sold:156,rating:4.9,ratingCount:87,status:'outofstock',imageCount:4,createdAt:'01/04/2025',updatedAt:'20/06/2025',restockHistory:[{qty:50,reason:'Nhập kho lần đầu',date:'01/04/2025'},{qty:100,reason:'Nhập thêm do hết hàng',date:'15/05/2025'}]},
+      {id:'slp-005',name:'Atomic Habits – Thói Quen Nguyên Tử',by:'James Clear',nxb:'NXB Lao động',isbn:'978-604-3-34567-8',year:2023,pages:344,lang:'vi',genre:'kynang',aud:['thpt','sinhvien'],desc:'Cuốn sách về việc xây dựng thói quen tốt và loại bỏ thói quen xấu. Phương pháp khoa học đã được kiểm chứng bởi hàng triệu người.',price:115000,oldPrice:145000,stock:12,sold:89,rating:4.7,ratingCount:56,status:'active',imageCount:3,createdAt:'10/05/2025',updatedAt:'20/06/2025',restockHistory:[]},
+      {id:'slp-006',name:'Oxford Quick Placement Test – Prep Book',by:'Many Authors',nxb:'Oxford University Press',isbn:'978-0-19-401234-5',year:2023,pages:256,lang:'en',genre:'ngoaingu',aud:['thpt','sinhvien'],desc:'Sách luyện thi Oxford Quick Placement Test cho học sinh THPT và sinh viên muốn xác định trình độ tiếng Anh.',price:195000,oldPrice:240000,stock:8,sold:34,rating:4.4,ratingCount:21,status:'draft',imageCount:2,createdAt:'20/05/2025',updatedAt:'10/06/2025',restockHistory:[]}
+    ];
+    activeSellers[sIdx].totalProducts=6;
     saveActiveSellers();
   }
 })();
@@ -7420,7 +7442,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-shop','Gian hàng'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sản phẩm'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8299,6 +8321,9 @@ function sellerContent(){
   const isApproved=myApp&&myApp.status==='approved';
 
   if(acctTab==='seller-reg')     return myApp?sellerAppStatus(myApp):sellerRegForm();
+  if(acctTab==='seller-products')     return isApproved?sellerProductList():sellerAppStatus(myApp);
+  if(acctTab==='seller-product-form') return isApproved?sellerProductForm(sellerEditProductId):sellerAppStatus(myApp);
+  if(acctTab==='seller-product-import')return isApproved?sellerProductImport():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -8669,7 +8694,7 @@ function sellerDashboard(app){
     stockHtml+
     // Quick actions
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+
-      '<button class="dash-card" onclick="acctTab=\'seller-shop\';renderAccount()">🏪 Gian hàng ›</button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-products\';renderAccount()">📦 Sản phẩm ›</button>'+
       '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()">💰 Thanh toán ›</button>'+
       '<button class="dash-card" onclick="acctTab=\'seller-notif\';renderAccount()">'+(unread?'🔔 Thông báo ('+unread+') ›':'🔔 Thông báo ›')+'</button>'+
     '</div>'+
@@ -8731,7 +8756,420 @@ function doMarkSellerNotifsRead(){
   renderAccount();
 }
 
-/* ── 6. Shop Editor (edit business info) ── */
+/* ── 6. Seller Product Management ── */
+const SELLER_GENRE=[{k:'sgk',lbl:'Sách giáo khoa'},{k:'thamkhao',lbl:'Sách tham khảo'},{k:'vanhoc',lbl:'Văn học'},{k:'thieunhi',lbl:'Thiếu nhi'},{k:'kynang',lbl:'Kỹ năng sống'},{k:'ngoaingu',lbl:'Ngoại ngữ'}];
+const SELLER_AUD=[{k:'tieuhoc',lbl:'Tiểu học'},{k:'thcs',lbl:'THCS'},{k:'thpt',lbl:'THPT'},{k:'sinhvien',lbl:'Sinh viên'},{k:'giaovien',lbl:'Giáo viên'}];
+const SELLER_LANG=[{k:'vi',lbl:'Tiếng Việt'},{k:'en',lbl:'Tiếng Anh'},{k:'bilingual',lbl:'Song ngữ'}];
+const SELLER_GENRE_LBL=Object.fromEntries(SELLER_GENRE.map(g=>[g.k,g.lbl]));
+
+function sellerProductList(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s)return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const allProds=s.products||[];
+  let prods=allProds.slice();
+  if(sellerProductSearch){const q=sellerProductSearch.toLowerCase();prods=prods.filter(p=>p.name.toLowerCase().includes(q)||(p.by||'').toLowerCase().includes(q));}
+  if(sellerProductStatusFilter==='outofstock')prods=prods.filter(p=>p.stock===0);
+  else if(sellerProductStatusFilter!=='all')prods=prods.filter(p=>p.status===sellerProductStatusFilter);
+  const total=allProds.length;
+  const activeCnt=allProds.filter(p=>p.status==='active').length;
+  const draftCnt=allProds.filter(p=>p.status==='draft').length;
+  const outCnt=allProds.filter(p=>p.stock===0).length;
+  const stBadge={active:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#27ae6020;color:#27ae60;font-weight:600">Đang bán</span>',draft:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#95a5a620;color:#7f8c8d;font-weight:600">Nháp</span>',outofstock:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#e67e2220;color:#e67e22;font-weight:600">Hết hàng</span>'};
+  const clr=NCC_CAT_CLR[s.category]||'#c0392b';
+  const filteredIds=prods.map(p=>p.id);
+  const selAll=filteredIds.length>0&&filteredIds.every(id=>sellerSelectedProds.includes(id));
+
+  const rows=prods.length
+    ?prods.map(p=>{
+        const isSel=sellerSelectedProds.includes(p.id);
+        const stockClr=p.stock===0?'#e74c3c':p.stock<=5?'#e67e22':'#27ae60';
+        const disc=p.oldPrice>0?Math.round((1-p.price/p.oldPrice)*100):0;
+        const stars='★'.repeat(Math.round(p.rating||0))+'☆'.repeat(5-Math.round(p.rating||0));
+        const badge=p.stock===0&&p.status!=='draft'?stBadge.outofstock:(stBadge[p.status]||stBadge.draft);
+        return '<tr style="border-top:1px solid var(--line);background:'+(isSel?'#f5f0eb':'transparent')+'">'+
+          '<td style="padding:10px 8px;width:34px"><input type="checkbox" '+(isSel?'checked':'')+' onclick="doSellerToggleSelect(\''+p.id+'\')" style="cursor:pointer;width:15px;height:15px"></td>'+
+          '<td style="padding:10px 8px;width:40px"><div style="width:36px;height:48px;background:'+clr+'18;border-radius:4px;display:flex;align-items:center;justify-content:center;color:'+clr+';font-weight:700;font-size:16px">'+escHtml(p.name.charAt(0).toUpperCase())+'</div></td>'+
+          '<td style="padding:10px 8px">'+
+            '<div style="font-weight:600;font-size:13.5px;color:var(--ink-deep);margin-bottom:2px">'+escHtml(p.name)+'</div>'+
+            '<div style="font-size:11.5px;color:var(--text-soft)">'+escHtml(p.by||'—')+
+              (p.genre?' · <span style="background:#f0ebe4;border-radius:4px;padding:1px 6px;font-size:11px">'+escHtml(SELLER_GENRE_LBL[p.genre]||p.genre)+'</span>':'')+
+            '</div>'+
+          '</td>'+
+          '<td style="padding:10px 8px;white-space:nowrap">'+
+            '<div style="font-weight:700;font-size:13.5px;color:var(--coral)">'+fmtBig(p.price)+'đ</div>'+
+            (disc>0?'<div style="font-size:11px;color:var(--text-soft);text-decoration:line-through">'+fmtBig(p.oldPrice)+'đ</div><span style="font-size:10.5px;background:#e74c3c20;color:#e74c3c;padding:1px 5px;border-radius:4px">-'+disc+'%</span>':'')+
+          '</td>'+
+          '<td style="padding:10px 8px;text-align:center"><span style="font-weight:700;font-size:14px;color:'+stockClr+'">'+p.stock+'</span></td>'+
+          '<td style="padding:10px 8px;text-align:center;color:var(--text-soft);font-size:13.5px">'+p.sold+'</td>'+
+          '<td style="padding:10px 8px;white-space:nowrap"><span style="font-size:12px;color:#f39c12">'+stars+'</span> <span style="font-size:11.5px;color:var(--text-soft)">('+((p.ratingCount||0))+')</span></td>'+
+          '<td style="padding:10px 8px">'+badge+'</td>'+
+          '<td style="padding:10px 8px;white-space:nowrap">'+
+            '<button title="Sửa" onclick="sellerEditProductId=\''+p.id+'\';acctTab=\'seller-product-form\';sellerProductSearch=\'\';sellerSelectedProds=[];renderAccount()" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">✏</button>'+
+            '<button title="Nhập hàng" onclick="doSellerToggleRestock(\''+p.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">📦</button>'+
+            '<button title="Xóa" onclick="doSellerDeleteProduct(\''+p.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;cursor:pointer;color:#e74c3c">🗑</button>'+
+          '</td>'+
+        '</tr>'+
+        (sellerRestockProductId===p.id?'<tr><td colspan="9" style="padding:0 8px 12px;background:#faf8f5">'+_sellerRestockInline(p)+'</td></tr>':'');
+      }).join('')
+    :'<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-soft);font-size:13.5px">Không tìm thấy sản phẩm nào.</td></tr>';
+
+  const bulkBar=sellerSelectedProds.length
+    ?'<div style="background:#f5f0eb;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span style="font-weight:600;font-size:13.5px">✓ Đã chọn '+sellerSelectedProds.length+' sản phẩm</span>'+
+        '<div style="height:18px;width:1px;background:var(--line)"></div>'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<input id="bulkPriceInput" type="number" placeholder="Giá mới (đ)" style="padding:5px 10px;border:1.5px solid var(--line);border-radius:6px;font-size:13px;width:130px">'+
+          '<button onclick="doSellerBulkPriceUpdate()" style="padding:5px 12px;border-radius:6px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-size:12.5px">Cập nhật giá</button>'+
+        '</div>'+
+        '<div style="height:18px;width:1px;background:var(--line)"></div>'+
+        '<button onclick="doSellerBulkStatusUpdate(\'active\')" style="padding:5px 12px;border-radius:6px;background:#27ae6018;color:#27ae60;border:1.5px solid #27ae6030;cursor:pointer;font-size:12.5px">→ Đang bán</button>'+
+        '<button onclick="doSellerBulkStatusUpdate(\'draft\')" style="padding:5px 12px;border-radius:6px;background:#7f8c8d18;color:#7f8c8d;border:1.5px solid #7f8c8d30;cursor:pointer;font-size:12.5px">→ Nháp</button>'+
+        '<div style="margin-left:auto"><button onclick="doSellerBulkDelete()" style="padding:5px 12px;border-radius:6px;background:#e74c3c18;color:#e74c3c;border:1.5px solid #e74c3c30;cursor:pointer;font-size:12.5px">🗑 Xóa đã chọn</button></div>'+
+      '</div>'
+    :'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<div><h3 style="margin:0">Quản lý Sản phẩm</h3>'+
+        '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">'+total+' sản phẩm · '+activeCnt+' đang bán · '+draftCnt+' nháp · '+outCnt+' hết hàng</p>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button onclick="sellerEditProductId=null;sellerProductSearch=\'\';acctTab=\'seller-product-form\';renderAccount()" class="btn-primary" style="font-size:13px">+ Thêm sách mới</button>'+
+        '<button onclick="sellerProductSearch=\'\';acctTab=\'seller-product-import\';renderAccount()" class="btn-ghost" style="font-size:13px">📥 Nhập CSV</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'+
+      '<input placeholder="🔍 Tìm theo tên sách, tác giả..." value="'+escHtml(sellerProductSearch)+'" oninput="sellerProductSearch=this.value;sellerSelectedProds=[];renderAccount()" style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+      [['all','Tất cả ('+total+')'],['active','Đang bán ('+activeCnt+')'],['draft','Nháp ('+draftCnt+')'],['outofstock','Hết hàng ('+outCnt+')']].map(([k,lbl])=>
+        '<button onclick="sellerProductStatusFilter=\''+k+'\';sellerSelectedProds=[];renderAccount()" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(sellerProductStatusFilter===k?'var(--ink)':'var(--line)')+';background:'+(sellerProductStatusFilter===k?'var(--ink)':'transparent')+';color:'+(sellerProductStatusFilter===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+lbl+'</button>'
+      ).join('')+
+    '</div>'+
+    bulkBar+
+    '<div style="overflow-x:auto">'+
+      '<table style="width:100%;border-collapse:collapse;min-width:720px">'+
+        '<thead><tr style="background:var(--paper)">'+
+          '<th style="padding:8px;width:34px"><input type="checkbox" '+(selAll&&prods.length?'checked':'')+' onclick="doSellerToggleSelectAll()" style="cursor:pointer;width:15px;height:15px"></th>'+
+          '<th style="padding:8px;width:40px"></th>'+
+          '<th style="text-align:left;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Sản phẩm</th>'+
+          '<th style="text-align:left;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Giá</th>'+
+          '<th style="text-align:center;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Tồn kho</th>'+
+          '<th style="text-align:center;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Đã bán</th>'+
+          '<th style="text-align:left;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Đánh giá</th>'+
+          '<th style="text-align:left;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Trạng thái</th>'+
+          '<th style="text-align:center;padding:8px;font-size:11.5px;color:var(--text-soft);font-weight:500">Thao tác</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
+
+function _sellerRestockInline(p){
+  const hist=p.restockHistory&&p.restockHistory.length?p.restockHistory.slice(-3).reverse():[];
+  return '<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:6px">'+
+    '<div style="font-weight:600;font-size:13.5px;margin-bottom:12px">📦 Nhập hàng: '+escHtml(p.name)+'</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Số lượng nhập thêm <span style="color:var(--ink)">*</span></label><input id="rsQty_'+p.id+'" type="number" value="50" min="1" placeholder="Số lượng" style="max-width:120px"></div>'+
+      '<div class="form-field" style="flex:2"><label>Lý do nhập hàng</label><input id="rsReason_'+p.id+'" value="Nhập hàng định kỳ" placeholder="VD: Nhập hàng mùa tựu trường..."></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn-primary" onclick="doSellerRestockProduct(\''+p.id+'\')" style="font-size:13px;padding:7px 16px">✓ Xác nhận nhập</button>'+
+      '<button class="btn-ghost" onclick="sellerRestockProductId=null;renderAccount()" style="font-size:13px;padding:7px 14px">Hủy</button>'+
+    '</div>'+
+    (hist.length?'<div style="margin-top:10px;font-size:12px;color:var(--text-soft)">Lần nhập gần nhất: '+hist.map(h=>'<b>+'+h.qty+'</b> ('+escHtml(h.date)+')').join(' · ')+'</div>':'')+
+  '</div>';
+}
+
+function sellerProductForm(productId){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s)return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const isEdit=!!productId;
+  const p=isEdit?(s.products||[]).find(x=>x.id===productId):null;
+  const v=(f,def='')=>escHtml(String((p?p[f]:null)??def));
+  const curAud=p?(p.aud||[]):[];
+  const curGenre=p?(p.genre||'sgk'):'sgk';
+  const curLang=p?(p.lang||'vi'):'vi';
+  const curStatus=p?(p.status||'active'):'active';
+  const disc=(p&&p.oldPrice>0)?Math.round((1-p.price/p.oldPrice)*100):0;
+  const imgCnt=p?p.imageCount||1:1;
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">'+
+      '<button onclick="acctTab=\'seller-products\';sellerEditProductId=null;renderAccount()" class="btn-ghost" style="padding:5px 12px;font-size:13px">← Danh sách</button>'+
+      '<h3 style="margin:0">'+(isEdit?'Chỉnh sửa Sách':'Thêm Sách Mới')+'</h3>'+
+    '</div>'+
+    // Basic info
+    '<div style="font-weight:600;font-size:14px;margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">📋 Thông tin cơ bản</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field" style="flex:2"><label>Tên sách <span style="color:var(--ink)">*</span></label><input id="pfName" value="'+v('name')+'" placeholder="Nhập tên đầy đủ của sách"></div>'+
+      '<div class="form-field"><label>Tác giả <span style="color:var(--ink)">*</span></label><input id="pfBy" value="'+v('by')+'" placeholder="Tên tác giả / nhiều tác giả"></div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Nhà xuất bản</label><input id="pfNxb" value="'+v('nxb')+'" placeholder="VD: NXB Giáo dục Việt Nam"></div>'+
+      '<div class="form-field"><label>ISBN</label><input id="pfIsbn" value="'+v('isbn')+'" placeholder="978-..."></div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Năm xuất bản</label><input id="pfYear" type="number" value="'+(p?p.year||'':'')+'" placeholder="2024" min="1900" max="2030"></div>'+
+      '<div class="form-field"><label>Số trang</label><input id="pfPages" type="number" value="'+(p?p.pages||'':'')+'" placeholder="256" min="0"></div>'+
+      '<div class="form-field"><label>Ngôn ngữ</label><select id="pfLang">'+SELLER_LANG.map(l=>'<option value="'+l.k+'"'+(curLang===l.k?' selected':'')+'>'+l.lbl+'</option>').join('')+'</select></div>'+
+    '</div>'+
+    // Category
+    '<div style="font-weight:600;font-size:14px;margin:20px 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">🏷 Phân loại</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Thể loại <span style="color:var(--ink)">*</span></label>'+
+        '<select id="pfGenre">'+SELLER_GENRE.map(g=>'<option value="'+g.k+'"'+(curGenre===g.k?' selected':'')+'>'+g.lbl+'</option>').join('')+'</select>'+
+      '</div>'+
+      '<div class="form-field"><label>Đối tượng độc giả <span style="color:var(--ink)">*</span></label>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">'+
+          SELLER_AUD.map(a=>'<label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pfAud_'+a.k+'"'+(curAud.includes(a.k)?' checked':'')+'>'+a.lbl+'</label>').join('')+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    // Description
+    '<div style="font-weight:600;font-size:14px;margin:20px 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">📝 Mô tả sản phẩm</div>'+
+    '<div class="form-field"><textarea id="pfDesc" rows="4" placeholder="Mô tả nội dung sách, ưu điểm nổi bật, đối tượng phù hợp...">'+escHtml(p?p.desc||'':'')+'</textarea></div>'+
+    // Pricing & inventory
+    '<div style="font-weight:600;font-size:14px;margin:20px 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">💰 Giá & Tồn kho</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Giá bán <span style="color:var(--ink)">*</span></label><input id="pfPrice" type="number" value="'+(p?p.price||'':'')+'" placeholder="85000" min="0" oninput="pfCalcDisc()"></div>'+
+      '<div class="form-field"><label>Giá gốc (để hiện giảm giá)</label><input id="pfOldPrice" type="number" value="'+(p?p.oldPrice||'':'')+'" placeholder="110000" min="0" oninput="pfCalcDisc()"></div>'+
+      '<div class="form-field"><label>% Giảm giá</label>'+
+        '<div id="pfDiscDisplay" style="padding:9px 12px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;font-weight:600;color:'+(disc>0?'#e74c3c':'var(--text-soft)')+'">'+(disc>0?'-'+disc+'%':'—')+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-field" style="max-width:200px"><label>Số lượng tồn kho <span style="color:var(--ink)">*</span></label><input id="pfStock" type="number" value="'+(p?p.stock:0)+'" min="0"></div>'+
+    // Images (demo)
+    '<div style="font-weight:600;font-size:14px;margin:20px 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">🖼 Ảnh bìa & ảnh bổ sung</div>'+
+    '<div style="background:#f5f0eb;border:1.5px dashed var(--line);border-radius:10px;padding:16px">'+
+      '<p style="font-size:12.5px;color:var(--text-soft);margin:0 0 12px">Demo: dùng số lượng ảnh. Bản production sẽ có upload file thực tế.</p>'+
+      '<div class="form-field" style="max-width:180px"><label>Số ảnh (1–10)</label><input id="pfImageCount" type="number" value="'+imgCnt+'" min="1" max="10" oninput="pfRenderSlots()"></div>'+
+      '<div id="pfImageSlots" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+
+        Array.from({length:imgCnt},(_,i)=>'<div style="width:60px;height:80px;background:#d0c8bf;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-soft);font-size:11px;font-weight:500">'+(i===0?'Bìa':(i+1))+'</div>').join('')+
+      '</div>'+
+    '</div>'+
+    // Status
+    '<div style="font-weight:600;font-size:14px;margin:20px 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--line)">📢 Trạng thái đăng bán</div>'+
+    '<div style="display:flex;gap:14px;flex-wrap:wrap">'+
+      '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 16px;border:1.5px solid '+(curStatus==='active'?'#27ae60':'var(--line)')+';border-radius:10px;background:'+(curStatus==='active'?'#27ae6010':'transparent')+'">'+
+        '<input type="radio" name="pfStatus" value="active" '+(curStatus==='active'?'checked':'')+' style="cursor:pointer">'+
+        '<div><div style="font-weight:600;font-size:13.5px">Đăng ngay</div><div style="font-size:12px;color:var(--text-soft)">Hiển thị trên cửa hàng</div></div>'+
+      '</label>'+
+      '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 16px;border:1.5px solid '+(curStatus==='draft'?'#7f8c8d':'var(--line)')+';border-radius:10px;background:'+(curStatus==='draft'?'#7f8c8d10':'transparent')+'">'+
+        '<input type="radio" name="pfStatus" value="draft" '+(curStatus==='draft'?'checked':'')+' style="cursor:pointer">'+
+        '<div><div style="font-weight:600;font-size:13.5px">Lưu nháp</div><div style="font-size:12px;color:var(--text-soft)">Ẩn tạm, chỉ bạn thấy</div></div>'+
+      '</label>'+
+    '</div>'+
+    '<div style="display:flex;gap:10px;margin-top:24px;padding-top:16px;border-top:1.5px solid var(--line)">'+
+      '<button class="btn-primary" onclick="doSellerSaveProduct('+(isEdit?'\''+productId+'\'':'null')+')" style="font-size:13.5px;padding:10px 24px">'+(isEdit?'💾 Lưu thay đổi':'✓ Lưu sản phẩm')+'</button>'+
+      '<button class="btn-ghost" onclick="acctTab=\'seller-products\';sellerEditProductId=null;renderAccount()">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function pfCalcDisc(){
+  const price=parseFloat((document.getElementById('pfPrice')||{}).value)||0;
+  const old=parseFloat((document.getElementById('pfOldPrice')||{}).value)||0;
+  const disc=price>0&&old>price?Math.round((1-price/old)*100):0;
+  const el=document.getElementById('pfDiscDisplay');
+  if(el){el.textContent=disc>0?('-'+disc+'%'):'—';el.style.color=disc>0?'#e74c3c':'var(--text-soft)';}
+}
+function pfRenderSlots(){
+  const cnt=Math.max(1,Math.min(10,parseInt((document.getElementById('pfImageCount')||{}).value)||1));
+  const el=document.getElementById('pfImageSlots');
+  if(el)el.innerHTML=Array.from({length:cnt},(_,i)=>'<div style="width:60px;height:80px;background:#d0c8bf;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-soft);font-size:11px;font-weight:500">'+(i===0?'Bìa':(i+1))+'</div>').join('');
+}
+
+function sellerProductImport(){
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">'+
+      '<button onclick="acctTab=\'seller-products\';renderAccount()" class="btn-ghost" style="padding:5px 12px;font-size:13px">← Danh sách</button>'+
+      '<h3 style="margin:0">Nhập sản phẩm từ file CSV</h3>'+
+    '</div>'+
+    '<div style="background:#f0f9ff;border:1.5px solid #b2d8f0;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13.5px;line-height:1.7">'+
+      '<b>📋 Cấu trúc CSV (13 cột, không có dòng tiêu đề):</b><br>'+
+      '<code style="font-size:11.5px;background:#e8f5ff;padding:4px 8px;border-radius:4px;display:inline-block;margin:6px 0">tên_sách, tác_giả, nxb, isbn, năm_xb, số_trang, ngôn_ngữ, thể_loại, đối_tượng, mô_tả, giá_bán, giá_gốc, tồn_kho</code><br>'+
+      '• Thể loại: <b>sgk / thamkhao / vanhoc / thieunhi / kynang / ngoaingu</b><br>'+
+      '• Đối tượng: <b>tieuhoc / thcs / thpt / sinhvien / giaovien</b> (phân cách bằng dấu <b>|</b>)<br>'+
+      '• Ngôn ngữ: <b>vi / en / bilingual</b> · Giá gốc = 0 nếu không có giảm giá'+
+    '</div>'+
+    '<div style="margin-bottom:14px"><a onclick="doSellerDownloadCSVTemplate()" style="color:var(--ink);font-weight:600;cursor:pointer;font-size:13.5px;text-decoration:underline">⬇ Tải file mẫu CSV</a></div>'+
+    '<div class="form-field">'+
+      '<label>Dán nội dung CSV vào đây</label>'+
+      '<textarea id="csvData" rows="8" placeholder="Sách GK Toán 6 Cánh Diều,Đỗ Đức Thái,NXB ĐH Sư phạm,978-604-0-98765-4,2024,168,vi,sgk,thcs|thpt,Sách giáo khoa Toán 6.,32000,0,28"></textarea>'+
+    '</div>'+
+    '<div style="display:flex;gap:10px;margin-top:4px">'+
+      '<button class="btn-primary" onclick="doSellerImportCSV()" style="font-size:13.5px">📥 Nhập dữ liệu</button>'+
+      '<button class="btn-ghost" onclick="acctTab=\'seller-products\';renderAccount()">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── Seller Product Action Functions ── */
+function doSellerSaveProduct(productId){
+  const name=((document.getElementById('pfName')||{}).value||'').trim();
+  const by=((document.getElementById('pfBy')||{}).value||'').trim();
+  if(!name){toast('Vui lòng nhập tên sách.');return;}
+  if(!by){toast('Vui lòng nhập tên tác giả.');return;}
+  const nxb=((document.getElementById('pfNxb')||{}).value||'').trim();
+  const isbn=((document.getElementById('pfIsbn')||{}).value||'').trim();
+  const year=parseInt((document.getElementById('pfYear')||{}).value||0)||0;
+  const pages=parseInt((document.getElementById('pfPages')||{}).value||0)||0;
+  const lang=(document.getElementById('pfLang')||{}).value||'vi';
+  const genre=(document.getElementById('pfGenre')||{}).value||'sgk';
+  const aud=SELLER_AUD.map(a=>a.k).filter(k=>(document.getElementById('pfAud_'+k)||{}).checked);
+  if(!aud.length){toast('Vui lòng chọn ít nhất một đối tượng độc giả.');return;}
+  const desc=((document.getElementById('pfDesc')||{}).value||'').trim();
+  const price=parseFloat((document.getElementById('pfPrice')||{}).value)||0;
+  if(price<=0){toast('Vui lòng nhập giá bán hợp lệ (lớn hơn 0).');return;}
+  const oldPrice=parseFloat((document.getElementById('pfOldPrice')||{}).value)||0;
+  const stock=Math.max(0,parseInt((document.getElementById('pfStock')||{}).value||0)||0);
+  const imageCount=Math.max(1,Math.min(10,parseInt((document.getElementById('pfImageCount')||{}).value||1)||1));
+  const statusEl=document.querySelector('input[name="pfStatus"]:checked');
+  const rawStatus=statusEl?statusEl.value:'active';
+  const status=stock===0&&rawStatus==='active'?'outofstock':rawStatus;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+  if(sIdx===-1)return;
+  activeSellers[sIdx].products=activeSellers[sIdx].products||[];
+  const today=todayStr();
+  if(productId){
+    const pIdx=activeSellers[sIdx].products.findIndex(x=>x.id===productId);
+    if(pIdx===-1){toast('Không tìm thấy sản phẩm.');return;}
+    const old=activeSellers[sIdx].products[pIdx];
+    activeSellers[sIdx].products[pIdx]={...old,name,by,nxb,isbn,year,pages,lang,genre,aud,desc,price,oldPrice,stock,imageCount,status,updatedAt:today};
+    toast('✓ Đã cập nhật sản phẩm!');
+  } else {
+    activeSellers[sIdx].products.unshift({id:'slp-'+Date.now().toString(36),name,by,nxb,isbn,year,pages,lang,genre,aud,desc,price,oldPrice,stock,sold:0,rating:0,ratingCount:0,imageCount,status,createdAt:today,updatedAt:today,restockHistory:[]});
+    activeSellers[sIdx].totalProducts=(activeSellers[sIdx].totalProducts||0)+1;
+    addNotif('Sản phẩm mới "'+name+'" đã được thêm vào gian hàng.');
+    toast('✓ Đã thêm sản phẩm mới!');
+  }
+  saveActiveSellers();
+  acctTab='seller-products';sellerEditProductId=null;
+  renderAccount();
+}
+
+function doSellerDeleteProduct(id){
+  if(!confirm('Xóa sản phẩm này? Hành động không thể hoàn tác.'))return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=activeSellers[sIdx].products.findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const name=activeSellers[sIdx].products[pIdx].name;
+  activeSellers[sIdx].products.splice(pIdx,1);
+  activeSellers[sIdx].totalProducts=Math.max(0,(activeSellers[sIdx].totalProducts||1)-1);
+  saveActiveSellers();
+  sellerSelectedProds=sellerSelectedProds.filter(x=>x!==id);
+  if(sellerRestockProductId===id)sellerRestockProductId=null;
+  toast('Đã xóa: '+name);renderAccount();
+}
+
+function doSellerToggleRestock(id){
+  sellerRestockProductId=(sellerRestockProductId===id?null:id);renderAccount();
+}
+
+function doSellerRestockProduct(id){
+  const qty=parseInt((document.getElementById('rsQty_'+id)||{}).value||0);
+  const reason=((document.getElementById('rsReason_'+id)||{}).value||'Nhập hàng').trim();
+  if(!qty||qty<=0){toast('Vui lòng nhập số lượng nhập hàng hợp lệ.');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=activeSellers[sIdx].products.findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const p=activeSellers[sIdx].products[pIdx];
+  p.stock+=qty;
+  p.restockHistory=p.restockHistory||[];
+  p.restockHistory.push({qty,reason,date:todayStr()});
+  if(p.status==='outofstock')p.status='active';
+  p.updatedAt=todayStr();
+  saveActiveSellers();
+  sellerRestockProductId=null;
+  toast('✓ Đã nhập thêm '+qty+' cuốn — tồn kho mới: '+p.stock);
+  addNotif('Nhập hàng thành công: +'+qty+' "'+p.name+'" — tồn kho: '+p.stock);
+  renderAccount();
+}
+
+function doSellerToggleSelect(id){
+  const i=sellerSelectedProds.indexOf(id);
+  if(i===-1)sellerSelectedProds.push(id);else sellerSelectedProds.splice(i,1);
+  renderAccount();
+}
+
+function doSellerToggleSelectAll(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  let prods=(s?s.products||[]:[]).slice();
+  if(sellerProductSearch){const q=sellerProductSearch.toLowerCase();prods=prods.filter(p=>p.name.toLowerCase().includes(q)||(p.by||'').toLowerCase().includes(q));}
+  if(sellerProductStatusFilter==='outofstock')prods=prods.filter(p=>p.stock===0);
+  else if(sellerProductStatusFilter!=='all')prods=prods.filter(p=>p.status===sellerProductStatusFilter);
+  const ids=prods.map(p=>p.id);
+  const allSel=ids.every(id=>sellerSelectedProds.includes(id));
+  if(allSel)sellerSelectedProds=sellerSelectedProds.filter(id=>!ids.includes(id));
+  else ids.forEach(id=>{if(!sellerSelectedProds.includes(id))sellerSelectedProds.push(id);});
+  renderAccount();
+}
+
+function doSellerBulkPriceUpdate(){
+  const newPrice=parseFloat((document.getElementById('bulkPriceInput')||{}).value||0);
+  if(!newPrice||newPrice<=0){toast('Nhập giá mới hợp lệ (lớn hơn 0).');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  let cnt=0;
+  (activeSellers[sIdx].products||[]).forEach(p=>{if(sellerSelectedProds.includes(p.id)){p.price=newPrice;p.updatedAt=todayStr();cnt++;}});
+  saveActiveSellers();sellerSelectedProds=[];
+  toast('✓ Đã cập nhật giá '+fmtBig(newPrice)+'đ cho '+cnt+' sản phẩm');renderAccount();
+}
+
+function doSellerBulkStatusUpdate(newStatus){
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  let cnt=0;
+  (activeSellers[sIdx].products||[]).forEach(p=>{
+    if(sellerSelectedProds.includes(p.id)){p.status=newStatus==='active'&&p.stock===0?'outofstock':newStatus;p.updatedAt=todayStr();cnt++;}
+  });
+  saveActiveSellers();sellerSelectedProds=[];
+  const lbl={active:'Đang bán',draft:'Nháp',outofstock:'Hết hàng'}[newStatus]||newStatus;
+  toast('✓ Đã chuyển '+cnt+' sản phẩm → "'+lbl+'"');renderAccount();
+}
+
+function doSellerBulkDelete(){
+  if(!sellerSelectedProds.length)return;
+  if(!confirm('Xóa '+sellerSelectedProds.length+' sản phẩm đã chọn? Hành động không thể hoàn tác.'))return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const cnt=sellerSelectedProds.length;
+  activeSellers[sIdx].products=(activeSellers[sIdx].products||[]).filter(p=>!sellerSelectedProds.includes(p.id));
+  activeSellers[sIdx].totalProducts=Math.max(0,(activeSellers[sIdx].totalProducts||cnt)-cnt);
+  saveActiveSellers();sellerSelectedProds=[];
+  toast('✓ Đã xóa '+cnt+' sản phẩm');renderAccount();
+}
+
+function doSellerImportCSV(){
+  const raw=((document.getElementById('csvData')||{}).value||'').trim();
+  const lines=raw.split('\n').filter(l=>l.trim()&&!l.startsWith('#'));
+  if(!lines.length){toast('Không có dữ liệu CSV nào để nhập.');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  activeSellers[sIdx].products=activeSellers[sIdx].products||[];
+  let ok=0,err=0;const today=todayStr();
+  lines.forEach((line,li)=>{
+    const cols=line.split(',').map(s=>s.trim());
+    if(cols.length<13){err++;return;}
+    const[name,by,nxb,isbn,year,pages,lang,genre,audStr,desc,priceStr,oldPriceStr,stockStr]=cols;
+    if(!name||!priceStr){err++;return;}
+    const price=parseFloat(priceStr)||0;if(price<=0){err++;return;}
+    const aud=audStr?audStr.split('|').map(s=>s.trim()).filter(Boolean):['thcs'];
+    const st=parseInt(stockStr)>0?'active':'outofstock';
+    activeSellers[sIdx].products.unshift({id:'slp-csv-'+today.replace(/\//g,'')+'-'+li,name,by:by||'',nxb:nxb||'',isbn:isbn||'',year:parseInt(year)||2024,pages:parseInt(pages)||0,lang:lang||'vi',genre:genre||'thamkhao',aud,desc:desc||'',price,oldPrice:parseFloat(oldPriceStr)||0,stock:parseInt(stockStr)||0,sold:0,rating:0,ratingCount:0,imageCount:1,status:st,createdAt:today,updatedAt:today,restockHistory:[]});
+    ok++;
+  });
+  activeSellers[sIdx].totalProducts=(activeSellers[sIdx].totalProducts||0)+ok;
+  saveActiveSellers();
+  toast('✓ Đã nhập '+ok+' sản phẩm'+(err?' ('+err+' dòng lỗi bỏ qua)':'')+'!');
+  acctTab='seller-products';renderAccount();
+}
+
+function doSellerDownloadCSVTemplate(){
+  const hdr='tên_sách,tác_giả,nxb,isbn,năm_xb,số_trang,ngôn_ngữ,thể_loại,đối_tượng,mô_tả,giá_bán,giá_gốc,tồn_kho';
+  const r1='Sách GK Toán 6 Cánh Diều,Đỗ Đức Thái,NXB ĐH Sư phạm,978-604-0-98765-4,2024,168,vi,sgk,thcs|thpt,Sách giáo khoa Toán 6 bộ Cánh Diều.,32000,0,28';
+  const r2='Atomic Habits – Thói Quen Nguyên Tử,James Clear,NXB Lao động,978-604-3-34567-8,2023,344,vi,kynang,thpt|sinhvien,Sách về xây dựng thói quen tốt.,115000,145000,15';
+  const blob=new Blob(['﻿'+hdr+'\n'+r1+'\n'+r2],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='mau-nhap-sach-edumart.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+/* ── 7. Shop Editor (edit business info) ── */
 function sellerShopEditor(app){
   const si=app.shopInfo||{};
   const clr=NCC_CAT_CLR[app.category]||'#888';
