@@ -1740,6 +1740,10 @@ let sellerEditVppId=null;
 let sellerVppSearch='';
 let sellerVppStatusFilter='all';
 let sellerRestockVppId=null;
+let sellerEditTbgdId=null;
+let sellerTbgdSearch='';
+let sellerTbgdStatusFilter='all';
+let sellerRestockTbgdId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3058,6 +3062,21 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
       {id:'svp-003',name:'Kẹp bướm 19mm (Hộp 12 cái)',brand:'Stacom',category:'giam',unit:'Hộp',desc:'Kẹp bướm inox 19mm, lực kẹp mạnh, không rỉ sét. Hộp 12 cái.',price:12000,oldPrice:15000,stock:7,lowStockThreshold:10,sold:88,rating:4.3,ratingCount:31,imageCount:1,status:'active',createdAt:'12/04/2025',updatedAt:'19/06/2025',restockHistory:[]},
       {id:'svp-004',name:'Băng keo trong 5cm×50m',brand:'Tesa',category:'muc',unit:'Cuộn',desc:'Băng keo trong suốt rộng 5cm, dài 50m, dính tốt, không vàng theo thời gian.',price:18000,oldPrice:22000,stock:0,lowStockThreshold:8,sold:145,rating:4.6,ratingCount:47,imageCount:1,status:'outofstock',createdAt:'15/04/2025',updatedAt:'15/06/2025',restockHistory:[]},
       {id:'svp-005',name:'Bộ màu sáp Faber-Castell 24 màu',brand:'Faber-Castell',category:'viet',unit:'Bộ',desc:'Màu sáp chất lượng cao 24 màu chuẩn EU, an toàn cho trẻ em, màu tươi sáng.',price:68000,oldPrice:80000,stock:42,lowStockThreshold:5,sold:73,rating:4.9,ratingCount:55,imageCount:3,status:'active',createdAt:'20/04/2025',updatedAt:'22/06/2025',restockHistory:[]}
+    ];
+    saveActiveSellers();
+  }
+})();
+
+/* ── Seed seller-sapp-001 TBGD products ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx!==-1&&!activeSellers[sIdx].tbgdProducts){
+    activeSellers[sIdx].tbgdProducts=[
+      {id:'std-001',name:'Máy tính bảng Samsung Galaxy Tab A8',brand:'Samsung',category:'maytinh',unit:'Cái',desc:'Màn hình 10.5" TFT, chip Unisoc T618, RAM 3GB, bộ nhớ 32GB, pin 7040mAh. Phù hợp học trực tuyến và đọc tài liệu.',price:6290000,oldPrice:7490000,stock:18,lowStockThreshold:5,warrantyMonths:24,warrantyNote:'Bảo hành chính hãng Samsung Việt Nam 24 tháng.',sold:42,rating:4.6,ratingCount:37,imageCount:3,status:'active',createdAt:'05/04/2025',updatedAt:'20/06/2025',restockHistory:[{qty:20,reason:'Nhập đầu tháng 6',date:'01/06/2025'}]},
+      {id:'std-002',name:'Máy chiếu Optoma X400LVe',brand:'Optoma',category:'maychieuvan',unit:'Cái',desc:'Độ sáng 4500 lumens, độ phân giải XGA (1024×768), công nghệ DLP, tuổi thọ bóng đèn 12.000 giờ ECO+.',price:14500000,oldPrice:16800000,stock:5,lowStockThreshold:3,warrantyMonths:36,warrantyNote:'Bảo hành 36 tháng tại trung tâm ủy quyền Optoma.',sold:15,rating:4.8,ratingCount:12,imageCount:2,status:'active',createdAt:'08/04/2025',updatedAt:'18/06/2025',restockHistory:[]},
+      {id:'std-003',name:'Loa hội trường TOA ZA-2120',brand:'TOA',category:'amthanh',unit:'Bộ',desc:'Bộ âm thanh 2 kênh 120W, micro không dây UHF kèm theo, điều khiển từ xa, cổng kết nối Bluetooth + AUX.',price:3850000,oldPrice:0,stock:2,lowStockThreshold:2,warrantyMonths:12,warrantyNote:'Bảo hành 12 tháng, đổi mới trong 30 ngày nếu lỗi kỹ thuật.',sold:8,rating:4.5,ratingCount:8,imageCount:2,status:'active',createdAt:'10/04/2025',updatedAt:'19/06/2025',restockHistory:[]},
+      {id:'std-004',name:'Bảng từ viết xóa 1.2×0.8m BAVICO',brand:'BAVICO',category:'bangbiet',unit:'Cái',desc:'Bảng từ viết tay xóa được kích thước 1.2×0.8m, bề mặt men tráng trắng, khung nhôm, kèm khay phấn từ.',price:850000,oldPrice:1100000,stock:0,lowStockThreshold:4,warrantyMonths:12,warrantyNote:'Bảo hành khung và bề mặt 12 tháng.',sold:64,rating:4.4,ratingCount:51,imageCount:2,status:'outofstock',createdAt:'12/04/2025',updatedAt:'10/06/2025',restockHistory:[]},
+      {id:'std-005',name:'Camera IP Hikvision DS-2CD1143G2-I',brand:'Hikvision',category:'camera',unit:'Cái',desc:'Camera IP dome 4MP, hồng ngoại 40m, chuẩn IK10 chống va đập, chống bụi bẩn IP67, H.265+.',price:1250000,oldPrice:1500000,stock:28,lowStockThreshold:5,warrantyMonths:24,warrantyNote:'Bảo hành 24 tháng tại các trung tâm Hikvision ủy quyền.',sold:31,rating:4.7,ratingCount:24,imageCount:2,status:'active',createdAt:'15/04/2025',updatedAt:'22/06/2025',restockHistory:[]}
     ];
     saveActiveSellers();
   }
@@ -7477,7 +7496,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8364,6 +8383,8 @@ function sellerContent(){
   if(acctTab==='seller-ebook-stats')   return isApproved?sellerEbookStats(sellerEbookStatsId):sellerAppStatus(myApp);
   if(acctTab==='seller-vpp')           return isApproved?sellerVppList():sellerAppStatus(myApp);
   if(acctTab==='seller-vpp-form')      return isApproved?sellerVppForm(sellerEditVppId):sellerAppStatus(myApp);
+  if(acctTab==='seller-tbgd')          return isApproved?sellerTbgdList():sellerAppStatus(myApp);
+  if(acctTab==='seller-tbgd-form')     return isApproved?sellerTbgdForm(sellerEditTbgdId):sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -9825,6 +9846,354 @@ function doSellerRestockVpp(id){
   v.updatedAt=todayStr();
   saveActiveSellers();
   sellerRestockVppId=null;
+  toast('✓ Đã nhập thêm '+qty+' '+v.unit+' — tồn kho mới: '+v.stock);
+  addNotif('Nhập hàng thành công: +'+qty+' "'+v.name+'" — tồn kho: '+v.stock);
+  renderAccount();
+}
+
+/* ── 6d. TBGD (Educational Device) Management ── */
+const TBGD_CAT=[
+  {k:'maytinh',    lbl:'Máy tính / Tablet',   icon:'💻'},
+  {k:'maychieuvan',lbl:'Máy chiếu / Màn chiếu',icon:'📽️'},
+  {k:'amthanh',   lbl:'Âm thanh / Micro',      icon:'🔊'},
+  {k:'bangbiet',  lbl:'Bảng & Phụ kiện bảng',  icon:'🖊️'},
+  {k:'camera',    lbl:'Camera / Giám sát',      icon:'📷'},
+  {k:'phukien',   lbl:'Phụ kiện thiết bị',      icon:'🔌'},
+  {k:'khac',      lbl:'Thiết bị khác',          icon:'📦'}
+];
+const TBGD_CAT_MAP=Object.fromEntries(TBGD_CAT.map(c=>[c.k,c]));
+const TBGD_UNITS=['Cái','Bộ','Chiếc','Hộp','Cuộn'];
+const TBGD_LOW_DEFAULT=3;
+const TBGD_WARRANTY_OPTS=[3,6,12,18,24,36,48,60];
+
+function sellerTbgdList(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const all=s.tbgdProducts||[];
+  let list=all.slice();
+  if(sellerTbgdSearch){const q=sellerTbgdSearch.toLowerCase();list=list.filter(v=>v.name.toLowerCase().includes(q)||(v.brand||'').toLowerCase().includes(q));}
+  if(sellerTbgdStatusFilter==='outofstock') list=list.filter(v=>v.stock===0);
+  else if(sellerTbgdStatusFilter!=='all') list=list.filter(v=>v.status===sellerTbgdStatusFilter);
+
+  const total=all.length;
+  const activeCnt=all.filter(v=>v.status==='active').length;
+  const draftCnt=all.filter(v=>v.status==='draft').length;
+  const outCnt=all.filter(v=>v.stock===0).length;
+  const lowItems=all.filter(v=>v.stock>0&&v.stock<=(v.lowStockThreshold||TBGD_LOW_DEFAULT)&&v.status==='active');
+
+  const stBadge={
+    active:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#27ae6020;color:#27ae60;font-weight:600">Đang bán</span>',
+    draft:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#95a5a620;color:#7f8c8d;font-weight:600">Nháp</span>',
+    outofstock:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#e67e2220;color:#e67e22;font-weight:600">Hết hàng</span>'
+  };
+  const filterTabs=[['all','Tất cả',total],['active','Đang bán',activeCnt],['draft','Nháp',draftCnt],['outofstock','Hết hàng',outCnt]];
+
+  const warrantyBadge=months=>{
+    if(!months) return '<span style="font-size:11px;color:var(--text-soft)">Không bảo hành</span>';
+    const years=months>=12?Math.floor(months/12):0;
+    const rem=months%12;
+    const txt=years>0?(rem>0?years+'N'+rem+'T':years+(years===1?' năm':' năm')):months+' tháng';
+    return '<span style="font-size:11px;padding:2px 7px;border-radius:5px;background:#e8f4fd;color:#1565c0;font-weight:600">🛡 '+txt+'</span>';
+  };
+
+  const rows=list.length
+    ?list.map(v=>{
+      const thr=v.lowStockThreshold||TBGD_LOW_DEFAULT;
+      const stockClr=v.stock===0?'#e74c3c':v.stock<=thr?'#e67e22':'#27ae60';
+      const lowWarn=v.stock>0&&v.stock<=thr?'<span title="Sắp hết hàng" style="margin-left:4px;font-size:11px;color:#e67e22">⚠</span>':'';
+      const disc=v.oldPrice>0?Math.round((1-v.price/v.oldPrice)*100):0;
+      const badge=v.stock===0&&v.status!=='draft'?stBadge.outofstock:(stBadge[v.status]||stBadge.draft);
+      const catInfo=TBGD_CAT_MAP[v.category]||{lbl:v.category,icon:'📦'};
+      return '<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:10px 8px;width:40px">'+
+          '<div style="width:38px;height:38px;background:#e8f4fd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">'+catInfo.icon+'</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;min-width:200px">'+
+          '<div style="font-weight:600;font-size:13.5px;color:var(--ink-deep)">'+escHtml(v.name)+'</div>'+
+          '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+
+            (v.brand?'<strong>'+escHtml(v.brand)+'</strong> · ':'')+
+            '<span style="background:#f0ebe4;border-radius:4px;padding:1px 6px;font-size:11px">'+escHtml(catInfo.lbl)+'</span>'+
+            ' · ĐVT: '+escHtml(v.unit||'Cái')+
+          '</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<div style="font-weight:700;font-size:13.5px;color:var(--coral)">'+fmtBig(v.price)+'đ</div>'+
+          (disc>0?'<div style="font-size:11px;color:var(--text-soft);text-decoration:line-through">'+fmtBig(v.oldPrice)+'đ</div>'+
+            '<span style="font-size:10.5px;background:#e74c3c20;color:#e74c3c;padding:1px 5px;border-radius:4px">-'+disc+'%</span>':'')+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:center">'+
+          '<span style="font-weight:700;font-size:14px;color:'+stockClr+'">'+v.stock+'</span>'+lowWarn+
+          '<div style="font-size:10.5px;color:var(--text-soft)">ngưỡng: '+thr+'</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+warrantyBadge(v.warrantyMonths)+
+          (v.warrantyNote?'<div style="font-size:10.5px;color:var(--text-soft);max-width:160px;margin-top:2px;white-space:normal">'+escHtml(v.warrantyNote.substring(0,60))+(v.warrantyNote.length>60?'…':'')+'</div>':'')+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:center;color:var(--text-soft);font-size:13.5px">'+v.sold+'</td>'+
+        '<td style="padding:10px 8px">'+badge+'</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<button title="Sửa" onclick="sellerEditTbgdId=\''+v.id+'\';acctTab=\'seller-tbgd-form\';renderAccount()" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">✏</button>'+
+          '<button title="Nhập hàng" onclick="doSellerToggleTbgdRestock(\''+v.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">📦</button>'+
+          '<button title="Xóa" onclick="doSellerDeleteTbgd(\''+v.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;cursor:pointer;color:#e74c3c">🗑</button>'+
+        '</td>'+
+      '</tr>'+
+      (sellerRestockTbgdId===v.id?'<tr><td colspan="8" style="padding:0 8px 12px;background:#faf8f5">'+_sellerTbgdRestockInline(v)+'</td></tr>':'');
+    }).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-soft);font-size:13.5px">Không tìm thấy thiết bị nào.</td></tr>';
+
+  const lowBanner=lowItems.length
+    ?'<div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span style="font-size:18px">⚠️</span>'+
+        '<div><strong style="font-size:13.5px;color:#f57f17">'+lowItems.length+' thiết bị sắp hết hàng:</strong>'+
+          '<div style="font-size:12.5px;color:#795548;margin-top:3px">'+
+            lowItems.map(v=>'<strong>'+escHtml(v.name)+'</strong> (còn '+v.stock+' '+escHtml(v.unit||'cái')+')').join(' · ')+
+          '</div>'+
+        '</div>'+
+      '</div>'
+    :'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<div><h3 style="margin:0">Quản lý Thiết bị giáo dục</h3>'+
+        '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">'+total+' thiết bị · '+activeCnt+' đang bán · '+draftCnt+' nháp · '+outCnt+' hết hàng</p>'+
+      '</div>'+
+      '<button onclick="sellerEditTbgdId=null;sellerTbgdSearch=\'\';acctTab=\'seller-tbgd-form\';renderAccount()" class="btn-primary" style="font-size:13px">+ Thêm thiết bị</button>'+
+    '</div>'+
+    lowBanner+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'+
+      '<input placeholder="🔍 Tìm theo tên, thương hiệu..." value="'+escHtml(sellerTbgdSearch)+'" oninput="sellerTbgdSearch=this.value;renderAccount()" style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        filterTabs.map(([k,lbl,cnt])=>
+          '<button onclick="sellerTbgdStatusFilter=\''+k+'\';renderAccount()" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(sellerTbgdStatusFilter===k?'var(--ink)':'var(--line)')+';background:'+(sellerTbgdStatusFilter===k?'var(--ink)':'transparent')+';color:'+(sellerTbgdStatusFilter===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+lbl+' ('+cnt+')</button>'
+        ).join('')+
+      '</div>'+
+    '</div>'+
+    '<div style="overflow-x:auto">'+
+      '<table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr style="background:var(--paper-alt,#f8f6f3)">'+
+          '<th style="padding:9px 8px"></th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Thiết bị</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Giá</th>'+
+          '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Tồn kho</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Bảo hành</th>'+
+          '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Đã bán</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Hành động</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
+
+function _sellerTbgdRestockInline(v){
+  return '<div style="background:#fff9f0;border:1.5px solid #ffe0b2;border-radius:8px;padding:14px 16px;margin-top:4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">'+
+    '<span style="font-weight:600;font-size:13px;color:#e65100">📦 Nhập hàng: '+escHtml(v.name)+'</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<input id="trsQty_'+v.id+'" type="number" min="1" placeholder="Số lượng nhập" style="width:140px;padding:6px 10px;border:1.5px solid #ffe0b2;border-radius:6px;font-size:13px">'+
+      '<input id="trsReason_'+v.id+'" placeholder="Lý do (tùy chọn)" style="width:200px;padding:6px 10px;border:1.5px solid #ffe0b2;border-radius:6px;font-size:13px">'+
+      '<button onclick="doSellerRestockTbgd(\''+v.id+'\')" style="padding:6px 14px;background:#e65100;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">✓ Xác nhận</button>'+
+      '<button onclick="sellerRestockTbgdId=null;renderAccount()" style="padding:6px 12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;font-size:13px">Hủy</button>'+
+    '</div>'+
+    '<div style="font-size:12px;color:#795548">Tồn hiện tại: <strong>'+v.stock+'</strong> '+escHtml(v.unit||'cái')+'</div>'+
+  '</div>';
+}
+
+function sellerTbgdForm(tbgdId){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const all=s.tbgdProducts||[];
+  const v=tbgdId?all.find(x=>x.id===tbgdId):null;
+  const isEdit=!!v;
+  const val=k=>v?escHtml(String(v[k]??'')):'';
+
+  const inputStyle='width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)';
+  const selectStyle='width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)';
+  const sectionStyle='background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:16px';
+  const h4Style='margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)';
+  const labelStyle='font-size:13px;font-weight:600;display:block;margin-bottom:5px';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'+
+      '<button onclick="acctTab=\'seller-tbgd\';sellerEditTbgdId=null;renderAccount()" class="btn-ghost" style="padding:5px 12px;font-size:13px">← Danh sách</button>'+
+      '<h3 style="margin:0">'+(isEdit?'Chỉnh sửa thiết bị':'Thêm thiết bị mới')+'</h3>'+
+    '</div>'+
+
+    /* 1. Basic info */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">1. Thông tin cơ bản</h4>'+
+      '<div style="display:grid;gap:12px">'+
+        '<div><label style="'+labelStyle+'">Tên thiết bị <span style="color:#e74c3c">*</span></label>'+
+          '<input id="tf-name" value="'+val('name')+'" placeholder="VD: Máy chiếu Optoma X400LVe" style="'+inputStyle+'"></div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+          '<div><label style="'+labelStyle+'">Thương hiệu</label>'+
+            '<input id="tf-brand" value="'+val('brand')+'" placeholder="VD: Samsung, Optoma..." style="'+inputStyle+'"></div>'+
+          '<div><label style="'+labelStyle+'">Đơn vị tính <span style="color:#e74c3c">*</span></label>'+
+            '<select id="tf-unit" style="'+selectStyle+'">'+
+              TBGD_UNITS.map(u=>'<option value="'+u+'"'+(v&&v.unit===u?' selected':'')+'>'+u+'</option>').join('')+
+            '</select></div>'+
+        '</div>'+
+        '<div><label style="'+labelStyle+'">Danh mục <span style="color:#e74c3c">*</span></label>'+
+          '<select id="tf-cat" style="'+selectStyle+'">'+
+            TBGD_CAT.map(c=>'<option value="'+c.k+'"'+(v&&v.category===c.k?' selected':'')+'>'+c.icon+' '+c.lbl+'</option>').join('')+
+          '</select></div>'+
+        '<div><label style="'+labelStyle+'">Mô tả sản phẩm</label>'+
+          '<textarea id="tf-desc" rows="3" placeholder="Thông số kỹ thuật, tính năng nổi bật..." style="'+inputStyle+';resize:vertical">'+
+            (v?escHtml(v.desc||''):'')+
+          '</textarea></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* 2. Pricing */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">2. Giá bán</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+        '<div><label style="'+labelStyle+'">Giá bán (đ) <span style="color:#e74c3c">*</span></label>'+
+          '<input id="tf-price" type="number" min="0" step="1000" value="'+(v?v.price:'')+'" placeholder="VD: 14500000" style="'+inputStyle+'"></div>'+
+        '<div><label style="'+labelStyle+'">Giá gốc (đ) <span style="font-size:11.5px;font-weight:400;color:var(--text-soft)">để hiện khuyến mãi</span></label>'+
+          '<input id="tf-oldprice" type="number" min="0" step="1000" value="'+(v&&v.oldPrice?v.oldPrice:'')+'" placeholder="Để trống nếu không giảm giá" style="'+inputStyle+'"></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* 3. Stock */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">3. Kho hàng</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+        '<div><label style="'+labelStyle+'">Số lượng tồn kho <span style="color:#e74c3c">*</span></label>'+
+          '<input id="tf-stock" type="number" min="0" value="'+(v?v.stock:'')+'" placeholder="VD: 10" style="'+inputStyle+'"></div>'+
+        '<div><label style="'+labelStyle+'">Ngưỡng cảnh báo <span style="font-size:11.5px;font-weight:400;color:var(--text-soft)">mặc định: '+TBGD_LOW_DEFAULT+'</span></label>'+
+          '<input id="tf-low" type="number" min="0" value="'+(v?v.lowStockThreshold:TBGD_LOW_DEFAULT)+'" placeholder="'+TBGD_LOW_DEFAULT+'" style="'+inputStyle+'"></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* 4. Warranty */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">4. Bảo hành</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+        '<div><label style="'+labelStyle+'">Thời hạn bảo hành</label>'+
+          '<select id="tf-warranty" style="'+selectStyle+'">'+
+            '<option value="0"'+(v&&!v.warrantyMonths?' selected':'')+'>Không bảo hành</option>'+
+            TBGD_WARRANTY_OPTS.map(m=>{
+              const years=m>=12?Math.floor(m/12):0;
+              const rem=m%12;
+              const txt=years>0?(rem>0?years+' năm '+rem+' tháng':years+' năm'):m+' tháng';
+              return '<option value="'+m+'"'+(v&&v.warrantyMonths===m?' selected':'')+'>'+txt+'</option>';
+            }).join('')+
+          '</select></div>'+
+        '<div><label style="'+labelStyle+'">Ghi chú bảo hành</label>'+
+          '<input id="tf-warrantynote" value="'+(v?escHtml(v.warrantyNote||''):'')+'" placeholder="VD: Bảo hành tại trung tâm ủy quyền" style="'+inputStyle+'"></div>'+
+      '</div>'+
+      '<div style="margin-top:12px;background:#e8f4fd;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#1565c0">'+
+        '🛡 Thông tin bảo hành sẽ hiển thị trực tiếp trên trang sản phẩm và trong xác nhận đơn hàng của khách.'+
+      '</div>'+
+    '</div>'+
+
+    /* 5. Images */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">5. Ảnh sản phẩm</h4>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">'+
+        [1,2,3,4].map(i=>`
+          <div onclick="toast('Demo: upload ảnh sẽ tích hợp với server thực tế.')" style="width:90px;height:90px;border:2px dashed ${isEdit&&v.imageCount>=i?'#1565c0':'var(--line)'};border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:${isEdit&&v.imageCount>=i?'#e8f4fd':'transparent'}">
+            <span style="font-size:24px">${isEdit&&v.imageCount>=i?'🖼️':'+'}</span>
+            <span style="font-size:10.5px;color:var(--text-soft);margin-top:4px">${isEdit&&v.imageCount>=i?'Ảnh '+i:'Thêm ảnh'}</span>
+          </div>`).join('')+
+        '<div style="padding-bottom:8px">'+
+          '<label style="font-size:12.5px;color:var(--text-soft)">Số ảnh (demo):</label>'+
+          '<input id="tf-imgcnt" type="number" min="0" max="10" value="'+(v?v.imageCount:1)+'" style="width:60px;padding:5px 8px;border:1.5px solid var(--line);border-radius:6px;font-size:13px;margin-left:6px;background:var(--paper)">'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    /* 6. Status */
+    '<div style="'+sectionStyle+'">'+
+      '<h4 style="'+h4Style+'">6. Trạng thái</h4>'+
+      '<div style="display:flex;gap:16px;flex-wrap:wrap">'+
+        [['active','Đang bán','#27ae60'],['draft','Nháp','#7f8c8d'],['outofstock','Hết hàng','#e67e22']].map(([sv,lbl,clr])=>
+          '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 16px;border-radius:8px;border:1.5px solid '+
+            ((!v&&sv==='active')||(v&&v.status===sv)?clr:'var(--line)')+';background:'+
+            ((!v&&sv==='active')||(v&&v.status===sv)?clr+'15':'transparent')+'">'+
+            '<input type="radio" name="tfStatus" value="'+sv+'" '+((!v&&sv==='active')||(v&&v.status===sv)?'checked':'')+' style="accent-color:'+clr+'">'+
+            '<span style="font-size:13.5px;font-weight:600;color:'+clr+'">'+lbl+'</span>'+
+          '</label>'
+        ).join('')+
+      '</div>'+
+    '</div>'+
+
+    '<div style="display:flex;gap:10px;justify-content:flex-end">'+
+      '<button onclick="acctTab=\'seller-tbgd\';sellerEditTbgdId=null;renderAccount()" class="btn-ghost" style="padding:8px 20px;font-size:13.5px">Hủy</button>'+
+      '<button onclick="doSellerSaveTbgd('+(isEdit?'\''+v.id+'\'':'null')+')" class="btn-primary" style="padding:8px 20px;font-size:13.5px">'+
+        (isEdit?'💾 Lưu thay đổi':'+ Thêm thiết bị')+
+      '</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function doSellerSaveTbgd(tbgdId){
+  const name=((document.getElementById('tf-name')||{}).value||'').trim();
+  if(!name){toast('Vui lòng nhập tên thiết bị.');return;}
+  const brand=((document.getElementById('tf-brand')||{}).value||'').trim();
+  const unit=(document.getElementById('tf-unit')||{}).value||'Cái';
+  const category=(document.getElementById('tf-cat')||{}).value||'khac';
+  const desc=((document.getElementById('tf-desc')||{}).value||'').trim();
+  const price=parseFloat((document.getElementById('tf-price')||{}).value)||0;
+  if(price<=0){toast('Vui lòng nhập giá bán hợp lệ (lớn hơn 0).');return;}
+  const oldPrice=parseFloat((document.getElementById('tf-oldprice')||{}).value)||0;
+  const stock=Math.max(0,parseInt((document.getElementById('tf-stock')||{}).value||0)||0);
+  const lowStockThreshold=Math.max(0,parseInt((document.getElementById('tf-low')||{}).value||TBGD_LOW_DEFAULT)||TBGD_LOW_DEFAULT);
+  const warrantyMonths=parseInt((document.getElementById('tf-warranty')||{}).value||0)||0;
+  const warrantyNote=((document.getElementById('tf-warrantynote')||{}).value||'').trim();
+  const imageCount=Math.max(0,Math.min(10,parseInt((document.getElementById('tf-imgcnt')||{}).value||1)||1));
+  const statusEl=document.querySelector('input[name="tfStatus"]:checked');
+  const rawStatus=statusEl?statusEl.value:'active';
+  const status=stock===0&&rawStatus==='active'?'outofstock':rawStatus;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+  if(sIdx===-1) return;
+  activeSellers[sIdx].tbgdProducts=activeSellers[sIdx].tbgdProducts||[];
+  const today=todayStr();
+  if(tbgdId){
+    const pIdx=activeSellers[sIdx].tbgdProducts.findIndex(x=>x.id===tbgdId);
+    if(pIdx===-1){toast('Không tìm thấy thiết bị.');return;}
+    const old=activeSellers[sIdx].tbgdProducts[pIdx];
+    activeSellers[sIdx].tbgdProducts[pIdx]={...old,name,brand,unit,category,desc,price,oldPrice,stock,lowStockThreshold,warrantyMonths,warrantyNote,imageCount,status,updatedAt:today};
+    toast('✓ Đã cập nhật thiết bị!');
+  } else {
+    activeSellers[sIdx].tbgdProducts.unshift({id:'std-'+Date.now().toString(36),name,brand,unit,category,desc,price,oldPrice,stock,lowStockThreshold,warrantyMonths,warrantyNote,sold:0,rating:0,ratingCount:0,imageCount,status,createdAt:today,updatedAt:today,restockHistory:[]});
+    addNotif('Thiết bị mới "'+name+'" đã được thêm vào gian hàng.');
+    toast('✓ Đã thêm thiết bị mới!');
+  }
+  saveActiveSellers();
+  acctTab='seller-tbgd';sellerEditTbgdId=null;
+  renderAccount();
+}
+
+function doSellerDeleteTbgd(id){
+  if(!confirm('Xóa thiết bị này? Hành động không thể hoàn tác.'))return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=(activeSellers[sIdx].tbgdProducts||[]).findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const name=activeSellers[sIdx].tbgdProducts[pIdx].name;
+  activeSellers[sIdx].tbgdProducts.splice(pIdx,1);
+  saveActiveSellers();
+  if(sellerRestockTbgdId===id)sellerRestockTbgdId=null;
+  toast('Đã xóa: '+name);renderAccount();
+}
+
+function doSellerToggleTbgdRestock(id){
+  sellerRestockTbgdId=(sellerRestockTbgdId===id?null:id);renderAccount();
+}
+
+function doSellerRestockTbgd(id){
+  const qty=parseInt((document.getElementById('trsQty_'+id)||{}).value||0);
+  const reason=((document.getElementById('trsReason_'+id)||{}).value||'Nhập hàng').trim();
+  if(!qty||qty<=0){toast('Vui lòng nhập số lượng nhập hàng hợp lệ.');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=(activeSellers[sIdx].tbgdProducts||[]).findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const v=activeSellers[sIdx].tbgdProducts[pIdx];
+  v.stock+=qty;
+  v.restockHistory=v.restockHistory||[];
+  v.restockHistory.push({qty,reason,date:todayStr()});
+  if(v.status==='outofstock')v.status='active';
+  v.updatedAt=todayStr();
+  saveActiveSellers();
+  sellerRestockTbgdId=null;
   toast('✓ Đã nhập thêm '+qty+' '+v.unit+' — tồn kho mới: '+v.stock);
   addNotif('Nhập hàng thành công: +'+qty+' "'+v.name+'" — tồn kho: '+v.stock);
   renderAccount();
