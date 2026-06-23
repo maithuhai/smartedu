@@ -1914,10 +1914,11 @@ function _rolePicker(){
     }).join('')+'</div>';
 }
 const DEMO_ACCOUNTS=[
-  {role:'admin',   label:'Quản trị viên',        email:'admin@edumart.vn',  pw:'admin123'},
-  {role:'hocsinh', label:'Học sinh',               email:'hocsinh@demo.vn',  pw:'demo123'},
-  {role:'sinhvien',label:'Sinh viên',              email:'sinhvien@demo.vn', pw:'demo123'},
-  {role:'parent',  label:'Phụ huynh',              email:'phuhuynh@demo.vn', pw:'demo123'},
+  {role:'admin',   label:'Quản trị viên',        email:'admin@edumart.vn',       pw:'admin123'},
+  {role:'hocsinh', label:'Học sinh',               email:'hocsinh@demo.vn',       pw:'demo123'},
+  {role:'sinhvien',label:'Sinh viên',              email:'sinhvien@demo.vn',      pw:'demo123'},
+  {role:'parent',  label:'Phụ huynh',              email:'phuhuynh@demo.vn',      pw:'demo123'},
+  {role:'seller',  label:'Người bán / NCC',        email:'minhlong.vpp@gmail.com',pw:'demo123'},
 ];
 function demoFill(role,email,pw){
   lgRole=role;
