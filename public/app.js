@@ -1750,6 +1750,14 @@ let sellerOrderSelected=[];
 let sellerViewOrderId=null;
 let sellerCancelOrderId=null;
 let sellerTrackingOrderId=null;
+let sellerWarehouseTab='stock';
+let sellerStockFilter='all';
+let sellerStockSearch='';
+let sellerEditReceiptId=null;
+let sellerReceiptLines=[];
+let sellerReceiptSupplier='';
+let sellerReceiptNote='';
+let sellerReceiptStatus='';
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3101,6 +3109,34 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
     {id:'ORD-2025-084',buyer:'Vũ Thị Thanh',buyerPhone:'0933 456 789',buyerAddress:'90 Nguyễn Văn Cừ, P.An Khánh, Q.Ninh Kiều, Cần Thơ',items:[{name:'Sách GK Toán 6 Cánh Diều',qty:3,price:32000,unit:'Quyển'},{name:'Bút bi Thiên Long TL-027',qty:20,price:4500,unit:'Cây'}],subtotal:186000,shippingFee:30000,total:216000,status:'processing',trackingNumber:'',note:'',cancelReason:'',cancelledAt:'',date:'23/06/2025',updatedAt:'23/06/2025'},
     {id:'ORD-2025-083',buyer:'Hoàng Minh Đức',buyerPhone:'0944 222 333',buyerAddress:'34 Lý Thường Kiệt, P.7, Q.Tân Bình, TP.HCM',items:[{name:'Màu sáp Faber-Castell 24 màu',qty:2,price:68000,unit:'Bộ'}],subtotal:136000,shippingFee:20000,total:156000,status:'cancelled',trackingNumber:'',note:'',cancelReason:'Khách hàng đổi ý, không có nhu cầu mua nữa.',cancelledAt:'19/06/2025',date:'18/06/2025',updatedAt:'19/06/2025'},
     {id:'ORD-2025-082',buyer:'Đặng Thu Hà',buyerPhone:'0956 333 444',buyerAddress:'67 Pasteur, P.Bến Nghé, Q.1, TP.HCM',items:[{name:'Máy tính bảng Samsung Galaxy Tab A8',qty:1,price:6290000,unit:'Cái'}],subtotal:6290000,shippingFee:0,total:6290000,status:'delivered',trackingNumber:'GHTK6621088',note:'Miễn phí vận chuyển đơn trên 5tr',cancelReason:'',cancelledAt:'',date:'17/06/2025',updatedAt:'19/06/2025'}
+  ];
+  saveActiveSellers();
+})();
+
+/* ── Seed seller-sapp-001 warehouse receipts ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx===-1||activeSellers[sIdx].receipts) return;
+  activeSellers[sIdx].receipts=[
+    {id:'PNK-001',supplier:'Công ty TNHH Phát Hành Sách TP.HCM',note:'Nhập đầu tháng 6/2025',status:'confirmed',createdAt:'01/06/2025',confirmedAt:'01/06/2025',
+      lines:[
+        {productId:'slp-001',productType:'books',productName:'Bộ SGK Lớp 5 Kết nối tri thức',unit:'Bộ',qty:20,importPrice:140000,total:2800000},
+        {productId:'slp-003',productType:'books',productName:'Sách Tiếng Anh 7 Global Success',unit:'Quyển',qty:50,importPrice:24000,total:1200000}
+      ],totalQty:70,totalValue:4000000},
+    {id:'PNK-002',supplier:'Thiên Long Group',note:'Nhập VPP tháng 6',status:'confirmed',createdAt:'01/06/2025',confirmedAt:'01/06/2025',
+      lines:[
+        {productId:'svp-001',productType:'vpp',productName:'Bút bi Thiên Long TL-027',unit:'Cây',qty:200,importPrice:2800,total:560000},
+        {productId:'svp-002',productType:'vpp',productName:'Vở ô ly Hồng Hà 96 trang',unit:'Quyển',qty:100,importPrice:5500,total:550000}
+      ],totalQty:300,totalValue:1110000},
+    {id:'PNK-003',supplier:'Nhà phân phối Samsung Việt Nam',note:'Nhập thiết bị quý 2',status:'confirmed',createdAt:'01/06/2025',confirmedAt:'01/06/2025',
+      lines:[
+        {productId:'std-001',productType:'tbgd',productName:'Máy tính bảng Samsung Galaxy Tab A8',unit:'Cái',qty:20,importPrice:4500000,total:90000000}
+      ],totalQty:20,totalValue:90000000},
+    {id:'PNK-004',supplier:'Công ty TNHH Phát Hành Sách TP.HCM',note:'Nhập bổ sung tháng 6 — đơn nháp chờ xác nhận',status:'draft',createdAt:'20/06/2025',confirmedAt:'',
+      lines:[
+        {productId:'slp-004',productType:'books',productName:'Dế Mèn Phiêu Lưu Ký (Bìa Cứng Kỷ Niệm)',unit:'Quyển',qty:50,importPrice:62000,total:3100000},
+        {productId:'svp-004',productType:'vpp',productName:'Băng keo trong 5cm×50m',unit:'Cuộn',qty:30,importPrice:11000,total:330000}
+      ],totalQty:80,totalValue:3430000}
   ];
   saveActiveSellers();
 })();
@@ -7519,7 +7555,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8410,6 +8446,7 @@ function sellerContent(){
   if(acctTab==='seller-tbgd-form')     return isApproved?sellerTbgdForm(sellerEditTbgdId):sellerAppStatus(myApp);
   if(acctTab==='seller-orders')        return isApproved?sellerOrderList():sellerAppStatus(myApp);
   if(acctTab==='seller-order-detail')  return isApproved?sellerOrderDetail(sellerViewOrderId):sellerAppStatus(myApp);
+  if(acctTab==='seller-warehouse')     return isApproved?sellerWarehouse():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -10666,6 +10703,368 @@ function _sellerOpenPrintWindow(orders,s){
       slips+
     '</body></html>');
   win.document.close();
+}
+
+/* ── 6f. Warehouse Management ── */
+function _getAllSellerProducts(s){
+  const rows=[];
+  (s.products||[]).forEach(p=>rows.push({id:p.id,type:'books',typeLabel:'Sách giấy',name:p.name,unit:p.unit||'Quyển',stock:p.stock,lowStockThreshold:p.lowStockThreshold||5,status:p.status,price:p.price,sold:p.sold||0}));
+  (s.vppProducts||[]).forEach(p=>rows.push({id:p.id,type:'vpp',typeLabel:'VPP',name:p.name,unit:p.unit||'Cái',stock:p.stock,lowStockThreshold:p.lowStockThreshold||10,status:p.status,price:p.price,sold:p.sold||0}));
+  (s.tbgdProducts||[]).forEach(p=>rows.push({id:p.id,type:'tbgd',typeLabel:'Thiết bị',name:p.name,unit:p.unit||'Cái',stock:p.stock,lowStockThreshold:p.lowStockThreshold||3,status:p.status,price:p.price,sold:p.sold||0}));
+  return rows;
+}
+
+function sellerWarehouse(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const tabBar=(tabs)=>tabs.map(([k,lbl])=>
+    '<button onclick="sellerWarehouseTab=\''+k+'\';renderAccount()" style="padding:8px 20px;border:none;border-bottom:2.5px solid '+(sellerWarehouseTab===k?'#1565c0':'transparent')+';background:transparent;color:'+(sellerWarehouseTab===k?'#1565c0':'var(--text-soft)')+';font-size:13.5px;font-weight:'+(sellerWarehouseTab===k?'700':'400')+';cursor:pointer">'+lbl+'</button>'
+  ).join('');
+
+  const tabNav='<div style="display:flex;border-bottom:1.5px solid var(--line);margin-bottom:20px">'+
+    tabBar([['stock','📦 Tồn kho'],['receipts','📋 Phiếu nhập'],['thresholds','🔔 Ngưỡng cảnh báo']])+
+  '</div>';
+
+  if(sellerWarehouseTab==='stock')     return '<div class="panel"><h3 style="margin:0 0 4px">Quản lý Kho hàng</h3><p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Theo dõi tồn kho toàn bộ sản phẩm.</p>'+tabNav+_warehouseStockTab(s)+'</div>';
+  if(sellerWarehouseTab==='receipts')  return '<div class="panel"><h3 style="margin:0 0 4px">Quản lý Kho hàng</h3><p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Phiếu nhập kho.</p>'+tabNav+_warehouseReceiptsTab(s)+'</div>';
+  if(sellerWarehouseTab==='thresholds')return '<div class="panel"><h3 style="margin:0 0 4px">Quản lý Kho hàng</h3><p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Cài đặt ngưỡng cảnh báo tồn kho.</p>'+tabNav+_warehouseThresholdsTab(s)+'</div>';
+  return '<div class="panel">'+tabNav+'</div>';
+}
+
+function _warehouseStockTab(s){
+  const all=_getAllSellerProducts(s);
+  const low=all.filter(p=>p.stock>0&&p.stock<=p.lowStockThreshold);
+  const out=all.filter(p=>p.stock===0);
+  const totalItems=all.reduce((a,p)=>a+p.stock,0);
+  const totalValue=all.reduce((a,p)=>a+p.stock*p.price,0);
+  let list=all.slice();
+  if(sellerStockSearch){const q=sellerStockSearch.toLowerCase();list=list.filter(p=>p.name.toLowerCase().includes(q));}
+  if(sellerStockFilter==='low') list=list.filter(p=>p.stock>0&&p.stock<=p.lowStockThreshold);
+  else if(sellerStockFilter==='out') list=list.filter(p=>p.stock===0);
+  const typeClr={books:'#1565c0',vpp:'#2e7d32',tbgd:'#6a1b9a'};
+
+  const rows=list.length
+    ?list.map(p=>{
+      const thr=p.lowStockThreshold;
+      const stockClr=p.stock===0?'#e74c3c':p.stock<=thr?'#e67e22':'#27ae60';
+      const warnIcon=p.stock===0?'🔴':p.stock<=thr?'🟡':'🟢';
+      const pct=Math.min(100,Math.round((p.stock/(thr*3||15))*100));
+      return '<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:9px 8px">'+
+          '<span style="font-size:10.5px;padding:2px 7px;border-radius:4px;background:'+(typeClr[p.type]||'#555')+'18;color:'+(typeClr[p.type]||'#555')+';font-weight:600">'+escHtml(p.typeLabel)+'</span>'+
+        '</td>'+
+        '<td style="padding:9px 8px"><div style="font-weight:600;font-size:13.5px">'+escHtml(p.name)+'</div></td>'+
+        '<td style="padding:9px 8px;text-align:center">'+
+          warnIcon+' <span style="font-weight:700;font-size:14px;color:'+stockClr+'">'+p.stock+'</span> '+escHtml(p.unit)+
+          '<div style="background:#f0f0f0;border-radius:4px;height:5px;width:80px;margin:4px auto 0">'+
+            '<div style="background:'+stockClr+';height:5px;border-radius:4px;width:'+pct+'%"></div>'+
+          '</div>'+
+        '</td>'+
+        '<td style="padding:9px 8px;text-align:center;font-size:12.5px;color:var(--text-soft)">ngưỡng: <strong>'+thr+'</strong></td>'+
+        '<td style="padding:9px 8px;text-align:right;font-size:13.5px;color:var(--coral)">'+fmtBig(p.price)+'đ</td>'+
+        '<td style="padding:9px 8px;text-align:right;font-size:13.5px;color:#1565c0;font-weight:600">'+fmtBig(p.stock*p.price)+'đ</td>'+
+        '<td style="padding:9px 8px;text-align:center;font-size:13px;color:var(--text-soft)">'+p.sold+'</td>'+
+        '<td style="padding:9px 8px">'+
+          (p.stock===0||p.stock<=thr?'<button onclick="sellerWarehouseTab=\'receipts\';sellerEditReceiptId=\'new\';sellerReceiptLines=[{productId:\''+p.id+'\',productType:\''+p.type+'\',productName:'+JSON.stringify(p.name)+',unit:\''+p.unit+'\',qty:1,importPrice:0,total:0}];sellerReceiptSupplier=\'\';sellerReceiptNote=\'\';renderAccount()" style="padding:4px 10px;font-size:12px;border:1.5px solid #e65100;border-radius:6px;background:#fff9f0;color:#e65100;cursor:pointer">📦 Nhập hàng</button>':'')+
+        '</td>'+
+      '</tr>';
+    }).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-soft)">Không có sản phẩm nào.</td></tr>';
+
+  return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">'+
+    '<div style="background:#e8f4fd;border-radius:10px;padding:16px 18px;text-align:center"><div style="font-size:24px;font-weight:700;color:#1565c0">'+all.length+'</div><div style="font-size:12.5px;color:#555;margin-top:4px">Tổng mặt hàng</div></div>'+
+    '<div style="background:#e8f5e9;border-radius:10px;padding:16px 18px;text-align:center"><div style="font-size:24px;font-weight:700;color:#2e7d32">'+fmtBig(totalItems)+'</div><div style="font-size:12.5px;color:#555;margin-top:4px">Tổng tồn kho</div></div>'+
+    '<div style="background:#fff8e1;border-radius:10px;padding:16px 18px;text-align:center"><div style="font-size:24px;font-weight:700;color:#f57f17">'+low.length+'</div><div style="font-size:12.5px;color:#555;margin-top:4px">Sắp hết hàng</div></div>'+
+    '<div style="background:#ffebee;border-radius:10px;padding:16px 18px;text-align:center"><div style="font-size:24px;font-weight:700;color:#b71c1c">'+out.length+'</div><div style="font-size:12.5px;color:#555;margin-top:4px">Hết hàng</div></div>'+
+  '</div>'+
+  '<div style="background:#f8f6f3;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">'+
+    '<span style="font-size:13.5px;color:var(--text-soft)">Tổng giá trị tồn kho:</span>'+
+    '<span style="font-size:18px;font-weight:700;color:#1565c0">'+fmtMil(totalValue)+'đ</span>'+
+  '</div>'+
+  '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'+
+    '<input placeholder="🔍 Tìm sản phẩm..." value="'+escHtml(sellerStockSearch)+'" oninput="sellerStockSearch=this.value;renderAccount()" style="flex:1;min-width:180px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+    '<div style="display:flex;gap:6px">'+
+      [['all','Tất cả ('+all.length+')'],['low','Sắp hết 🟡 ('+low.length+')'],['out','Hết hàng 🔴 ('+out.length+')']].map(([k,lbl])=>
+        '<button onclick="sellerStockFilter=\''+k+'\';renderAccount()" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(sellerStockFilter===k?'var(--ink)':'var(--line)')+';background:'+(sellerStockFilter===k?'var(--ink)':'transparent')+';color:'+(sellerStockFilter===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+lbl+'</button>'
+      ).join('')+
+    '</div>'+
+  '</div>'+
+  '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+    '<thead><tr style="background:#f8f6f3">'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Loại</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Tên sản phẩm</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Tồn kho</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Ngưỡng</th>'+
+      '<th style="padding:9px 8px;text-align:right;font-size:12px;color:var(--text-soft);font-weight:600">Giá bán</th>'+
+      '<th style="padding:9px 8px;text-align:right;font-size:12px;color:var(--text-soft);font-weight:600">Giá trị tồn</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Đã bán</th>'+
+      '<th style="padding:9px 8px"></th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+function _warehouseReceiptsTab(s){
+  const receipts=(s.receipts||[]).slice().reverse();
+  const stBadge={
+    confirmed:'<span style="font-size:11px;padding:2px 9px;border-radius:6px;background:#e8f5e9;color:#2e7d32;font-weight:600">✓ Đã xác nhận</span>',
+    draft:'<span style="font-size:11px;padding:2px 9px;border-radius:6px;background:#fff8e1;color:#f57f17;font-weight:600">Nháp</span>'
+  };
+
+  /* Form tạo / chỉnh sửa phiếu */
+  if(sellerEditReceiptId){
+    const isNew=sellerEditReceiptId==='new';
+    const existing=isNew?null:receipts.find(r=>r.id===sellerEditReceiptId);
+    const allProds=_getAllSellerProducts(s);
+
+    const lineRows=sellerReceiptLines.map((ln,i)=>'<tr style="border-top:1px solid var(--line)">'+
+      '<td style="padding:8px;font-size:13px">'+escHtml(ln.productName)+'<br><span style="font-size:11px;color:var(--text-soft)">'+escHtml(ln.productType==='books'?'Sách':ln.productType==='vpp'?'VPP':'Thiết bị')+'</span></td>'+
+      '<td style="padding:8px;text-align:center"><input type="number" min="1" value="'+ln.qty+'" onchange="sellerReceiptLines['+i+'].qty=Math.max(1,parseInt(this.value)||1);sellerReceiptLines['+i+'].total=sellerReceiptLines['+i+'].qty*sellerReceiptLines['+i+'].importPrice;renderAccount()" style="width:70px;padding:5px;border:1.5px solid var(--line);border-radius:6px;text-align:center;font-size:13px"></td>'+
+      '<td style="padding:8px;text-align:center"><input type="number" min="0" step="100" value="'+ln.importPrice+'" onchange="sellerReceiptLines['+i+'].importPrice=parseFloat(this.value)||0;sellerReceiptLines['+i+'].total=sellerReceiptLines['+i+'].qty*sellerReceiptLines['+i+'].importPrice;renderAccount()" style="width:110px;padding:5px;border:1.5px solid var(--line);border-radius:6px;text-align:right;font-size:13px"></td>'+
+      '<td style="padding:8px;text-align:right;font-weight:600;font-size:13.5px;color:#1565c0">'+fmtBig(ln.total)+'đ</td>'+
+      '<td style="padding:8px;text-align:center"><button onclick="sellerReceiptLines.splice('+i+',1);renderAccount()" style="padding:4px 9px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;color:#e74c3c;cursor:pointer;font-size:12px">✕</button></td>'+
+    '</tr>').join('');
+
+    const totalQty=sellerReceiptLines.reduce((a,l)=>a+l.qty,0);
+    const totalVal=sellerReceiptLines.reduce((a,l)=>a+l.total,0);
+
+    const unusedProds=allProds.filter(p=>!sellerReceiptLines.find(l=>l.productId===p.id));
+
+    return '<div style="background:#f8f6f3;border-radius:10px;padding:18px 20px">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'+
+        '<button onclick="sellerEditReceiptId=null;sellerReceiptLines=[];renderAccount()" style="padding:5px 12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;font-size:13px">← Quay lại</button>'+
+        '<h4 style="margin:0;font-size:1rem;font-weight:700">'+(isNew?'Tạo phiếu nhập kho mới':'Chỉnh sửa phiếu '+escHtml(sellerEditReceiptId))+'</h4>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Nhà cung cấp <span style="color:#e74c3c">*</span></label>'+
+          '<input id="rcvSupplier" value="'+escHtml(sellerReceiptSupplier)+'" oninput="sellerReceiptSupplier=this.value" placeholder="Tên nhà cung cấp..." style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ghi chú</label>'+
+          '<input id="rcvNote" value="'+escHtml(sellerReceiptNote)+'" oninput="sellerReceiptNote=this.value" placeholder="Ghi chú phiếu nhập..." style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+      '</div>'+
+      '<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">Thêm sản phẩm vào phiếu</label>'+
+        '<select onchange="if(this.value){const p='+JSON.stringify(allProds).replace(/"/g,'&quot;')+'.find(x=>x.id===this.value);if(p){sellerReceiptLines.push({productId:p.id,productType:p.type,productName:p.name,unit:p.unit,qty:1,importPrice:0,total:0});renderAccount();}this.value=\'\'}" style="padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper);max-width:400px">'+
+          '<option value="">-- Chọn sản phẩm --</option>'+
+          unusedProds.map(p=>'<option value="'+p.id+'">['+escHtml(p.typeLabel)+'] '+escHtml(p.name)+'</option>').join('')+
+        '</select>'+
+      '</div>'+
+      (sellerReceiptLines.length
+        ?'<table style="width:100%;border-collapse:collapse;margin-bottom:14px"><thead><tr style="background:#fff"><th style="padding:8px;text-align:left;font-size:12px;color:var(--text-soft)">Sản phẩm</th><th style="padding:8px;text-align:center;font-size:12px;color:var(--text-soft)">Số lượng</th><th style="padding:8px;text-align:center;font-size:12px;color:var(--text-soft)">Giá nhập (đ)</th><th style="padding:8px;text-align:right;font-size:12px;color:var(--text-soft)">Thành tiền</th><th></th></tr></thead><tbody>'+lineRows+'</tbody>'+
+          '<tfoot><tr style="border-top:2px solid var(--line);background:#f8f6f3"><td colspan="2" style="padding:8px;font-weight:700">Tổng: '+totalQty+' sản phẩm</td><td></td><td style="padding:8px;text-align:right;font-weight:700;font-size:15px;color:#1565c0">'+fmtBig(totalVal)+'đ</td><td></td></tr></tfoot></table>'
+        :'<div style="text-align:center;padding:20px;color:var(--text-soft);font-size:13.5px;border:2px dashed var(--line);border-radius:8px;margin-bottom:14px">Chọn sản phẩm từ danh sách trên để thêm vào phiếu nhập.</div>'
+      )+
+      '<div style="display:flex;gap:10px;justify-content:flex-end">'+
+        '<button onclick="sellerEditReceiptId=null;sellerReceiptLines=[];renderAccount()" style="padding:8px 18px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-size:13.5px">Hủy</button>'+
+        '<button onclick="doSellerSaveReceipt(\'draft\')" style="padding:8px 18px;border:1.5px solid #f57f17;border-radius:8px;background:#fff8e1;color:#f57f17;cursor:pointer;font-size:13.5px;font-weight:600">Lưu nháp</button>'+
+        '<button onclick="doSellerSaveReceipt(\'confirmed\')" style="padding:8px 18px;border:none;border-radius:8px;background:#1565c0;color:#fff;cursor:pointer;font-size:13.5px;font-weight:600">✓ Xác nhận nhập kho</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  /* Danh sách phiếu nhập */
+  const receiptRows=receipts.length
+    ?receipts.map(r=>'<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:10px 8px;font-weight:600;font-size:13.5px">#'+escHtml(r.id)+'</td>'+
+        '<td style="padding:10px 8px;font-size:13.5px">'+escHtml(r.supplier)+'</td>'+
+        '<td style="padding:10px 8px;font-size:13.5px;color:var(--text-soft)">'+
+          r.lines.slice(0,2).map(l=>escHtml(l.productName)+' ×'+l.qty).join(', ')+
+          (r.lines.length>2?' +'+( r.lines.length-2)+' nữa':'')+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:center;font-size:13.5px">'+r.totalQty+'</td>'+
+        '<td style="padding:10px 8px;text-align:right;font-weight:600;color:#1565c0">'+fmtMil(r.totalValue)+'đ</td>'+
+        '<td style="padding:10px 8px">'+escHtml(r.createdAt)+'</td>'+
+        '<td style="padding:10px 8px">'+(stBadge[r.status]||r.status)+'</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          (r.status==='draft'?'<button onclick="doSellerEditReceipt(\''+r.id+'\')" style="padding:4px 10px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">✏ Sửa</button>':'')+
+          (r.status==='draft'?'<button onclick="doSellerConfirmReceipt(\''+r.id+'\')" style="padding:4px 10px;font-size:12px;border:none;border-radius:6px;background:#1565c0;color:#fff;cursor:pointer;margin-right:3px">✓ XN</button>':'')+
+          (r.status==='draft'?'<button onclick="doSellerDeleteReceipt(\''+r.id+'\')" style="padding:4px 9px;font-size:12px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;color:#e74c3c;cursor:pointer">🗑</button>':'')+
+        '</td>'+
+      '</tr>').join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-soft)">Chưa có phiếu nhập kho nào.</td></tr>';
+
+  return '<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'+
+    '<button onclick="sellerEditReceiptId=\'new\';sellerReceiptLines=[];sellerReceiptSupplier=\'\';sellerReceiptNote=\'\';renderAccount()" style="padding:8px 18px;border:none;border-radius:8px;background:#1565c0;color:#fff;cursor:pointer;font-size:13.5px;font-weight:600">+ Tạo phiếu nhập mới</button>'+
+  '</div>'+
+  '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+    '<thead><tr style="background:#f8f6f3">'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Mã phiếu</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Nhà cung cấp</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Sản phẩm</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Tổng SL</th>'+
+      '<th style="padding:9px 8px;text-align:right;font-size:12px;color:var(--text-soft);font-weight:600">Giá trị</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Ngày tạo</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+      '<th style="padding:9px 8px"></th>'+
+    '</tr></thead><tbody>'+receiptRows+'</tbody></table></div>';
+}
+
+function _warehouseThresholdsTab(s){
+  const all=_getAllSellerProducts(s);
+  const typeClr={books:'#1565c0',vpp:'#2e7d32',tbgd:'#6a1b9a'};
+  const rows=all.map((p,i)=>'<tr style="border-top:1px solid var(--line)">'+
+    '<td style="padding:9px 8px">'+
+      '<span style="font-size:10.5px;padding:2px 7px;border-radius:4px;background:'+(typeClr[p.type]||'#555')+'18;color:'+(typeClr[p.type]||'#555')+';font-weight:600">'+escHtml(p.typeLabel)+'</span>'+
+    '</td>'+
+    '<td style="padding:9px 8px;font-weight:600;font-size:13.5px">'+escHtml(p.name)+'</td>'+
+    '<td style="padding:9px 8px;text-align:center">'+
+      '<span style="font-weight:700;font-size:14px;color:'+(p.stock===0?'#e74c3c':p.stock<=p.lowStockThreshold?'#e67e22':'#27ae60')+'">'+p.stock+'</span> '+escHtml(p.unit)+
+    '</td>'+
+    '<td style="padding:9px 8px;text-align:center">'+
+      '<input type="number" min="0" value="'+p.lowStockThreshold+'" id="thr_'+p.type+'_'+p.id+'" style="width:70px;padding:5px 8px;border:1.5px solid var(--line);border-radius:6px;text-align:center;font-size:13.5px;background:var(--paper)">'+
+      ' '+escHtml(p.unit)+
+    '</td>'+
+    '<td style="padding:9px 8px;text-align:center">'+
+      '<button onclick="doSellerSaveThreshold(\''+p.id+'\',\''+p.type+'\')" style="padding:5px 14px;border:none;border-radius:6px;background:#1565c0;color:#fff;cursor:pointer;font-size:12.5px;font-weight:600">Lưu</button>'+
+    '</td>'+
+  '</tr>').join('');
+
+  return '<div style="background:#e8f4fd;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1565c0">'+
+    '🔔 Khi tồn kho của sản phẩm xuống dưới ngưỡng, hệ thống sẽ gửi thông báo vào mục <strong>Thông báo</strong> và hiển thị banner cảnh báo trong trang quản lý sản phẩm tương ứng.'+
+  '</div>'+
+  '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+    '<thead><tr style="background:#f8f6f3">'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Loại</th>'+
+      '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Tên sản phẩm</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Tồn hiện tại</th>'+
+      '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Ngưỡng cảnh báo</th>'+
+      '<th style="padding:9px 8px"></th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+  '<div style="display:flex;justify-content:flex-end;margin-top:14px">'+
+    '<button onclick="doSellerSaveAllThresholds()" style="padding:8px 20px;border:none;border-radius:8px;background:#2e7d32;color:#fff;cursor:pointer;font-size:13.5px;font-weight:600">💾 Lưu tất cả ngưỡng</button>'+
+  '</div>';
+}
+
+/* ── Warehouse action functions ── */
+function doSellerSaveReceipt(status){
+  const supplier=((document.getElementById('rcvSupplier')||{}).value||sellerReceiptSupplier).trim();
+  if(!supplier){toast('Vui lòng nhập tên nhà cung cấp.');return;}
+  if(!sellerReceiptLines.length){toast('Vui lòng thêm ít nhất 1 sản phẩm vào phiếu.');return;}
+  if(status==='confirmed'&&sellerReceiptLines.some(l=>l.importPrice<=0)){toast('Vui lòng nhập giá nhập cho tất cả sản phẩm.');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  activeSellers[sIdx].receipts=activeSellers[sIdx].receipts||[];
+  const today=todayStr();
+  const totalQty=sellerReceiptLines.reduce((a,l)=>a+l.qty,0);
+  const totalValue=sellerReceiptLines.reduce((a,l)=>a+l.total,0);
+  const note=(document.getElementById('rcvNote')||{}).value||sellerReceiptNote;
+
+  if(sellerEditReceiptId&&sellerEditReceiptId!=='new'){
+    const rIdx=activeSellers[sIdx].receipts.findIndex(r=>r.id===sellerEditReceiptId);
+    if(rIdx!==-1){
+      const old=activeSellers[sIdx].receipts[rIdx];
+      activeSellers[sIdx].receipts[rIdx]={...old,supplier,note,lines:[...sellerReceiptLines],totalQty,totalValue,status};
+      if(status==='confirmed'&&old.status==='draft'){
+        _applyReceiptToStock(sIdx,sellerReceiptLines);
+        activeSellers[sIdx].receipts[rIdx].confirmedAt=today;
+        toast('✓ Phiếu nhập đã xác nhận — tồn kho đã được cập nhật.');
+        addNotif('Phiếu nhập '+sellerEditReceiptId+' đã được xác nhận, tồn kho đã cập nhật.');
+      } else {
+        toast('✓ Đã lưu phiếu nhập.');
+      }
+    }
+  } else {
+    const newId='PNK-'+Date.now().toString(36).toUpperCase();
+    const receipt={id:newId,supplier,note,status,createdAt:today,confirmedAt:status==='confirmed'?today:'',lines:[...sellerReceiptLines],totalQty,totalValue};
+    activeSellers[sIdx].receipts.push(receipt);
+    if(status==='confirmed'){
+      _applyReceiptToStock(sIdx,sellerReceiptLines);
+      toast('✓ Phiếu nhập đã xác nhận — tồn kho đã được cập nhật.');
+      addNotif('Phiếu nhập kho mới đã được xác nhận, tồn kho đã cập nhật.');
+    } else {
+      toast('Đã lưu phiếu nháp.');
+    }
+  }
+  saveActiveSellers();
+  sellerEditReceiptId=null;sellerReceiptLines=[];sellerReceiptSupplier='';sellerReceiptNote='';
+  renderAccount();
+}
+
+function _applyReceiptToStock(sIdx,lines){
+  lines.forEach(ln=>{
+    if(ln.productType==='books'){
+      const p=activeSellers[sIdx].products||[];
+      const i=p.findIndex(x=>x.id===ln.productId);
+      if(i!==-1){p[i].stock+=ln.qty;if(p[i].status==='outofstock')p[i].status='active';p[i].updatedAt=todayStr();}
+    } else if(ln.productType==='vpp'){
+      const p=activeSellers[sIdx].vppProducts||[];
+      const i=p.findIndex(x=>x.id===ln.productId);
+      if(i!==-1){p[i].stock+=ln.qty;if(p[i].status==='outofstock')p[i].status='active';p[i].updatedAt=todayStr();}
+    } else if(ln.productType==='tbgd'){
+      const p=activeSellers[sIdx].tbgdProducts||[];
+      const i=p.findIndex(x=>x.id===ln.productId);
+      if(i!==-1){p[i].stock+=ln.qty;if(p[i].status==='outofstock')p[i].status='active';p[i].updatedAt=todayStr();}
+    }
+  });
+}
+
+function doSellerEditReceipt(id){
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const r=(activeSellers[sIdx].receipts||[]).find(x=>x.id===id);
+  if(!r||r.status!=='draft'){toast('Chỉ có thể sửa phiếu nháp.');return;}
+  sellerEditReceiptId=id;
+  sellerReceiptLines=r.lines.map(l=>({...l}));
+  sellerReceiptSupplier=r.supplier;
+  sellerReceiptNote=r.note||'';
+  renderAccount();
+}
+
+function doSellerConfirmReceipt(id){
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const rIdx=(activeSellers[sIdx].receipts||[]).findIndex(x=>x.id===id);
+  if(rIdx===-1)return;
+  const r=activeSellers[sIdx].receipts[rIdx];
+  if(r.status==='confirmed'){toast('Phiếu này đã được xác nhận rồi.');return;}
+  if(r.lines.some(l=>l.importPrice<=0)){toast('Phiếu có sản phẩm chưa có giá nhập — vui lòng chỉnh sửa trước khi xác nhận.');return;}
+  _applyReceiptToStock(sIdx,r.lines);
+  activeSellers[sIdx].receipts[rIdx].status='confirmed';
+  activeSellers[sIdx].receipts[rIdx].confirmedAt=todayStr();
+  saveActiveSellers();
+  toast('✓ Phiếu #'+id+' đã xác nhận — tồn kho đã cập nhật.');
+  addNotif('Phiếu nhập kho #'+id+' đã xác nhận, tồn kho đã được cập nhật.');
+  renderAccount();
+}
+
+function doSellerDeleteReceipt(id){
+  if(!confirm('Xóa phiếu nhập #'+id+'? Hành động này không thể hoàn tác.'))return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const rIdx=(activeSellers[sIdx].receipts||[]).findIndex(x=>x.id===id);
+  if(rIdx===-1)return;
+  if(activeSellers[sIdx].receipts[rIdx].status==='confirmed'){toast('Không thể xóa phiếu đã xác nhận.');return;}
+  activeSellers[sIdx].receipts.splice(rIdx,1);
+  saveActiveSellers();
+  toast('Đã xóa phiếu nhập #'+id+'.');
+  renderAccount();
+}
+
+function doSellerSaveThreshold(productId,productType){
+  const el=document.getElementById('thr_'+productType+'_'+productId);
+  if(!el)return;
+  const thr=Math.max(0,parseInt(el.value)||0);
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const arr=productType==='books'?activeSellers[sIdx].products:productType==='vpp'?activeSellers[sIdx].vppProducts:activeSellers[sIdx].tbgdProducts;
+  const pIdx=(arr||[]).findIndex(x=>x.id===productId);
+  if(pIdx===-1)return;
+  arr[pIdx].lowStockThreshold=thr;
+  arr[pIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  toast('✓ Đã cập nhật ngưỡng cảnh báo cho "'+arr[pIdx].name+'".');
+  if(arr[pIdx].stock<=thr&&arr[pIdx].stock>0) addNotif('Cảnh báo: "'+arr[pIdx].name+'" đang có tồn kho ('+arr[pIdx].stock+') ≤ ngưỡng mới ('+thr+').');
+  renderAccount();
+}
+
+function doSellerSaveAllThresholds(){
+  const s=activeSellers.find(x=>x.email===user.email);if(!s)return;
+  const all=_getAllSellerProducts(s);
+  let saved=0;
+  all.forEach(p=>{
+    const el=document.getElementById('thr_'+p.type+'_'+p.id);
+    if(!el)return;
+    const thr=Math.max(0,parseInt(el.value)||0);
+    const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+    const arr=p.type==='books'?activeSellers[sIdx].products:p.type==='vpp'?activeSellers[sIdx].vppProducts:activeSellers[sIdx].tbgdProducts;
+    const pIdx=(arr||[]).findIndex(x=>x.id===p.id);
+    if(pIdx!==-1){arr[pIdx].lowStockThreshold=thr;arr[pIdx].updatedAt=todayStr();saved++;}
+  });
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+  if(sIdx!==-1)saveActiveSellers();
+  toast('✓ Đã lưu ngưỡng cảnh báo cho '+saved+' sản phẩm.');
+  renderAccount();
 }
 
 /* ── 7. Shop Editor (edit business info) ── */
