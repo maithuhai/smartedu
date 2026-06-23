@@ -2219,6 +2219,16 @@
 .adm-side .acct-nav button.danger{color:rgba(240,140,128,.6);}
 .adm-side .acct-nav button.danger:hover{background:rgba(200,54,42,.15);color:#f5a5a0;}
 
+/* ── Seller Sidebar Icon Nav ──────────────────── */
+.sel-side{background:var(--surface);border:1px solid var(--line);}
+.sel-side .acct-nav button{font-size:13.5px;letter-spacing:.005em;}
+.sel-side .acct-nav button svg{opacity:.38;flex-shrink:0;transition:opacity .15s,color .15s;}
+.sel-side .acct-nav button span{flex:1;}
+.sel-side .acct-nav button:hover:not(.on) svg{opacity:.62;}
+.sel-side .acct-nav button.on{background:#fdeeeb;color:var(--ink);font-weight:600;}
+.sel-side .acct-nav button.on svg{opacity:1;color:var(--ink);}
+.sel-side .acct-nav button.danger svg{opacity:.5;}
+
 /* ── Admin Content Area ───────────────────────── */
 .adm-content{background:#eae4db;padding:28px 30px;min-height:calc(100vh - 152px);}
 

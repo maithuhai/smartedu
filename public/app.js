@@ -7704,9 +7704,27 @@ function navForRole(r){
   if(r==='seller'){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
+    const SIC={
+      dash:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+      bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+      bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+      box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+      bar:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+      act:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+      star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+      tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+      book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+      mon:'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+      lay:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+      tab:'<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+      shop:'<path d="M3 9l1-5h16l1 5"/><path d="M21 9v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9"/><path d="M9 22V12h6v10"/>',
+      cc:'<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+      usr:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'
+    };
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-analytics','Phân tích'],['seller-reviews','Đánh giá'],['seller-promo','Khuyến mãi'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
-      :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
+      ?[['seller-dashboard','Tổng quan',SIC.dash],['seller-notif','Thông báo',SIC.bell],['seller-orders','Đơn hàng',SIC.bag],['seller-warehouse','Kho hàng',SIC.box],['seller-revenue','Doanh thu',SIC.bar],['seller-analytics','Phân tích',SIC.act],['seller-reviews','Đánh giá',SIC.star],['seller-promo','Khuyến mãi',SIC.tag],['seller-products','Sách giấy',SIC.book],['seller-ebooks','Ebook',SIC.mon],['seller-vpp','VPP',SIC.lay],['seller-tbgd','Thiết bị',SIC.tab],['seller-shop','Thông tin shop',SIC.shop],['seller-payment','Thanh toán',SIC.cc],['profile','Hồ sơ cá nhân',SIC.usr]]
+      :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng',SIC.doc],['seller-payment','Thông tin thanh toán',SIC.cc],['profile','Hồ sơ cá nhân',SIC.usr]];
     return nav;
   }
   const nav=[['dashboard','Tổng quan'],['orders','Đơn hàng của tôi'],['returns','Đổi / Trả hàng']];
@@ -7726,14 +7744,15 @@ function renderAccount(){
   if(!user){renderLogin();return;}
   const nav=navForRole(user.role);
   const isAdmin=user.role==='admin';
+  const isSeller=user.role==='seller';
   const navBtnHtml=nav.map(n=>'<button class="'+(acctTab===n[0]?'on':'')+'" onclick="acctTab=\''+n[0]+'\';profileTab=\'info\';twoFAStep=null;pfEditMode=false;emailChangeStep=null;emailChangePending=\'\';renderAccount()">'
-    +(isAdmin&&n[2]?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'+n[2]+'</svg><span>'+n[1]+'</span>':n[1])
+    +(n[2]?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'+n[2]+'</svg><span>'+n[1]+'</span>':n[1])
     +'</button>').join('');
   const logoutBtn='<button class="danger" onclick="logout()">'
-    +(isAdmin?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Đăng xuất</span>':'Đăng xuất')
+    +(isAdmin||isSeller?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Đăng xuất</span>':'Đăng xuất')
     +'</button>';
   document.getElementById('app').innerHTML=
-  '<div class="acct'+(isAdmin?' adm-layout':'')+'"><aside class="acct-side'+(isAdmin?' adm-side':'')+'"><div class="acct-user"><div class="av">'+user.name.charAt(0).toUpperCase()+'</div><div><div class="nm">'+user.name+'</div><div class="rl">'+ROLELBL[user.role]+'</div></div></div>'+
+  '<div class="acct'+(isAdmin?' adm-layout':'')+'"><aside class="acct-side'+(isAdmin?' adm-side':isSeller?' sel-side':'')+'"><div class="acct-user"><div class="av">'+user.name.charAt(0).toUpperCase()+'</div><div><div class="nm">'+user.name+'</div><div class="rl">'+ROLELBL[user.role]+'</div></div></div>'+
     '<div class="acct-nav">'+navBtnHtml+logoutBtn+'</div></aside>'+
     '<div class="'+(isAdmin?'adm-content':'')+'">'+acctContent()+'</div></div>';
 }
@@ -8876,7 +8895,7 @@ function sellerDashboard(app){
   const maxR=Math.max(...chart,1);
   const CH=80;
   const valRow='<div style="display:flex;gap:4px">'+chart.map(v=>'<div style="flex:1;text-align:center;font-size:9px;color:var(--text-soft);height:14px;line-height:14px">'+(v>0?Math.round(v/1000)+'k':'')+'</div>').join('')+'</div>';
-  const barRow='<div style="display:flex;align-items:flex-end;gap:4px;height:'+CH+'px">'+chart.map((v,i)=>'<div style="flex:1;height:'+Math.max(Math.round((v/maxR)*CH),3)+'px;border-radius:3px 3px 0 0;background:'+(i===chart.length-1?clr:'#d0c8bf')+'"></div>').join('')+'</div>';
+  const barRow='<div style="display:flex;align-items:flex-end;gap:4px;height:'+CH+'px">'+chart.map((v,i)=>'<div style="flex:1;height:'+Math.max(Math.round((v/maxR)*CH),3)+'px;border-radius:3px 3px 0 0;background:'+(i===chart.length-1?clr:clr+'66')+'"></div>').join('')+'</div>';
   const dayRow='<div style="display:flex;gap:4px;margin-top:4px">'+chartDays.map((d,i)=>'<div style="flex:1;text-align:center;font-size:10.5px;color:'+(i===chart.length-1?clr:'var(--text-soft)')+'">'+d+'</div>').join('')+'</div>';
 
   // Recent orders rows
@@ -8926,25 +8945,29 @@ function sellerDashboard(app){
     '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">'+periodTabs+'</div>'+
     // KPI cards
     '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">'+
-      '<div style="background:'+clr+'10;border:1.5px solid '+clr+'30;border-radius:12px;padding:14px">'+
-        '<div style="font-size:10.5px;color:'+clr+';text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Doanh thu · '+pd.l+'</div>'+
-        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+fmtMil(pd.r)+'đ</div>'+
-        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+pd.o+' đơn</div>'+
+      '<div style="background:'+clr+'0d;border:1.5px solid '+clr+'28;border-radius:14px;padding:16px 16px 14px;display:flex;align-items:flex-start;gap:12px">'+
+        '<div style="background:'+clr+'1a;border-radius:10px;padding:9px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+clr+'" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>'+
+        '<div><div style="font-size:10px;color:'+clr+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-weight:600">Doanh thu · '+pd.l+'</div>'+
+        '<div style="font-size:20px;font-weight:700;color:var(--ink-deep);line-height:1.1">'+fmtMil(pd.r)+'đ</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">'+pd.o+' đơn hoàn thành</div></div>'+
       '</div>'+
-      '<div style="background:#2980b910;border:1.5px solid #2980b930;border-radius:12px;padding:14px">'+
-        '<div style="font-size:10.5px;color:#2980b9;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Đơn mới hôm nay</div>'+
-        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+(st.todayOrders||0)+'</div>'+
-        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">đơn hàng</div>'+
+      '<div style="background:#2980b90d;border:1.5px solid #2980b928;border-radius:14px;padding:16px 16px 14px;display:flex;align-items:flex-start;gap:12px">'+
+        '<div style="background:#2980b91a;border-radius:10px;padding:9px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2980b9" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>'+
+        '<div><div style="font-size:10px;color:#2980b9;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-weight:600">Đơn mới hôm nay</div>'+
+        '<div style="font-size:20px;font-weight:700;color:var(--ink-deep);line-height:1.1">'+(st.todayOrders||0)+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">đơn hàng mới nhận</div></div>'+
       '</div>'+
-      '<div style="background:#27ae6010;border:1.5px solid #27ae6030;border-radius:12px;padding:14px">'+
-        '<div style="font-size:10.5px;color:#27ae60;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Sản phẩm đang bán</div>'+
-        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+(s.totalProducts||products.length||0)+'</div>'+
-        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">sản phẩm</div>'+
+      '<div style="background:#27ae600d;border:1.5px solid #27ae6028;border-radius:14px;padding:16px 16px 14px;display:flex;align-items:flex-start;gap:12px">'+
+        '<div style="background:#27ae601a;border-radius:10px;padding:9px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>'+
+        '<div><div style="font-size:10px;color:#27ae60;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-weight:600">Sản phẩm đang bán</div>'+
+        '<div style="font-size:20px;font-weight:700;color:var(--ink-deep);line-height:1.1">'+(s.totalProducts||products.length||0)+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">mặt hàng trong kho</div></div>'+
       '</div>'+
-      '<div style="background:'+(allWarn.length?'#e67e2210':'var(--paper)')+';border:1.5px solid '+(allWarn.length?'#e67e2230':'var(--line)')+';border-radius:12px;padding:14px">'+
-        '<div style="font-size:10.5px;color:'+(allWarn.length?'#e67e22':'var(--text-soft)')+';text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Cảnh báo tồn kho</div>'+
-        '<div style="font-size:17px;font-weight:700;color:'+(allWarn.length?'#e67e22':'var(--ink-deep)')+'">'+allWarn.length+'</div>'+
-        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+(allWarn.length?outOfStock.length+' hết · '+lowStock.length+' sắp hết':'Ổn định')+'</div>'+
+      '<div style="background:'+(allWarn.length?'#e67e220d':'var(--paper)')+';border:1.5px solid '+(allWarn.length?'#e67e2228':'var(--line)')+';border-radius:14px;padding:16px 16px 14px;display:flex;align-items:flex-start;gap:12px">'+
+        '<div style="background:'+(allWarn.length?'#e67e221a':'var(--line)')+';border-radius:10px;padding:9px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+(allWarn.length?'#e67e22':'var(--text-soft)')+'" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>'+
+        '<div><div style="font-size:10px;color:'+(allWarn.length?'#e67e22':'var(--text-soft)')+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-weight:600">Cảnh báo tồn kho</div>'+
+        '<div style="font-size:20px;font-weight:700;color:'+(allWarn.length?'#e67e22':'var(--ink-deep)')+';line-height:1.1">'+allWarn.length+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">'+(allWarn.length?outOfStock.length+' hết · '+lowStock.length+' sắp hết':'Tồn kho ổn định')+'</div></div>'+
       '</div>'+
     '</div>'+
     // Chart + Recent orders
@@ -8971,9 +8994,9 @@ function sellerDashboard(app){
     stockHtml+
     // Quick actions
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+
-      '<button class="dash-card" onclick="acctTab=\'seller-products\';renderAccount()">📦 Sản phẩm ›</button>'+
-      '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()">💰 Thanh toán ›</button>'+
-      '<button class="dash-card" onclick="acctTab=\'seller-notif\';renderAccount()">'+(unread?'🔔 Thông báo ('+unread+') ›':'🔔 Thông báo ›')+'</button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-products\';renderAccount()" style="display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Quản lý sản phẩm</span><span style="margin-left:auto;opacity:.5">›</span></button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()" style="display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Thông tin thanh toán</span><span style="margin-left:auto;opacity:.5">›</span></button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-notif\';renderAccount()" style="display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>'+(unread?'Thông báo ('+unread+')':'Thông báo')+'</span><span style="margin-left:auto;opacity:.5">›</span>'+(unread?'<span style="background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">'+unread+'</span>':'')+'</button>'+
     '</div>'+
   '</div>';
 }
@@ -12520,25 +12543,41 @@ function sellerShopEditor(app){
   const si=app.shopInfo||{};
   const clr=NCC_CAT_CLR[app.category]||'#888';
   const catLbl=NCC_CAT_LBL[app.category]||app.category;
+  const s=activeSellers.find(x=>x.email===user.email)||{};
+  const rating=s.rating||0;
+  const totalProducts=s.totalProducts||0;
   return '<div class="panel">'+
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">'+
-      '<div class="av" style="background:'+clr+'18;color:'+clr+'">'+escHtml(app.shopName.charAt(0).toUpperCase())+'</div>'+
-      '<div><div style="font-weight:700;font-size:16px">'+escHtml(app.shopName)+'</div>'+
-        '<div style="font-size:12.5px;color:var(--text-soft)"><span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">'+catLbl+'</span> · Tham gia: '+escHtml(app.reviewedAt||'—')+'</div>'+
+    // Shop header card with stats
+    '<div style="background:'+clr+'08;border:1.5px solid '+clr+'22;border-radius:14px;padding:20px 22px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'+
+      '<div class="av" style="background:'+clr+'22;color:'+clr+';width:54px;height:54px;font-size:22px;font-weight:700;flex-shrink:0">'+escHtml(app.shopName.charAt(0).toUpperCase())+'</div>'+
+      '<div style="flex:1;min-width:150px">'+
+        '<div style="font-weight:700;font-size:17px;margin-bottom:5px">'+escHtml(app.shopName)+'</div>'+
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+          '<span style="background:'+clr+'18;color:'+clr+';padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:600">'+catLbl+'</span>'+
+          '<span style="color:var(--text-soft);font-size:12.5px">Tham gia '+escHtml(app.reviewedAt||app.submittedAt||'—')+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:24px">'+
+        (rating?'<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#e67e22">'+rating.toFixed(1)+'</div><div style="font-size:11px;color:var(--text-soft)">★ Đánh giá</div></div>':'') +
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:'+clr+'">'+totalProducts+'</div><div style="font-size:11px;color:var(--text-soft)">Sản phẩm</div></div>'+
       '</div>'+
     '</div>'+
-    '<h4 style="margin:0 0 14px">✏ Chỉnh sửa Thông tin Gian hàng</h4>'+
+    // Section heading
+    '<div style="font-weight:600;font-size:14px;color:var(--ink-deep);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px">'+
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+      'Chỉnh sửa Thông tin Gian hàng'+
+    '</div>'+
     '<div class="form-field"><label>Mô tả gian hàng</label>'+
-      '<textarea id="seDesc" rows="4">'+escHtml(si.desc||'')+'</textarea>'+
+      '<textarea id="seDesc" rows="4" placeholder="Mô tả ngắn gọn về gian hàng của bạn…">'+escHtml(si.desc||'')+'</textarea>'+
     '</div>'+
     '<div class="form-row">'+
-      '<div class="form-field"><label>Địa chỉ kho hàng</label><input id="seAddress" value="'+escHtml(si.address||'')+'"></div>'+
-      '<div class="form-field"><label>Số điện thoại liên hệ</label><input id="sePhone" value="'+escHtml(app.phone||'')+'"></div>'+
+      '<div class="form-field"><label>Địa chỉ kho hàng</label><input id="seAddress" value="'+escHtml(si.address||'')+'" placeholder="Số nhà, đường, quận, thành phố"></div>'+
+      '<div class="form-field"><label>Số điện thoại liên hệ</label><input id="sePhone" value="'+escHtml(app.phone||'')+'" placeholder="0912 345 678"></div>'+
     '</div>'+
-    '<div class="form-field"><label>Sản phẩm chính (cách nhau bởi dấu phẩy)</label>'+
-      '<input id="seMainCats" value="'+escHtml((si.mainCats||[]).join(', '))+'">'+
+    '<div class="form-field"><label>Sản phẩm chính <span style="font-weight:400;color:var(--text-soft);font-size:12px">(cách nhau bởi dấu phẩy)</span></label>'+
+      '<input id="seMainCats" value="'+escHtml((si.mainCats||[]).join(', '))+'" placeholder="VD: Sách GK, Sách tham khảo, Văn phòng phẩm">'+
     '</div>'+
-    '<div style="margin-top:16px;display:flex;gap:10px">'+
+    '<div style="margin-top:20px;display:flex;gap:10px">'+
       '<button class="btn-primary" onclick="doUpdateSellerShop(\''+app.id+'\')">Lưu thay đổi</button>'+
       '<button class="btn-ghost" onclick="renderAccount()">Hủy</button>'+
     '</div>'+
@@ -12556,18 +12595,25 @@ function sellerPaymentSettings(app){
   const maskAcc=bankAcc?'****'+bankAcc.slice(-4):'—';
 
   return '<div class="panel">'+
-    '<h3>Thông tin Thanh toán</h3>'+
-    '<p style="color:var(--text-soft);font-size:13.5px;margin:-4px 0 20px">EduMart sẽ chuyển tiền vào tài khoản này sau mỗi kỳ thanh toán (T+3 ngày làm việc sau khi đơn hoàn thành).</p>'+
+    '<div style="margin-bottom:20px">'+
+      '<h3 style="margin:0 0 6px">Thông tin Thanh toán</h3>'+
+      '<p style="color:var(--text-soft);font-size:13.5px;margin:0">EduMart chuyển tiền sau mỗi kỳ thanh toán — T+3 ngày làm việc sau khi đơn hoàn thành.</p>'+
+    '</div>'+
     (hasBank
-      ?'<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
-          '<div style="font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">TÀI KHOẢN HIỆN TẠI</div>'+
-          '<div style="font-weight:700;font-size:16px">'+escHtml(bankName)+'</div>'+
-          '<div style="font-size:14px;margin-top:2px;color:var(--text-soft)">'+maskAcc+' · '+escHtml(bankHolder)+'</div>'+
+      ?'<div style="background:linear-gradient(135deg,#f8f6ff 0%,#fff 100%);border:1.5px solid #d4cef0;border-radius:14px;padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px">'+
+          '<div style="background:#6c5ce7;border-radius:10px;padding:10px;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>'+
+          '<div style="flex:1">'+
+            '<div style="font-size:10.5px;color:#6c5ce7;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:4px">Tài khoản thanh toán</div>'+
+            '<div style="font-weight:700;font-size:16px">'+escHtml(bankName)+'</div>'+
+            '<div style="font-size:13.5px;margin-top:2px;color:var(--text-soft)">'+maskAcc+' &nbsp;·&nbsp; '+escHtml(bankHolder)+'</div>'+
+          '</div>'+
+          '<div style="background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;border:1px solid #a5d6a7">● Đã xác minh</div>'+
         '</div>'
-      :'<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:13.5px">'+
-          '⚠ Chưa có tài khoản ngân hàng. Vui lòng thêm để nhận thanh toán.'+
+      :'<div style="background:#fff9f0;border:1.5px solid #fcc419;border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px">'+
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'+
+          '<span style="font-size:13.5px;color:#b45309">Chưa có tài khoản ngân hàng. Vui lòng thêm để nhận thanh toán.</span>'+
         '</div>')+
-    '<h4 style="margin:0 0 14px">'+(hasBank?'Cập nhật':'Thêm')+'  Tài khoản Ngân hàng</h4>'+
+    '<div style="font-weight:600;font-size:14px;color:var(--ink-deep);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">'+(hasBank?'Cập nhật':'Thêm')+' Tài khoản Ngân hàng</div>'+
     '<div class="form-field"><label>Ngân hàng <span style="color:var(--ink)">*</span></label>'+
       '<select id="pyBankName">'+bankOpts+'</select>'+
     '</div>'+
@@ -12575,8 +12621,9 @@ function sellerPaymentSettings(app){
       '<div class="form-field"><label>Số tài khoản <span style="color:var(--ink)">*</span></label><input id="pyBankAcc" value="'+escHtml(bankAcc)+'" placeholder="Nhập số tài khoản"></div>'+
       '<div class="form-field"><label>Tên chủ tài khoản <span style="color:var(--ink)">*</span></label><input id="pyBankHolder" value="'+escHtml(bankHolder)+'" placeholder="Đúng như in trên thẻ"></div>'+
     '</div>'+
-    '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a5c38;margin-bottom:16px">'+
-      '🔒 Thông tin ngân hàng được mã hóa. EduMart không lưu CVV hoặc mã PIN.'+
+    '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;font-size:13px;color:#166534;margin-bottom:18px;display:flex;align-items:center;gap:10px">'+
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'+
+      'Thông tin ngân hàng được mã hóa. EduMart không lưu CVV hoặc mã PIN.'+
     '</div>'+
     '<button class="btn-primary" onclick="doUpdateSellerPayment('+(app?'\''+app.id+'\'':"null")+')">Lưu tài khoản ngân hàng</button>'+
   '</div>';
