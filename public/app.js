@@ -1676,7 +1676,7 @@ const ROLE_GROUPS=[
     roles:[
       {k:'seller',name:'Người bán / NCC',desc:'Quản lý gian hàng, đơn, tồn kho',ic:'<path d="M3 9l1-5h16l1 5M5 9v11h14V9"/>'},
     ],
-    kind:'redirect',to:'seller.html'
+    kind:'ncc'
   },
   {
     group:'Quản trị viên',
@@ -1725,6 +1725,8 @@ let admSettingsGeneralTab='info';
 let admSettingsPaymentTab='gateways';
 // Email & Notification Management
 let admNotifTab='compose';
+// Seller Portal
+let sellerRegStep=1;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -2112,6 +2114,7 @@ function orderCardFull(o){
 }
 function acctContent(){
   if(user.role==='admin')return adminContent();
+  if(user.role==='seller')return sellerContent();
   const PF_SUBTABS=[['info','Thông tin'],['security','Bảo mật'],['devices','Thiết bị & Lịch sử'],['privacy','Quyền riêng tư'],['danger','Xóa tài khoản']];
   const pfSubBar=acctTab==='profile'?'<div class="pf-subtab-bar">'+PF_SUBTABS.map(([k,l])=>'<button class="pf-stab'+(profileTab===k?' on':'')+(k==='danger'?' pf-stab-del':'')+'" onclick="profileTab=\''+k+'\';twoFAStep=null;pfEditMode=false;emailChangeStep=null;emailChangePending=\'\';renderAccount()">'+l+'</button>').join('')+'</div>':'';
   if(acctTab==='dashboard'){
@@ -7375,6 +7378,14 @@ function navForRole(r){
     ];
     return adminTabs;
   }
+  if(r==='seller'){
+    const myApp=user?sellerApps.find(a=>a.email===user.email):null;
+    const isApproved=myApp&&myApp.status==='approved';
+    const nav=isApproved
+      ?[['seller-dashboard','Tổng quan'],['seller-shop','Gian hàng'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
+    return nav;
+  }
   const nav=[['dashboard','Tổng quan'],['orders','Đơn hàng của tôi'],['returns','Đổi / Trả hàng']];
   /* Người mua — sub-types */
   if(r==='hocsinh')nav.push(['study','Học tập & Gợi ý sách']);
@@ -8186,6 +8197,8 @@ document.addEventListener('click',e=>{
     {id:'demo-sv',   name:'Trần Sinh Viên',     email:'sinhvien@demo.vn',  pw:'demo123', role:'sinhvien'},
     {id:'demo-ph',   name:'Lê Phụ Huynh',       email:'phuhuynh@demo.vn',  pw:'demo123', role:'parent'},
     {id:'demo-th',   name:'Trường THPT Demo',   email:'truonghoc@demo.vn', pw:'demo123', role:'school'},
+    {id:'demo-sl',   name:'Nguyễn Văn Long',    email:'minhlong.vpp@gmail.com', pw:'demo123', role:'seller'},
+    {id:'demo-sl2',  name:'Trần Thị Huyền',     email:'edu.tech.htn@gmail.com', pw:'demo123', role:'seller'},
   ];
   const MOCKS=[
     {id:'mock-01',name:'Nguyễn Văn An',    email:'nva001@gmail.com',     pw:'mock123',role:'hocsinh', status:'active',  createdAt:'15/03/2025',points:240,ref:'EDU4812'},
@@ -8227,4 +8240,507 @@ document.addEventListener('click',e=>{
   if(changed)saveAuthUsers();
 })();
 updateCartCount(); updateWishCount(); updateNotifCount();
+
+/* ══════════════════════════════════════════════════════════════
+   PHÂN HỆ NGƯỜI BÁN / NCC — SELLER PORTAL
+   Nhóm chức năng: Đăng ký & Xác minh Seller
+══════════════════════════════════════════════════════════════ */
+
+/* ── Constants ── */
+const SELLER_CAT_OPTS=[
+  {k:'sach',    lbl:'Sách'},
+  {k:'vpp',     lbl:'Văn phòng phẩm'},
+  {k:'tbgd',    lbl:'Thiết bị Giáo dục'},
+  {k:'ebook',   lbl:'Ebook'},
+  {k:'audiobook',lbl:'Sách nói'}
+];
+
+/* ── Router ── */
+function sellerContent(){
+  const myApp=sellerApps.find(a=>a.email===user.email);
+  const isApproved=myApp&&myApp.status==='approved';
+
+  if(acctTab==='seller-reg')     return myApp?sellerAppStatus(myApp):sellerRegForm();
+  if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
+  if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
+  if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
+  /* fallthrough for 'profile', 'address', etc. handled by buyer acctContent below */
+  return sellerDefaultContent(myApp,isApproved);
+}
+
+function sellerDefaultContent(myApp,isApproved){
+  if(acctTab==='dashboard'){
+    const myActiveSeller=isApproved?activeSellers.find(s=>s.email===user.email):null;
+    if(isApproved&&myActiveSeller) return sellerDashboard(myApp);
+    return sellerWelcome(myApp);
+  }
+  /* Share buyer profile/address/points */
+  const tmpRole=user.role;
+  user.role='hocsinh'; /* temporarily borrow buyer content for profile/address tabs */
+  const html=acctContent();
+  user.role=tmpRole;
+  return html;
+}
+
+/* ── 1. Welcome (no application yet) ── */
+function sellerWelcome(myApp){
+  const statusBanner=myApp?sellerStatusBanner(myApp):'';
+  return '<div class="panel">'+
+    '<h3>Chào mừng đến Cổng Người bán EduMart!</h3>'+
+    '<p style="color:var(--text-soft);margin:-4px 0 16px;font-size:13.5px">Bắt đầu hành trình kinh doanh sách & giáo dục cùng hàng triệu học sinh, sinh viên và giáo viên trên cả nước.</p>'+
+    statusBanner+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0">'+
+      _sellerBenefitCard('📦','Đơn giản','Đăng ký miễn phí, duyệt trong 1–2 ngày làm việc')+
+      _sellerBenefitCard('💰','Hoa hồng thấp','8–15% tùy danh mục, thấp nhất thị trường')+
+      _sellerBenefitCard('📊','Minh bạch','Thống kê doanh thu, đơn hàng realtime')+
+    '</div>'+
+    (myApp
+      ?'<button class="btn-primary" onclick="acctTab=\'seller-reg\';renderAccount()">Xem trạng thái hồ sơ ›</button>'
+      :'<button class="btn-primary" onclick="acctTab=\'seller-reg\';renderAccount()">Đăng ký ngay ›</button>')+
+  '</div>';
+}
+function _sellerBenefitCard(ic,title,desc){
+  return '<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center">'+
+    '<div style="font-size:24px;margin-bottom:6px">'+ic+'</div>'+
+    '<div style="font-weight:600;font-size:13.5px;margin-bottom:4px">'+title+'</div>'+
+    '<div style="font-size:12.5px;color:var(--text-soft)">'+desc+'</div>'+
+  '</div>';
+}
+
+/* ── 2. Registration form (multi-step) ── */
+function sellerRegForm(){
+  const steps=['Thông tin shop','Giấy phép KD','CCCD','Ngân hàng','Xác nhận'];
+  const stepBar='<div style="display:flex;gap:0;margin-bottom:24px">'+
+    steps.map((s,i)=>{
+      const done=i<sellerRegStep-1, active=i===sellerRegStep-1;
+      return '<div style="flex:1;text-align:center">'+
+        '<div style="width:28px;height:28px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;'+
+          (done?'background:var(--ink);color:#fff':active?'background:var(--ink);color:#fff':'background:#e8e2db;color:var(--text-soft)')+
+        '">'+(done?'✓':(i+1))+'</div>'+
+        '<div style="font-size:11px;color:'+(active?'var(--ink-deep)':'var(--text-soft)')+'">'+s+'</div>'+
+      '</div>'+(i<steps.length-1?'<div style="flex:none;width:20px;display:flex;align-items:flex-start;padding-top:12px"><div style="height:2px;width:100%;background:'+(done?'var(--ink)':'#e8e2db')+'"></div></div>':'');
+    }).join('')+
+  '</div>';
+
+  let formHtml='';
+  if(sellerRegStep===1) formHtml=_slRegStep1();
+  else if(sellerRegStep===2) formHtml=_slRegStep2();
+  else if(sellerRegStep===3) formHtml=_slRegStep3();
+  else if(sellerRegStep===4) formHtml=_slRegStep4();
+  else formHtml=_slRegStep5();
+
+  const navBtns='<div style="display:flex;gap:10px;margin-top:20px">'+
+    (sellerRegStep>1?'<button class="btn-ghost" onclick="sellerRegStep--;renderAccount()">← Quay lại</button>':'')+
+    (sellerRegStep<5
+      ?'<button class="btn-primary" onclick="doSellerRegNext()">Tiếp theo →</button>'
+      :'<button class="btn-primary" onclick="doSubmitSellerApp()">Nộp hồ sơ</button>')+
+  '</div>';
+
+  return '<div class="panel"><h3>Đăng ký Người bán / NCC</h3>'+stepBar+formHtml+navBtns+'</div>';
+}
+
+function _slRegStep1(){
+  return '<div style="font-weight:600;font-size:14px;margin-bottom:14px">📋 Thông tin Gian hàng</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Tên shop <span style="color:var(--ink)">*</span></label><input id="slShopName" value="'+(user.name||'')+'" placeholder="VD: Sách & VPP Minh Long"></div>'+
+      '<div class="form-field"><label>Số điện thoại liên hệ <span style="color:var(--ink)">*</span></label><input id="slPhone" value="'+(user.phone||'')+'" placeholder="09xx xxx xxx"></div>'+
+    '</div>'+
+    '<div class="form-field"><label>Danh mục chính <span style="color:var(--ink)">*</span></label>'+
+      '<select id="slCategory">'+SELLER_CAT_OPTS.map(c=>'<option value="'+c.k+'">'+c.lbl+'</option>').join('')+'</select>'+
+    '</div>'+
+    '<div class="form-field"><label>Mô tả gian hàng <span style="color:var(--ink)">*</span></label>'+
+      '<textarea id="slDesc" rows="3" placeholder="Giới thiệu về sản phẩm bạn kinh doanh, kinh nghiệm, điểm khác biệt..."></textarea>'+
+    '</div>'+
+    '<div class="form-field"><label>Địa chỉ kho hàng / văn phòng <span style="color:var(--ink)">*</span></label><input id="slAddress" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></div>'+
+    '<div class="form-field"><label>Danh mục sản phẩm dự kiến</label><input id="slMainCats" placeholder="Sách GK, Sách tham khảo, Văn phòng phẩm..."></div>';
+}
+
+function _slRegStep2(){
+  return '<div style="font-weight:600;font-size:14px;margin-bottom:14px">📄 Giấy phép Kinh doanh (GPKD)</div>'+
+    '<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#7a6000">'+
+      '⚠ Thông tin phải khớp chính xác với giấy phép kinh doanh bản gốc. Admin sẽ xác minh trước khi duyệt.'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Số đăng ký / Mã số KD <span style="color:var(--ink)">*</span></label><input id="slGpkdNum" placeholder="VD: ĐKKD-HN-2024-112345"></div>'+
+      '<div class="form-field"><label>Loại hình kinh doanh <span style="color:var(--ink)">*</span></label>'+
+        '<select id="slGpkdType">'+
+          '<option>Hộ kinh doanh cá thể</option>'+
+          '<option>Công ty TNHH MTV</option>'+
+          '<option>Công ty TNHH</option>'+
+          '<option>Công ty Cổ phần</option>'+
+          '<option>Nhà xuất bản</option>'+
+        '</select>'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Ngày cấp <span style="color:var(--ink)">*</span></label><input id="slGpkdIssued" type="date"></div>'+
+      '<div class="form-field"><label>Nơi cấp <span style="color:var(--ink)">*</span></label><input id="slGpkdPlace" placeholder="VD: Sở KH&ĐT Hà Nội"></div>'+
+    '</div>'+
+    '<div style="background:#f0f7ff;border:1.5px solid #c3daf5;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a4a7a">'+
+      '📎 <b>Bản demo:</b> Trong môi trường thực, bạn sẽ tải ảnh chụp GPKD bản gốc lên đây. Hiện tại điền thông tin text là đủ.'+
+    '</div>';
+}
+
+function _slRegStep3(){
+  return '<div style="font-weight:600;font-size:14px;margin-bottom:14px">🪪 Căn cước Công dân (CCCD)</div>'+
+    '<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#7a6000">'+
+      '⚠ Thông tin CCCD của chủ sở hữu / người đại diện pháp lý doanh nghiệp.'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Số CCCD (12 chữ số) <span style="color:var(--ink)">*</span></label><input id="slCccdNum" placeholder="034xxxxxxxxx" maxlength="12"></div>'+
+      '<div class="form-field"><label>Họ và tên trên CCCD <span style="color:var(--ink)">*</span></label><input id="slCccdName" value="'+(user.name||'')+'" placeholder="Đúng như trên thẻ CCCD"></div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Ngày cấp <span style="color:var(--ink)">*</span></label><input id="slCccdIssued" type="date"></div>'+
+      '<div class="form-field"><label>Nơi cấp <span style="color:var(--ink)">*</span></label><input id="slCccdPlace" placeholder="VD: Công an TP Hà Nội"></div>'+
+    '</div>'+
+    '<div style="background:#f0f7ff;border:1.5px solid #c3daf5;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a4a7a">'+
+      '📎 <b>Bản demo:</b> Trong môi trường thực, bạn sẽ tải ảnh CCCD 2 mặt còn hiệu lực. Hiện tại điền thông tin text là đủ.'+
+    '</div>';
+}
+
+function _slRegStep4(){
+  return '<div style="font-weight:600;font-size:14px;margin-bottom:14px">🏦 Thông tin Tài khoản Ngân hàng</div>'+
+    '<p style="font-size:13px;color:var(--text-soft);margin:-4px 0 16px">Tài khoản này dùng để EduMart thanh toán tiền bán hàng cho bạn sau khi đơn hoàn thành.</p>'+
+    '<div class="form-field"><label>Ngân hàng <span style="color:var(--ink)">*</span></label>'+
+      '<select id="slBankName">'+
+        ['Vietcombank','Techcombank','MB Bank','BIDV','VietinBank','Agribank','TPBank','VPBank','SHB','ACB','Sacombank','HDBank','OCB','SeABank'].map(b=>'<option>'+b+'</option>').join('')+
+      '</select>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Số tài khoản <span style="color:var(--ink)">*</span></label><input id="slBankAcc" placeholder="Nhập số tài khoản" type="text"></div>'+
+      '<div class="form-field"><label>Tên chủ tài khoản <span style="color:var(--ink)">*</span></label><input id="slBankHolder" value="'+(user.name||'')+'" placeholder="Đúng như in trên thẻ ngân hàng"></div>'+
+    '</div>'+
+    '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a5c38">'+
+      '✅ Thông tin ngân hàng được mã hóa và chỉ được dùng để thanh toán. EduMart không lưu CVV hoặc thông tin thẻ.'+
+    '</div>';
+}
+
+function _slRegStep5(){
+  /* Read stored values from LS temp or just show summary prompt */
+  return '<div style="font-weight:600;font-size:14px;margin-bottom:14px">✅ Xác nhận và Nộp hồ sơ</div>'+
+    '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:12px;padding:16px 18px;margin-bottom:16px">'+
+      '<p style="margin:0 0 10px;font-weight:600">Trước khi nộp, hãy xác nhận:</p>'+
+      '<ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.8">'+
+        '<li>Tất cả thông tin tôi cung cấp là <b>trung thực và chính xác</b></li>'+
+        '<li>Giấy phép kinh doanh và CCCD còn <b>hiệu lực</b></li>'+
+        '<li>Tôi đồng ý với <a style="color:var(--ink);font-weight:500" onclick="go(\'terms\')">Điều khoản dịch vụ Người bán</a> của EduMart</li>'+
+        '<li>Tôi hiểu rằng vi phạm chính sách có thể dẫn đến đình chỉ hoặc khóa tài khoản</li>'+
+      '</ul>'+
+    '</div>'+
+    '<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px">'+
+      '<b>Quy trình sau khi nộp:</b><br>'+
+      '① Admin EduMart xem xét hồ sơ (1–2 ngày làm việc)<br>'+
+      '② Nhận thông báo kết quả tại đây và qua email<br>'+
+      '③ Nếu được duyệt: tài khoản seller kích hoạt ngay lập tức'+
+    '</div>'+
+    '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer">'+
+      '<input type="checkbox" id="slConfirmCheck" style="margin-top:2px">'+
+      '<span style="font-size:13.5px">Tôi xác nhận tất cả thông tin trên là đúng sự thật và đồng ý với điều khoản của EduMart.</span>'+
+    '</label>';
+}
+
+/* ── 3. Application Status ── */
+function sellerAppStatus(app){
+  const st=app.status;
+  let banner='', actions='';
+
+  if(st==='pending'){
+    banner='<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
+      '<div style="font-weight:700;font-size:15px;margin-bottom:4px">⏳ Hồ sơ đang chờ xét duyệt</div>'+
+      '<p style="margin:0;font-size:13.5px;color:var(--text-soft)">Admin EduMart đang xem xét hồ sơ của bạn. Thường mất 1–2 ngày làm việc. Bạn sẽ nhận thông báo tại đây khi có kết quả.</p>'+
+    '</div>';
+  } else if(st==='more-info'){
+    banner='<div style="background:#e8f4ff;border:1.5px solid #90c3f5;border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
+      '<div style="font-weight:700;font-size:15px;margin-bottom:6px">📋 Cần bổ sung thông tin</div>'+
+      '<p style="margin:0 0 8px;font-size:13.5px">Admin yêu cầu bổ sung: <b>'+escHtml(app.reviewNote||'')+'</b></p>'+
+      '<p style="margin:0;font-size:12.5px;color:var(--text-soft)">Xem xét bởi: '+escHtml(app.reviewedBy||'Admin EduMart')+' · '+escHtml(app.reviewedAt||'')+'</p>'+
+    '</div>';
+    actions='<button class="btn-primary" onclick="doSellerResubmit(\''+app.id+'\')">✏ Bổ sung và nộp lại</button> ';
+  } else if(st==='rejected'){
+    banner='<div style="background:#fff0f0;border:1.5px solid #f5c0c0;border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
+      '<div style="font-weight:700;font-size:15px;margin-bottom:6px;color:#c0392b">✕ Hồ sơ bị từ chối</div>'+
+      '<p style="margin:0 0 8px;font-size:13.5px">Lý do: <b>'+escHtml(app.reviewNote||'Không đủ điều kiện')+'</b></p>'+
+      '<p style="margin:0;font-size:12.5px;color:var(--text-soft)">Xem xét bởi: '+escHtml(app.reviewedBy||'Admin EduMart')+' · '+escHtml(app.reviewedAt||'')+'</p>'+
+    '</div>';
+    actions='<button class="btn-primary" onclick="doSellerNewApp()">Nộp hồ sơ mới</button> ';
+  } else if(st==='approved'){
+    banner='<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
+      '<div style="font-weight:700;font-size:15px;margin-bottom:4px;color:#1a5c38">✅ Hồ sơ đã được duyệt!</div>'+
+      '<p style="margin:0;font-size:13.5px;color:var(--text-soft)">Tài khoản bán hàng của bạn đã kích hoạt. Duyệt bởi: '+escHtml(app.reviewedBy||'Admin EduMart')+' · '+escHtml(app.reviewedAt||'')+'</p>'+
+    '</div>';
+    actions='<button class="btn-primary" onclick="acctTab=\'seller-dashboard\';renderAccount()">Vào Tổng quan ›</button> ';
+  }
+
+  const clr=NCC_CAT_CLR[app.category]||'#888';
+  const catLbl=NCC_CAT_LBL[app.category]||app.category;
+  const infoGrid=(lbl,val)=>'<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em">'+lbl+'</div><div style="font-size:14px;font-weight:500;margin-top:2px">'+escHtml(String(val||'—'))+'</div></div>';
+
+  return '<div class="panel"><h3>Hồ sơ Đăng ký Người bán</h3>'+
+    banner+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">'+
+      infoGrid('Tên shop',app.shopName)+
+      infoGrid('Chủ sở hữu',app.ownerName)+
+      infoGrid('Email',app.email)+
+      infoGrid('Số điện thoại',app.phone)+
+      infoGrid('Danh mục','<span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600">'+catLbl+'</span>')+
+      infoGrid('Ngày nộp',app.submittedAt)+
+    '</div>'+
+    '<div style="margin-top:14px;padding:12px 0;border-top:1px solid var(--line)">'+
+      '<div style="font-size:11.5px;color:var(--text-soft);margin-bottom:4px">MÔ TẢ GIAN HÀNG</div>'+
+      '<p style="font-size:13.5px;margin:0">'+escHtml(app.shopInfo&&app.shopInfo.desc||'—')+'</p>'+
+    '</div>'+
+    '<div style="margin-top:16px">'+actions+'</div>'+
+  '</div>';
+}
+
+function sellerStatusBanner(app){
+  const st=app.status;
+  if(st==='pending')
+    return '<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13.5px">⏳ <b>Hồ sơ đang chờ xét duyệt.</b> <a style="color:var(--ink);font-weight:500" onclick="acctTab=\'seller-reg\';renderAccount()">Xem chi tiết ›</a></div>';
+  if(st==='more-info')
+    return '<div style="background:#e8f4ff;border:1.5px solid #90c3f5;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13.5px">📋 <b>Hồ sơ cần bổ sung.</b> <a style="color:var(--ink);font-weight:500" onclick="acctTab=\'seller-reg\';renderAccount()">Xem yêu cầu ›</a></div>';
+  if(st==='rejected')
+    return '<div style="background:#fff0f0;border:1.5px solid #f5c0c0;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13.5px">✕ <b>Hồ sơ bị từ chối.</b> <a style="color:var(--ink);font-weight:500" onclick="acctTab=\'seller-reg\';renderAccount()">Xem lý do ›</a></div>';
+  if(st==='approved')
+    return '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13.5px">✅ <b>Hồ sơ đã được duyệt!</b> <a style="color:var(--ink);font-weight:500" onclick="acctTab=\'seller-dashboard\';renderAccount()">Vào Tổng quan ›</a></div>';
+  return '';
+}
+
+/* ── 4. Seller Dashboard (approved) ── */
+function sellerDashboard(app){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s)return '<div class="panel"><p>Đang khởi tạo tài khoản seller…</p></div>';
+  const clr=NCC_CAT_CLR[s.category]||'#888';
+  const catLbl=NCC_CAT_LBL[s.category]||s.category;
+  const stars='★'.repeat(Math.round(s.rating||0))+'☆'.repeat(5-Math.round(s.rating||0));
+  const kpis=[
+    {lbl:'Tổng đơn',val:s.stats.totalOrders},
+    {lbl:'Doanh thu',val:fmtBig(s.stats.totalRevenue)+'đ'},
+    {lbl:'Sản phẩm',val:s.totalProducts},
+    {lbl:'Đánh giá',val:stars+' '+(s.rating||0).toFixed(1)}
+  ];
+  const statusBadge={active:'<span style="color:#27ae60;font-weight:600">● Hoạt động</span>',warning:'<span style="color:#e67e22;font-weight:600">⚠ Cảnh báo</span>',suspended:'<span style="color:#c0392b;font-weight:600">⏸ Đình chỉ</span>',locked:'<span style="color:#7f8c8d;font-weight:600">🔒 Đã khóa</span>'}[s.status]||s.status;
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">'+
+      '<div class="av" style="background:'+clr+'18;color:'+clr+';width:46px;height:46px;font-size:18px">'+escHtml(s.shopName.charAt(0).toUpperCase())+'</div>'+
+      '<div><div style="font-weight:700;font-size:17px">'+escHtml(s.shopName)+'</div>'+
+        '<div style="font-size:13px;color:var(--text-soft);margin-top:2px">'+
+          '<span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">'+catLbl+'</span> '+
+          statusBadge+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="stat-row">'+kpis.map(k=>'<div class="stat-box"><div class="v" style="font-size:15px">'+k.val+'</div><div class="l">'+k.lbl+'</div></div>').join('')+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">'+
+      '<button class="dash-card" onclick="acctTab=\'seller-shop\';renderAccount()">Quản lý Gian hàng ›</button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()">Thông tin Thanh toán ›</button>'+
+    '</div>'+
+    (s.status==='suspended'?'<div style="background:#fff0f0;border:1.5px solid #f5c0c0;border-radius:10px;padding:12px 14px;margin-top:16px;font-size:13.5px">⏸ <b>Tài khoản đang bị đình chỉ đến '+escHtml(s.suspendedUntil||'?')+'.</b> Lý do: '+escHtml(s.suspendedReason||'—')+'</div>':'')+
+  '</div>';
+}
+
+/* ── 5. Shop Editor (edit business info) ── */
+function sellerShopEditor(app){
+  const si=app.shopInfo||{};
+  const clr=NCC_CAT_CLR[app.category]||'#888';
+  const catLbl=NCC_CAT_LBL[app.category]||app.category;
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">'+
+      '<div class="av" style="background:'+clr+'18;color:'+clr+'">'+escHtml(app.shopName.charAt(0).toUpperCase())+'</div>'+
+      '<div><div style="font-weight:700;font-size:16px">'+escHtml(app.shopName)+'</div>'+
+        '<div style="font-size:12.5px;color:var(--text-soft)"><span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">'+catLbl+'</span> · Tham gia: '+escHtml(app.reviewedAt||'—')+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<h4 style="margin:0 0 14px">✏ Chỉnh sửa Thông tin Gian hàng</h4>'+
+    '<div class="form-field"><label>Mô tả gian hàng</label>'+
+      '<textarea id="seDesc" rows="4">'+escHtml(si.desc||'')+'</textarea>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Địa chỉ kho hàng</label><input id="seAddress" value="'+escHtml(si.address||'')+'"></div>'+
+      '<div class="form-field"><label>Số điện thoại liên hệ</label><input id="sePhone" value="'+escHtml(app.phone||'')+'"></div>'+
+    '</div>'+
+    '<div class="form-field"><label>Sản phẩm chính (cách nhau bởi dấu phẩy)</label>'+
+      '<input id="seMainCats" value="'+escHtml((si.mainCats||[]).join(', '))+'">'+
+    '</div>'+
+    '<div style="margin-top:16px;display:flex;gap:10px">'+
+      '<button class="btn-primary" onclick="doUpdateSellerShop(\''+app.id+'\')">Lưu thay đổi</button>'+
+      '<button class="btn-ghost" onclick="renderAccount()">Hủy</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── 6. Payment Settings ── */
+function sellerPaymentSettings(app){
+  const bank=app&&app.shopInfo&&app.shopInfo.bank?app.shopInfo.bank:'';
+  const parts=bank.split(' – ');
+  const bankName=parts[0]||'',bankAcc=parts[1]||'',bankHolder=parts[2]||'';
+  const BANKS=['Vietcombank','Techcombank','MB Bank','BIDV','VietinBank','Agribank','TPBank','VPBank','SHB','ACB','Sacombank','HDBank','OCB','SeABank'];
+  const bankOpts=BANKS.map(b=>'<option'+(b===bankName?' selected':'')+'>'+b+'</option>').join('');
+  const hasBank=bankName&&bankAcc&&bankHolder;
+  const maskAcc=bankAcc?'****'+bankAcc.slice(-4):'—';
+
+  return '<div class="panel">'+
+    '<h3>Thông tin Thanh toán</h3>'+
+    '<p style="color:var(--text-soft);font-size:13.5px;margin:-4px 0 20px">EduMart sẽ chuyển tiền vào tài khoản này sau mỗi kỳ thanh toán (T+3 ngày làm việc sau khi đơn hoàn thành).</p>'+
+    (hasBank
+      ?'<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:20px">'+
+          '<div style="font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">TÀI KHOẢN HIỆN TẠI</div>'+
+          '<div style="font-weight:700;font-size:16px">'+escHtml(bankName)+'</div>'+
+          '<div style="font-size:14px;margin-top:2px;color:var(--text-soft)">'+maskAcc+' · '+escHtml(bankHolder)+'</div>'+
+        '</div>'
+      :'<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:13.5px">'+
+          '⚠ Chưa có tài khoản ngân hàng. Vui lòng thêm để nhận thanh toán.'+
+        '</div>')+
+    '<h4 style="margin:0 0 14px">'+(hasBank?'Cập nhật':'Thêm')+'  Tài khoản Ngân hàng</h4>'+
+    '<div class="form-field"><label>Ngân hàng <span style="color:var(--ink)">*</span></label>'+
+      '<select id="pyBankName">'+bankOpts+'</select>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-field"><label>Số tài khoản <span style="color:var(--ink)">*</span></label><input id="pyBankAcc" value="'+escHtml(bankAcc)+'" placeholder="Nhập số tài khoản"></div>'+
+      '<div class="form-field"><label>Tên chủ tài khoản <span style="color:var(--ink)">*</span></label><input id="pyBankHolder" value="'+escHtml(bankHolder)+'" placeholder="Đúng như in trên thẻ"></div>'+
+    '</div>'+
+    '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a5c38;margin-bottom:16px">'+
+      '🔒 Thông tin ngân hàng được mã hóa. EduMart không lưu CVV hoặc mã PIN.'+
+    '</div>'+
+    '<button class="btn-primary" onclick="doUpdateSellerPayment('+(app?'\''+app.id+'\'':"null")+')">Lưu tài khoản ngân hàng</button>'+
+  '</div>';
+}
+
+/* ── Action Functions ── */
+
+function doSellerRegNext(){
+  if(sellerRegStep===1){
+    const shopName=(document.getElementById('slShopName')||{}).value||'';
+    const phone=(document.getElementById('slPhone')||{}).value||'';
+    const desc=(document.getElementById('slDesc')||{}).value||'';
+    const address=(document.getElementById('slAddress')||{}).value||'';
+    if(!shopName.trim()){toast('Vui lòng nhập tên shop');return;}
+    if(!phone.trim()){toast('Vui lòng nhập số điện thoại');return;}
+    if(!desc.trim()){toast('Vui lòng nhập mô tả gian hàng');return;}
+    if(!address.trim()){toast('Vui lòng nhập địa chỉ kho hàng');return;}
+    LS.set('slReg1',{shopName:shopName.trim(),phone:phone.trim(),category:(document.getElementById('slCategory')||{}).value||'sach',desc:desc.trim(),address:address.trim(),mainCats:((document.getElementById('slMainCats')||{}).value||'').split(',').map(s=>s.trim()).filter(Boolean)});
+  }
+  if(sellerRegStep===2){
+    const num=(document.getElementById('slGpkdNum')||{}).value||'';
+    const place=(document.getElementById('slGpkdPlace')||{}).value||'';
+    if(!num.trim()){toast('Vui lòng nhập số đăng ký GPKD');return;}
+    if(!place.trim()){toast('Vui lòng nhập nơi cấp');return;}
+    LS.set('slReg2',{number:num.trim(),type:(document.getElementById('slGpkdType')||{}).value||'',issued:(document.getElementById('slGpkdIssued')||{}).value||'',place:place.trim()});
+  }
+  if(sellerRegStep===3){
+    const num=(document.getElementById('slCccdNum')||{}).value||'';
+    const name=(document.getElementById('slCccdName')||{}).value||'';
+    if(!num.trim()||num.trim().length<9){toast('Số CCCD không hợp lệ (tối thiểu 9 chữ số)');return;}
+    if(!name.trim()){toast('Vui lòng nhập họ tên trên CCCD');return;}
+    LS.set('slReg3',{number:num.trim(),name:name.trim(),issued:(document.getElementById('slCccdIssued')||{}).value||'',place:(document.getElementById('slCccdPlace')||{}).value||''});
+  }
+  if(sellerRegStep===4){
+    const acc=(document.getElementById('slBankAcc')||{}).value||'';
+    const holder=(document.getElementById('slBankHolder')||{}).value||'';
+    if(!acc.trim()){toast('Vui lòng nhập số tài khoản ngân hàng');return;}
+    if(!holder.trim()){toast('Vui lòng nhập tên chủ tài khoản');return;}
+    LS.set('slReg4',{bankName:(document.getElementById('slBankName')||{}).value||'',acc:acc.trim(),holder:holder.trim()});
+  }
+  sellerRegStep++;
+  renderAccount();
+}
+
+function doSubmitSellerApp(){
+  const chk=document.getElementById('slConfirmCheck');
+  if(!chk||!chk.checked){toast('Vui lòng xác nhận thông tin trước khi nộp');return;}
+  const d1=LS.get('slReg1',{}), d2=LS.get('slReg2',{}), d3=LS.get('slReg3',{}), d4=LS.get('slReg4',{});
+  if(!d1.shopName){toast('Thiếu thông tin bước 1. Vui lòng quay lại.');sellerRegStep=1;renderAccount();return;}
+  const newId='sapp-'+Date.now().toString(36);
+  const now=todayStr();
+  const newApp={
+    id:newId,
+    shopName:d1.shopName,ownerName:user.name,email:user.email,phone:d1.phone,
+    submittedAt:now,status:'pending',category:d1.category,
+    gpkd:{number:d2.number||'',issued:d2.issued||'',place:d2.place||'',type:d2.type||''},
+    cccd:{number:d3.number||'',name:d3.name||user.name,issued:d3.issued||'',place:d3.place||''},
+    shopInfo:{name:d1.shopName,desc:d1.desc||'',address:d1.address||'',bank:(d4.bankName||'')+(d4.acc?' – '+d4.acc:'')+(d4.holder?' – '+d4.holder:''),mainCats:d1.mainCats||[]},
+    reviewNote:'',reviewedBy:null,reviewedAt:null
+  };
+  sellerApps.push(newApp);
+  saveSellerApps();
+  LS.set('slReg1',null);LS.set('slReg2',null);LS.set('slReg3',null);LS.set('slReg4',null);
+  sellerRegStep=1;
+  acctTab='seller-reg';
+  addNotif('Hồ sơ đăng ký người bán đã được gửi thành công! Chúng tôi sẽ xem xét và phản hồi trong 1–2 ngày làm việc.');
+  toast('✓ Hồ sơ đã nộp thành công!');
+  renderAccount();
+}
+
+function doSellerResubmit(appId){
+  const reason=prompt('Bạn đã bổ sung thông tin gì? (tóm tắt cho Admin)','');
+  if(reason===null)return;
+  const idx=sellerApps.findIndex(a=>a.id===appId);
+  if(idx===-1)return;
+  sellerApps[idx].status='pending';
+  sellerApps[idx].reviewNote='Seller đã bổ sung: '+(reason.trim()||'Đã cập nhật hồ sơ')+'. (Nộp lại '+todayStr()+')';
+  sellerApps[idx].reviewedBy=null;
+  sellerApps[idx].reviewedAt=null;
+  saveSellerApps();
+  toast('Đã nộp lại hồ sơ!');
+  renderAccount();
+}
+
+function doSellerNewApp(){
+  if(!confirm('Nộp hồ sơ đăng ký mới? Hồ sơ cũ sẽ được thay thế.'))return;
+  sellerRegStep=1;
+  acctTab='seller-reg';
+  /* Mark old app as new attempt */
+  const idx=sellerApps.findIndex(a=>a.email===user.email);
+  if(idx!==-1) sellerApps.splice(idx,1);
+  saveSellerApps();
+  renderAccount();
+}
+
+function doUpdateSellerShop(appId){
+  const desc=(document.getElementById('seDesc')||{}).value||'';
+  const address=(document.getElementById('seAddress')||{}).value||'';
+  const phone=(document.getElementById('sePhone')||{}).value||'';
+  const mainCats=((document.getElementById('seMainCats')||{}).value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const idx=sellerApps.findIndex(a=>a.id===appId);
+  if(idx===-1)return;
+  sellerApps[idx].shopInfo=sellerApps[idx].shopInfo||{};
+  sellerApps[idx].shopInfo.desc=desc.trim();
+  sellerApps[idx].shopInfo.address=address.trim();
+  sellerApps[idx].shopInfo.mainCats=mainCats;
+  sellerApps[idx].phone=phone.trim();
+  /* Sync to activeSellers if exists */
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  if(sIdx!==-1){activeSellers[sIdx].phone=phone.trim();saveActiveSellers();}
+  saveSellerApps();
+  toast('Đã lưu thông tin gian hàng!');
+  renderAccount();
+}
+
+function doUpdateSellerPayment(appId){
+  const bankName=(document.getElementById('pyBankName')||{}).value||'';
+  const acc=(document.getElementById('pyBankAcc')||{}).value||'';
+  const holder=(document.getElementById('pyBankHolder')||{}).value||'';
+  if(!bankName){toast('Vui lòng chọn ngân hàng');return;}
+  if(!acc.trim()){toast('Vui lòng nhập số tài khoản');return;}
+  if(!holder.trim()){toast('Vui lòng nhập tên chủ tài khoản');return;}
+  const bankStr=bankName+' – '+acc.trim()+' – '+holder.trim();
+  if(appId){
+    const idx=sellerApps.findIndex(a=>a.id===appId);
+    if(idx!==-1){
+      sellerApps[idx].shopInfo=sellerApps[idx].shopInfo||{};
+      sellerApps[idx].shopInfo.bank=bankStr;
+      saveSellerApps();
+    }
+  }
+  /* Also save to activeSellers if available */
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  if(sIdx!==-1){
+    activeSellers[sIdx].shopInfo=activeSellers[sIdx].shopInfo||{};
+    activeSellers[sIdx].shopInfo.bank=bankStr;
+    saveActiveSellers();
+  }
+  toast('Đã lưu thông tin tài khoản ngân hàng!');
+  renderAccount();
+}
 render();
