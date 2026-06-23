@@ -1727,6 +1727,7 @@ let admSettingsPaymentTab='gateways';
 let admNotifTab='compose';
 // Seller Portal
 let sellerRegStep=1;
+let sellerDashPeriod='month';
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -2967,6 +2968,43 @@ if(!activeSellers){
   LS.set('activeSellers',activeSellers);
 }
 function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
+
+/* ── Demo seller migration: approve sapp-001 + ensure activeSellers entry ── */
+(function(){
+  const s1=sellerApps.find(a=>a.id==='sapp-001');
+  if(s1&&s1.status!=='approved'){s1.status='approved';s1.reviewedBy='Admin EduMart';s1.reviewedAt='12/06/2025';saveSellerApps();}
+  if(!activeSellers.find(s=>s.id==='seller-sapp-001')){
+    activeSellers.unshift({id:'seller-sapp-001',shopName:'Sách & VPP Minh Long',ownerName:'Nguyễn Văn Long',email:'minhlong.vpp@gmail.com',phone:'0912 345 678',joinedAt:'12/06/2025',status:'active',category:'sach',rating:4.3,totalProducts:5,
+      stats:{totalOrders:124,totalRevenue:8200000,returnRate:0.8,todayOrders:3,todayRev:285000,thisWeekOrders:18,thisWeekRev:1420000,thisMonthOrders:52,thisMonthRev:4100000,growth:18.5},
+      recentOrders:[
+        {id:'#ORD-2025-089',buyer:'Nguyễn Thị Hoa',items:3,revenue:245000,status:'pending',date:'23/06/2025'},
+        {id:'#ORD-2025-088',buyer:'Trần Văn Nam',items:1,revenue:32000,status:'delivered',date:'22/06/2025'},
+        {id:'#ORD-2025-087',buyer:'Lê Thị Linh',items:2,revenue:128000,status:'shipping',date:'22/06/2025'},
+        {id:'#ORD-2025-086',buyer:'Phạm Hoài Nam',items:4,revenue:380000,status:'delivered',date:'21/06/2025'},
+        {id:'#ORD-2025-085',buyer:'Nguyễn Văn Tú',items:1,revenue:88000,status:'delivered',date:'20/06/2025'}
+      ],
+      products:[
+        {id:'slp-001',name:'Bộ SGK Lớp 5 Kết nối tri thức',stock:3,price:185000,sold:24},
+        {id:'slp-002',name:'Vở ô ly 4 ô 200 trang (50 quyển)',stock:0,price:45000,sold:156},
+        {id:'slp-003',name:'Bút bi Thiên Long RT-007 (Hộp 20c)',stock:12,price:65000,sold:89},
+        {id:'slp-004',name:'Sách GK Toán 6 Cánh Diều',stock:28,price:32000,sold:67},
+        {id:'slp-005',name:'Sách Tiếng Anh 7 Global Success',stock:45,price:35000,sold:53}
+      ],
+      revenueChart:[320000,480000,215000,560000,390000,720000,285000],
+      revenueChartDays:['T3','T4','T5','T6','T7','CN','T2'],
+      sellerNotifs:[
+        {id:'sn-001',type:'order',t:'Đơn hàng mới #ORD-2025-089 từ Nguyễn Thị Hoa — 3 sản phẩm, 245.000đ',time:'15 phút trước',read:false},
+        {id:'sn-002',type:'order',t:'Đơn hàng mới #ORD-2025-088 từ Trần Văn Nam — 1 sản phẩm, 32.000đ',time:'1 giờ trước',read:false},
+        {id:'sn-003',type:'stock',t:'Cảnh báo hết hàng: "Vở ô ly 4 ô 200 trang (50 quyển)" đã hết hàng — cần nhập thêm hàng ngay',time:'2 giờ trước',read:true},
+        {id:'sn-004',type:'report',t:'Sản phẩm "Bộ SGK Lớp 5 Kết nối tri thức" bị 1 báo cáo — vui lòng kiểm tra và cập nhật thông tin',time:'Hôm qua',read:true},
+        {id:'sn-005',type:'review',t:'Đánh giá mới 5★ từ Minh Anh: "Sách mới nguyên, giao hàng nhanh, đóng gói cẩn thận. Rất hài lòng!"',time:'Hôm qua',read:true},
+        {id:'sn-006',type:'stock',t:'Cảnh báo sắp hết hàng: "Bộ SGK Lớp 5 Kết nối tri thức" còn 3 sản phẩm — cần nhập thêm hàng',time:'2 ngày trước',read:true},
+        {id:'sn-007',type:'review',t:'Đánh giá mới 4★ từ Thanh Hoa: "Sản phẩm tốt, đúng mô tả. Giao hàng hơi chậm nhưng đóng gói kỹ."',time:'3 ngày trước',read:true}
+      ],
+      violations:[],commissionOverride:null,warnings:0});
+    saveActiveSellers();
+  }
+})();
 
 let commissionCfg=LS.get('commissionCfg',null);
 if(!commissionCfg){
@@ -7382,7 +7420,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-shop','Gian hàng'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-shop','Gian hàng'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8264,6 +8302,7 @@ function sellerContent(){
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
+  if(acctTab==='seller-notif')    return sellerNotifCenter();
   /* fallthrough for 'profile', 'address', etc. handled by buyer acctContent below */
   return sellerDefaultContent(myApp,isApproved);
 }
@@ -8513,34 +8552,186 @@ function sellerDashboard(app){
   if(!s)return '<div class="panel"><p>Đang khởi tạo tài khoản seller…</p></div>';
   const clr=NCC_CAT_CLR[s.category]||'#888';
   const catLbl=NCC_CAT_LBL[s.category]||s.category;
-  const stars='★'.repeat(Math.round(s.rating||0))+'☆'.repeat(5-Math.round(s.rating||0));
-  const kpis=[
-    {lbl:'Tổng đơn',val:s.stats.totalOrders},
-    {lbl:'Doanh thu',val:fmtBig(s.stats.totalRevenue)+'đ'},
-    {lbl:'Sản phẩm',val:s.totalProducts},
-    {lbl:'Đánh giá',val:stars+' '+(s.rating||0).toFixed(1)}
-  ];
-  const statusBadge={active:'<span style="color:#27ae60;font-weight:600">● Hoạt động</span>',warning:'<span style="color:#e67e22;font-weight:600">⚠ Cảnh báo</span>',suspended:'<span style="color:#c0392b;font-weight:600">⏸ Đình chỉ</span>',locked:'<span style="color:#7f8c8d;font-weight:600">🔒 Đã khóa</span>'}[s.status]||s.status;
+  const st=s.stats||{};
+  const products=s.products||[];
+  const outOfStock=products.filter(p=>p.stock===0);
+  const lowStock=products.filter(p=>p.stock>0&&p.stock<=5);
+  const allWarn=[...outOfStock.map(p=>({...p,wt:'out'})),...lowStock.map(p=>({...p,wt:'low'}))];
+  const rOrders=s.recentOrders||[];
+  const sNotifs=s.sellerNotifs||[];
+  const unread=sNotifs.filter(n=>!n.read).length;
+
+  const sBadge={active:'<span style="color:#27ae60;font-weight:600">● Hoạt động</span>',warning:'<span style="color:#e67e22;font-weight:600">⚠ Cảnh báo</span>',suspended:'<span style="color:#c0392b;font-weight:600">⏸ Đình chỉ</span>',locked:'<span style="color:#7f8c8d;font-weight:600">🔒 Đã khóa</span>'}[s.status]||'';
+
+  // Period tabs & data
+  const pData={today:{o:st.todayOrders||0,r:st.todayRev||0,l:'Hôm nay'},week:{o:st.thisWeekOrders||0,r:st.thisWeekRev||0,l:'Tuần này'},month:{o:st.thisMonthOrders||0,r:st.thisMonthRev||0,l:'Tháng này'}};
+  const pd=pData[sellerDashPeriod]||pData.month;
+  const periodTabs=['today','week','month'].map(p=>'<button onclick="sellerDashPeriod=\''+p+'\';renderAccount()" style="padding:4px 14px;border-radius:20px;border:1.5px solid '+(sellerDashPeriod===p?clr:'var(--line)')+';background:'+(sellerDashPeriod===p?clr+'20':'transparent')+';color:'+(sellerDashPeriod===p?clr:'var(--text-soft)')+';font-size:12.5px;cursor:pointer;font-weight:'+(sellerDashPeriod===p?'600':'400')+'">'+pData[p].l+'</button>').join('');
+
+  // Revenue chart (7-day CSS bars)
+  const chart=s.revenueChart||[0,0,0,0,0,0,0];
+  const chartDays=s.revenueChartDays||['T2','T3','T4','T5','T6','T7','CN'];
+  const maxR=Math.max(...chart,1);
+  const CH=80;
+  const valRow='<div style="display:flex;gap:4px">'+chart.map(v=>'<div style="flex:1;text-align:center;font-size:9px;color:var(--text-soft);height:14px;line-height:14px">'+(v>0?Math.round(v/1000)+'k':'')+'</div>').join('')+'</div>';
+  const barRow='<div style="display:flex;align-items:flex-end;gap:4px;height:'+CH+'px">'+chart.map((v,i)=>'<div style="flex:1;height:'+Math.max(Math.round((v/maxR)*CH),3)+'px;border-radius:3px 3px 0 0;background:'+(i===chart.length-1?clr:'#d0c8bf')+'"></div>').join('')+'</div>';
+  const dayRow='<div style="display:flex;gap:4px;margin-top:4px">'+chartDays.map((d,i)=>'<div style="flex:1;text-align:center;font-size:10.5px;color:'+(i===chart.length-1?clr:'var(--text-soft)')+'">'+d+'</div>').join('')+'</div>';
+
+  // Recent orders rows
+  const oStLbl={pending:'Chờ xác nhận',processing:'Đang xử lý',shipping:'Đang giao',delivered:'Đã giao',cancelled:'Đã hủy'};
+  const oStClr={pending:'#e67e22',processing:'#2980b9',shipping:'#8e44ad',delivered:'#27ae60',cancelled:'#7f8c8d'};
+  const orderRows=rOrders.length
+    ?rOrders.slice(0,5).map(o=>'<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:7px 6px;font-size:12.5px;font-weight:600;color:var(--ink)">'+escHtml(o.id)+'</td>'+
+        '<td style="padding:7px 6px;font-size:12.5px">'+escHtml(o.buyer)+'</td>'+
+        '<td style="padding:7px 6px;font-size:12.5px;text-align:center">'+o.items+'</td>'+
+        '<td style="padding:7px 6px;font-size:12.5px;font-weight:600">'+fmtBig(o.revenue)+'đ</td>'+
+        '<td style="padding:7px 6px"><span style="font-size:11px;padding:2px 8px;border-radius:6px;background:'+(oStClr[o.status]||'#888')+'18;color:'+(oStClr[o.status]||'#888')+'">'+escHtml(oStLbl[o.status]||o.status)+'</span></td>'+
+        '<td style="padding:7px 6px;font-size:11.5px;color:var(--text-soft)">'+escHtml(o.date)+'</td>'+
+      '</tr>').join('')
+    :'<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-soft);font-size:13.5px">Chưa có đơn hàng nào</td></tr>';
+
+  // Stock warning cards
+  const stockHtml=allWarn.length
+    ?'<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:12px;padding:14px 16px;margin-bottom:20px">'+
+        '<div style="font-weight:600;font-size:13.5px;margin-bottom:10px">⚠ Cảnh báo Tồn kho ('+allWarn.length+')</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+          allWarn.map(p=>'<div style="background:#fff;border:1.5px solid '+(p.wt==='out'?'#e74c3c':'#f39c12')+';border-radius:8px;padding:6px 12px;font-size:12.5px">'+
+            (p.wt==='out'?'🔴':'🟡')+' <b>'+escHtml(p.name)+'</b> — <span style="color:'+(p.wt==='out'?'#c0392b':'#e67e22')+'">'+(p.wt==='out'?'Hết hàng':'Còn '+p.stock+' cái')+'</span></div>'
+          ).join('')+
+        '</div>'+
+      '</div>'
+    :'';
+
+  const suspHtml=s.status==='suspended'?'<div style="background:#fff0f0;border:1.5px solid #f5c0c0;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13.5px">⏸ <b>Tài khoản đang bị đình chỉ đến '+escHtml(s.suspendedUntil||'?')+'.</b> Lý do: '+escHtml(s.suspendedReason||'—')+'</div>':'';
+
   return '<div class="panel">'+
+    // Shop header
     '<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">'+
-      '<div class="av" style="background:'+clr+'18;color:'+clr+';width:46px;height:46px;font-size:18px">'+escHtml(s.shopName.charAt(0).toUpperCase())+'</div>'+
-      '<div><div style="font-weight:700;font-size:17px">'+escHtml(s.shopName)+'</div>'+
-        '<div style="font-size:13px;color:var(--text-soft);margin-top:2px">'+
-          '<span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">'+catLbl+'</span> '+
-          statusBadge+
+      '<div class="av" style="background:'+clr+'18;color:'+clr+';width:46px;height:46px;font-size:20px">'+escHtml(s.shopName.charAt(0).toUpperCase())+'</div>'+
+      '<div style="flex:1">'+
+        '<div style="font-weight:700;font-size:17px">'+escHtml(s.shopName)+'</div>'+
+        '<div style="font-size:13px;color:var(--text-soft);margin-top:3px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+          '<span style="background:'+clr+'18;color:'+clr+';padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">'+catLbl+'</span>'+
+          sBadge+
+          '<span>· Tham gia '+escHtml(s.joinedAt||'—')+'</span>'+
         '</div>'+
       '</div>'+
+      (unread?'<div onclick="acctTab=\'seller-notif\';renderAccount()" style="cursor:pointer;background:#e74c3c;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap">🔔 '+unread+' chưa đọc</div>':'')+
     '</div>'+
-    '<div class="stat-row">'+kpis.map(k=>'<div class="stat-box"><div class="v" style="font-size:15px">'+k.val+'</div><div class="l">'+k.lbl+'</div></div>').join('')+'</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">'+
-      '<button class="dash-card" onclick="acctTab=\'seller-shop\';renderAccount()">Quản lý Gian hàng ›</button>'+
-      '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()">Thông tin Thanh toán ›</button>'+
+    suspHtml+
+    // Period selector
+    '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">'+periodTabs+'</div>'+
+    // KPI cards
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">'+
+      '<div style="background:'+clr+'10;border:1.5px solid '+clr+'30;border-radius:12px;padding:14px">'+
+        '<div style="font-size:10.5px;color:'+clr+';text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Doanh thu · '+pd.l+'</div>'+
+        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+fmtMil(pd.r)+'đ</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+pd.o+' đơn</div>'+
+      '</div>'+
+      '<div style="background:#2980b910;border:1.5px solid #2980b930;border-radius:12px;padding:14px">'+
+        '<div style="font-size:10.5px;color:#2980b9;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Đơn mới hôm nay</div>'+
+        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+(st.todayOrders||0)+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">đơn hàng</div>'+
+      '</div>'+
+      '<div style="background:#27ae6010;border:1.5px solid #27ae6030;border-radius:12px;padding:14px">'+
+        '<div style="font-size:10.5px;color:#27ae60;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Sản phẩm đang bán</div>'+
+        '<div style="font-size:17px;font-weight:700;color:var(--ink-deep)">'+(s.totalProducts||products.length||0)+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">sản phẩm</div>'+
+      '</div>'+
+      '<div style="background:'+(allWarn.length?'#e67e2210':'var(--paper)')+';border:1.5px solid '+(allWarn.length?'#e67e2230':'var(--line)')+';border-radius:12px;padding:14px">'+
+        '<div style="font-size:10.5px;color:'+(allWarn.length?'#e67e22':'var(--text-soft)')+';text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Cảnh báo tồn kho</div>'+
+        '<div style="font-size:17px;font-weight:700;color:'+(allWarn.length?'#e67e22':'var(--ink-deep)')+'">'+allWarn.length+'</div>'+
+        '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+(allWarn.length?outOfStock.length+' hết · '+lowStock.length+' sắp hết':'Ổn định')+'</div>'+
+      '</div>'+
     '</div>'+
-    (s.status==='suspended'?'<div style="background:#fff0f0;border:1.5px solid #f5c0c0;border-radius:10px;padding:12px 14px;margin-top:16px;font-size:13.5px">⏸ <b>Tài khoản đang bị đình chỉ đến '+escHtml(s.suspendedUntil||'?')+'.</b> Lý do: '+escHtml(s.suspendedReason||'—')+'</div>':'')+
+    // Chart + Recent orders
+    '<div style="display:grid;grid-template-columns:1fr 1.6fr;gap:16px;margin-bottom:20px">'+
+      '<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px">'+
+        '<div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--ink-deep)">📈 Doanh thu 7 ngày</div>'+
+        valRow+barRow+dayRow+
+      '</div>'+
+      '<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px;overflow:auto">'+
+        '<div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--ink-deep)">🧾 Đơn hàng gần đây</div>'+
+        '<table style="width:100%;border-collapse:collapse;min-width:400px">'+
+          '<thead><tr>'+
+            '<th style="text-align:left;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">Đơn</th>'+
+            '<th style="text-align:left;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">Khách hàng</th>'+
+            '<th style="text-align:center;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">SP</th>'+
+            '<th style="text-align:left;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">Doanh thu</th>'+
+            '<th style="text-align:left;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">Trạng thái</th>'+
+            '<th style="text-align:left;padding:0 6px 8px;font-size:11px;color:var(--text-soft);font-weight:500">Ngày</th>'+
+          '</tr></thead>'+
+          '<tbody>'+orderRows+'</tbody>'+
+        '</table>'+
+      '</div>'+
+    '</div>'+
+    stockHtml+
+    // Quick actions
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+
+      '<button class="dash-card" onclick="acctTab=\'seller-shop\';renderAccount()">🏪 Gian hàng ›</button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-payment\';renderAccount()">💰 Thanh toán ›</button>'+
+      '<button class="dash-card" onclick="acctTab=\'seller-notif\';renderAccount()">'+(unread?'🔔 Thông báo ('+unread+') ›':'🔔 Thông báo ›')+'</button>'+
+    '</div>'+
   '</div>';
 }
 
-/* ── 5. Shop Editor (edit business info) ── */
+/* ── 5. Seller Notification Center ── */
+function sellerNotifCenter(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s)return '<div class="panel"><p>Không tìm thấy tài khoản seller.</p></div>';
+  const sNotifs=s.sellerNotifs||[];
+  const unread=sNotifs.filter(n=>!n.read).length;
+  const typeIcon={order:'🛒',report:'⚠️',review:'⭐',stock:'📦'};
+  const typeLbl={order:'Đơn hàng mới',report:'Sản phẩm bị báo cáo',review:'Đánh giá mới',stock:'Tồn kho'};
+  const typeClr={order:'#2980b9',report:'#e74c3c',review:'#f39c12',stock:'#e67e22'};
+
+  const rows=sNotifs.length
+    ?sNotifs.map(n=>'<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start">'+
+        '<div style="width:36px;height:36px;border-radius:50%;background:'+(typeClr[n.type]||'#888')+'18;color:'+(typeClr[n.type]||'#888')+';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+(typeIcon[n.type]||'🔔')+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:11.5px;color:'+(typeClr[n.type]||'#888')+';font-weight:600;margin-bottom:3px">'+escHtml(typeLbl[n.type]||'Thông báo')+'</div>'+
+          '<div style="font-size:13.5px;color:var(--ink);line-height:1.4;'+(n.read?'':'font-weight:500')+'">'+escHtml(n.t)+'</div>'+
+          '<div style="font-size:11.5px;color:var(--text-soft);margin-top:4px">'+escHtml(n.time)+'</div>'+
+        '</div>'+
+        (!n.read?'<div style="width:8px;height:8px;border-radius:50%;background:#e74c3c;flex-shrink:0;margin-top:6px"></div>':'')+
+      '</div>'
+    ).join('')
+    :'<div style="text-align:center;padding:40px 20px;color:var(--text-soft)">🔔 Chưa có thông báo nào.</div>';
+
+  const typeSummary=Object.entries(typeLbl).map(([k,v])=>{
+    const cnt=sNotifs.filter(n=>n.type===k).length;
+    const uCnt=sNotifs.filter(n=>n.type===k&&!n.read).length;
+    if(!cnt)return '';
+    return '<div style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;border:1.5px solid '+(typeClr[k]||'#888')+'30;background:'+(typeClr[k]||'#888')+'10;font-size:12px;color:'+(typeClr[k]||'#888')+'">'+
+      (typeIcon[k]||'🔔')+' '+v+
+      ' <span style="background:'+(typeClr[k]||'#888')+';color:#fff;border-radius:20px;padding:0 6px;font-size:10.5px;font-weight:600">'+cnt+(uCnt?' · '+uCnt+' mới':'')+' </span>'+
+    '</div>';
+  }).join('');
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<div>'+
+        '<h3 style="margin:0">Thông báo Cổng Người bán</h3>'+
+        '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">Đơn hàng mới, đánh giá, cảnh báo tồn kho và sản phẩm bị báo cáo.</p>'+
+      '</div>'+
+      (unread?'<button class="btn-ghost" onclick="doMarkSellerNotifsRead()" style="font-size:12.5px;padding:6px 14px">✓ Đánh dấu tất cả đã đọc</button>':'')+
+    '</div>'+
+    (typeSummary?'<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+typeSummary+'</div>':'')+
+    rows+
+  '</div>';
+}
+
+function doMarkSellerNotifsRead(){
+  const idx=activeSellers.findIndex(x=>x.email===user.email);
+  if(idx===-1)return;
+  (activeSellers[idx].sellerNotifs||[]).forEach(n=>n.read=true);
+  saveActiveSellers();
+  toast('Đã đánh dấu tất cả thông báo là đã đọc.');
+  renderAccount();
+}
+
+/* ── 6. Shop Editor (edit business info) ── */
 function sellerShopEditor(app){
   const si=app.shopInfo||{};
   const clr=NCC_CAT_CLR[app.category]||'#888';
