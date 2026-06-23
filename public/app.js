@@ -1733,6 +1733,9 @@ let sellerProductSearch='';
 let sellerProductStatusFilter='all';
 let sellerSelectedProds=[];
 let sellerRestockProductId=null;
+let sellerEditEbookId=null;
+let sellerEbookStatusFilter='all';
+let sellerEbookStatsId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3024,6 +3027,19 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
       {id:'slp-006',name:'Oxford Quick Placement Test – Prep Book',by:'Many Authors',nxb:'Oxford University Press',isbn:'978-0-19-401234-5',year:2023,pages:256,lang:'en',genre:'ngoaingu',aud:['thpt','sinhvien'],desc:'Sách luyện thi Oxford Quick Placement Test cho học sinh THPT và sinh viên muốn xác định trình độ tiếng Anh.',price:195000,oldPrice:240000,stock:8,sold:34,rating:4.4,ratingCount:21,status:'draft',imageCount:2,createdAt:'20/05/2025',updatedAt:'10/06/2025',restockHistory:[]}
     ];
     activeSellers[sIdx].totalProducts=6;
+    saveActiveSellers();
+  }
+})();
+
+/* ── Seed seller-sapp-001 ebooks ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx!==-1&&!activeSellers[sIdx].ebooks){
+    activeSellers[sIdx].ebooks=[
+      {id:'sle-001',name:'Hướng dẫn ôn thi THPT Quốc gia Toán 2025',by:'TS Nguyễn Văn Minh',nxb:'EduMart Digital',genre:'thamkhao',aud:['thpt'],desc:'Tài liệu ôn thi THPT Quốc gia môn Toán từ cơ bản đến nâng cao, có bài giải chi tiết và đề thi thử cập nhật.',price:49000,formats:['PDF','EPUB'],pages:324,previewPages:30,size:8.5,tableOfContents:'Chương 1: Đại số tổ hợp\nChương 2: Hàm số và đồ thị\nChương 3: Tích phân & Ứng dụng\nChương 4: Số phức\nChương 5: Hình học không gian',status:'active',imageCount:1,totalDownloads:284,downloadsByFormat:{PDF:198,EPUB:86,MOBI:0},previewCount:1240,purchaseCount:284,revenue:13916000,revenueChart:[1200000,980000,1540000,890000,2100000,1680000,780000],createdAt:'01/05/2025',updatedAt:'20/06/2025'},
+      {id:'sle-002',name:'Sổ Tay Từ Vựng Tiếng Anh 2000 Từ Thiết Yếu',by:'Nhóm giáo viên EduMart',nxb:'EduMart Digital',genre:'ngoaingu',aud:['thcs','thpt','sinhvien'],desc:'Bộ 2000 từ vựng tiếng Anh thiết yếu theo chủ đề, kèm ví dụ câu và phiên âm quốc tế. Phù hợp ôn thi và giao tiếp.',price:35000,formats:['PDF','EPUB','MOBI'],pages:186,previewPages:20,size:4.2,tableOfContents:'Phần 1: Gia đình & Bạn bè\nPhần 2: Trường học & Giáo dục\nPhần 3: Nghề nghiệp & Công việc\nPhần 4: Công nghệ & Số hóa',status:'active',imageCount:1,totalDownloads:512,downloadsByFormat:{PDF:280,EPUB:167,MOBI:65},previewCount:1890,purchaseCount:512,revenue:17920000,revenueChart:[2200000,1900000,2800000,1600000,3100000,2400000,1400000],createdAt:'15/04/2025',updatedAt:'22/06/2025'},
+      {id:'sle-003',name:'Kỹ Năng Tư Duy Phản Biện cho Học Sinh',by:'PGS.TS Lê Thị Mai',nxb:'EduMart Digital',genre:'kynang',aud:['thpt','sinhvien'],desc:'Hướng dẫn thực hành tư duy phản biện, giải quyết vấn đề và ra quyết định có căn cứ dành cho học sinh và sinh viên.',price:55000,formats:['PDF'],pages:210,previewPages:15,size:5.8,tableOfContents:'Bài 1: Tư duy phản biện là gì?\nBài 2: Phân tích và đánh giá lập luận\nBài 3: Nhận biết ngụy biện phổ biến\nBài 4: Kỹ thuật ra quyết định',status:'draft',imageCount:1,totalDownloads:0,downloadsByFormat:{PDF:0,EPUB:0,MOBI:0},previewCount:0,purchaseCount:0,revenue:0,revenueChart:[0,0,0,0,0,0,0],createdAt:'15/06/2025',updatedAt:'23/06/2025'}
+    ];
     saveActiveSellers();
   }
 })();
@@ -7442,7 +7458,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sản phẩm'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8324,6 +8340,9 @@ function sellerContent(){
   if(acctTab==='seller-products')     return isApproved?sellerProductList():sellerAppStatus(myApp);
   if(acctTab==='seller-product-form') return isApproved?sellerProductForm(sellerEditProductId):sellerAppStatus(myApp);
   if(acctTab==='seller-product-import')return isApproved?sellerProductImport():sellerAppStatus(myApp);
+  if(acctTab==='seller-ebooks')        return isApproved?sellerEbookList():sellerAppStatus(myApp);
+  if(acctTab==='seller-ebook-form')    return isApproved?sellerEbookForm(sellerEditEbookId):sellerAppStatus(myApp);
+  if(acctTab==='seller-ebook-stats')   return isApproved?sellerEbookStats(sellerEbookStatsId):sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -9167,6 +9186,322 @@ function doSellerDownloadCSVTemplate(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='mau-nhap-sach-edumart.csv';
   document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+/* ── 6b. Ebook Management ── */
+function sellerEbookList(){
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  const ebooks=(sIdx!==-1&&activeSellers[sIdx].ebooks)||[];
+  const filtered=sellerEbookStatusFilter==='all'?ebooks:ebooks.filter(e=>e.status===sellerEbookStatusFilter);
+  const tabs=[['all','Tất cả'],['active','Hoạt động'],['draft','Nháp'],['paused','Tạm dừng']];
+  const statusLabel={active:'<span class="badge badge-success">Hoạt động</span>',draft:'<span class="badge badge-secondary">Nháp</span>',paused:'<span class="badge badge-warning">Tạm dừng</span>'};
+  const formatBadge=f=>`<span style="font-size:11px;background:#e8f4fd;color:#1565c0;border-radius:4px;padding:1px 6px;margin-right:3px;">${escHtml(f)}</span>`;
+  const rows=filtered.map(e=>`
+    <tr>
+      <td><strong>${escHtml(e.name)}</strong><br><small style="color:#666;">${escHtml(e.by)}</small></td>
+      <td>${e.formats.map(formatBadge).join('')}</td>
+      <td style="text-align:right;">${fmtBig(e.price)}đ</td>
+      <td style="text-align:right;">${fmtBig(e.totalDownloads)}</td>
+      <td style="text-align:right;">${fmtBig(e.revenue)}đ</td>
+      <td>${statusLabel[e.status]||e.status}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-secondary" onclick="sellerEditEbookId='${e.id}';acctTab='seller-ebook-form';renderAccount();" title="Chỉnh sửa">✏️</button>
+        <button class="btn btn-sm btn-outline-info" onclick="sellerEbookStatsId='${e.id}';acctTab='seller-ebook-stats';renderAccount();" title="Thống kê">📊</button>
+        <button class="btn btn-sm btn-outline-${e.status==='active'?'warning':'success'}" onclick="doSellerToggleEbookStatus('${e.id}')" title="${e.status==='active'?'Tạm dừng':'Kích hoạt'}">${e.status==='active'?'⏸':'▶'}</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="doSellerDeleteEbook('${e.id}')" title="Xóa">🗑</button>
+      </td>
+    </tr>`).join('');
+  return `
+<div class="seller-section">
+  <div class="seller-section-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+    <h2 style="margin:0;font-size:1.3rem;font-weight:700;">Quản lý Ebook</h2>
+    <button class="btn btn-primary" onclick="sellerEditEbookId=null;acctTab='seller-ebook-form';renderAccount();">+ Thêm Ebook mới</button>
+  </div>
+  <div class="filter-tabs" style="margin-bottom:16px;">
+    ${tabs.map(([k,l])=>`<button class="filter-tab${sellerEbookStatusFilter===k?' active':''}" onclick="sellerEbookStatusFilter='${k}';renderAccount();">${l}<span class="tab-count">${k==='all'?ebooks.length:ebooks.filter(e=>e.status===k).length}</span></button>`).join('')}
+  </div>
+  ${filtered.length===0?`<div class="empty-state"><p>Không có ebook nào${sellerEbookStatusFilter!=='all'?' trong bộ lọc này':''}.</p><button class="btn btn-primary" onclick="sellerEditEbookId=null;acctTab='seller-ebook-form';renderAccount();">Thêm ebook đầu tiên</button></div>`:`
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead><tr><th>Tên Ebook</th><th>Định dạng</th><th>Giá</th><th>Lượt tải</th><th>Doanh thu</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`}
+</div>`;
+}
+
+function sellerEbookForm(ebookId){
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  const ebooks=(sIdx!==-1&&activeSellers[sIdx].ebooks)||[];
+  const eb=ebookId?ebooks.find(e=>e.id===ebookId):null;
+  const isEdit=!!eb;
+  const v=k=>eb?escHtml(String(eb[k]??'')):'';
+  const chk=(arr,val)=>arr&&arr.includes(val)?'checked':'';
+  const audArr=eb?eb.aud:[];
+  const fmtArr=eb?eb.formats:['PDF'];
+  const genreOpts=[['thamkhao','Tham khảo'],['sgk','Sách giáo khoa'],['vanhoc','Văn học'],['thieunhi','Thiếu nhi'],['kynang','Kỹ năng'],['ngoaingu','Ngoại ngữ'],['khoa-hoc','Khoa học']];
+  const audOpts=[['tieuhoc','Tiểu học'],['thcs','THCS'],['thpt','THPT'],['sinhvien','Sinh viên'],['giaovien','Giáo viên'],['nguoilon','Người lớn']];
+  return `
+<div class="seller-section">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <button class="btn btn-sm btn-outline-secondary" onclick="acctTab='seller-ebooks';renderAccount();">← Quay lại</button>
+    <h2 style="margin:0;font-size:1.3rem;font-weight:700;">${isEdit?'Chỉnh sửa Ebook':'Thêm Ebook mới'}</h2>
+  </div>
+  <form onsubmit="return false;">
+    <!-- Thông tin cơ bản -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">1. Thông tin cơ bản</h3>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr;gap:12px;">
+        <div><label class="form-label">Tên Ebook <span style="color:red">*</span></label><input id="sef-name" class="form-control" value="${v('name')}" placeholder="Nhập tên ebook..."></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label class="form-label">Tác giả <span style="color:red">*</span></label><input id="sef-by" class="form-control" value="${v('by')}" placeholder="Tên tác giả"></div>
+          <div><label class="form-label">Nhà xuất bản</label><input id="sef-nxb" class="form-control" value="${v('nxb')}" placeholder="NXB..."></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div><label class="form-label">Số trang</label><input id="sef-pages" type="number" class="form-control" value="${v('pages')}" min="1" placeholder="VD: 280"></div>
+          <div><label class="form-label">Số trang đọc thử</label><input id="sef-preview" type="number" class="form-control" value="${v('previewPages')}" min="0" placeholder="VD: 30"></div>
+          <div><label class="form-label">Dung lượng (MB)</label><input id="sef-size" type="number" step="0.1" class="form-control" value="${v('size')}" min="0.1" placeholder="VD: 8.5"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Phân loại -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">2. Phân loại</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <label class="form-label">Thể loại <span style="color:red">*</span></label>
+          <select id="sef-genre" class="form-control">
+            ${genreOpts.map(([k,l])=>`<option value="${k}"${eb&&eb.genre===k?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Đối tượng</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+            ${audOpts.map(([k,l])=>`<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="sef-aud-${k}" ${chk(audArr,k)}> ${l}</label>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Mô tả -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">3. Mô tả</h3>
+      <div style="margin-bottom:12px;">
+        <label class="form-label">Mô tả ngắn <span style="color:red">*</span></label>
+        <textarea id="sef-desc" class="form-control" rows="4" placeholder="Giới thiệu nội dung ebook...">${eb?escHtml(eb.desc):''}</textarea>
+      </div>
+      <div>
+        <label class="form-label">Mục lục</label>
+        <textarea id="sef-toc" class="form-control" rows="6" placeholder="VD:\nChương 1: ...\nChương 2: ...">${eb?escHtml(eb.tableOfContents||''):''}</textarea>
+      </div>
+    </div>
+    <!-- Định dạng & File -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">4. Định dạng & File</h3>
+      <div style="margin-bottom:16px;">
+        <label class="form-label">Định dạng cung cấp <span style="color:red">*</span></label>
+        <div style="display:flex;gap:20px;margin-top:4px;">
+          ${['PDF','EPUB','MOBI'].map(f=>`<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:${fmtArr.includes(f)?'600':'400'};"><input type="checkbox" id="sef-fmt-${f}" ${chk(fmtArr,f)}> ${f}</label>`).join('')}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        ${['PDF','EPUB','MOBI'].map(f=>`
+        <div>
+          <label class="form-label">Upload file ${f}</label>
+          <div style="border:2px dashed #ccc;border-radius:8px;padding:16px;text-align:center;color:#999;cursor:pointer;" onclick="toast('Demo: chức năng upload file sẽ tích hợp với server thực tế.');">
+            <div style="font-size:24px;">📄</div>
+            <div style="font-size:12px;">${isEdit&&fmtArr.includes(f)?`<span style="color:#388e3c;">✓ Đã có file ${f}</span>`:'Kéo thả hoặc click để chọn'}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <!-- Ảnh bìa -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">5. Ảnh bìa</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="width:120px;height:160px;border:2px dashed #1565c0;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#f8f9ff;" onclick="toast('Demo: upload ảnh bìa sẽ tích hợp với server thực tế.');">
+          <span style="font-size:32px;">📗</span>
+          <span style="font-size:11px;color:#666;margin-top:4px;">${isEdit?'Thay ảnh bìa':'+ Thêm ảnh bìa'}</span>
+        </div>
+        ${isEdit?`<div style="font-size:12px;color:#666;align-self:flex-end;padding-bottom:8px;">Ảnh hiện tại: <em>ebook-cover-${escHtml(eb.id)}.jpg</em></div>`:''}
+      </div>
+    </div>
+    <!-- Giá & Trạng thái -->
+    <div class="form-section-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:20px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;color:#1565c0;">6. Giá & Trạng thái</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <label class="form-label">Giá bán (VNĐ) <span style="color:red">*</span></label>
+          <input id="sef-price" type="number" class="form-control" value="${eb?eb.price:''}" min="0" step="1000" placeholder="VD: 49000">
+        </div>
+        <div>
+          <label class="form-label">Trạng thái</label>
+          <div style="display:flex;gap:16px;margin-top:6px;">
+            <label style="cursor:pointer;"><input type="radio" name="sef-status" value="active" ${!isEdit||eb.status==='active'?'checked':''}> Hoạt động</label>
+            <label style="cursor:pointer;"><input type="radio" name="sef-status" value="draft" ${isEdit&&eb.status==='draft'?'checked':''}> Nháp</label>
+            <label style="cursor:pointer;"><input type="radio" name="sef-status" value="paused" ${isEdit&&eb.status==='paused'?'checked':''}> Tạm dừng</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button type="button" class="btn btn-outline-secondary" onclick="acctTab='seller-ebooks';renderAccount();">Hủy</button>
+      <button type="button" class="btn btn-primary" onclick="doSellerSaveEbook(${isEdit?`'${eb.id}'`:null});">💾 ${isEdit?'Lưu thay đổi':'Thêm Ebook'}</button>
+    </div>
+  </form>
+</div>`;
+}
+
+function sellerEbookStats(ebookId){
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  const ebooks=(sIdx!==-1&&activeSellers[sIdx].ebooks)||[];
+  const eb=ebooks.find(e=>e.id===ebookId);
+  if(!eb) return `<div class="seller-section"><p>Không tìm thấy ebook.</p><button class="btn btn-outline-secondary" onclick="acctTab='seller-ebooks';renderAccount();">← Quay lại</button></div>`;
+  const chart=eb.revenueChart||[0,0,0,0,0,0,0];
+  const maxVal=Math.max(...chart,1);
+  const days=['T2','T3','T4','T5','T6','T7','CN'];
+  const funnelPct=eb.previewCount>0?Math.round((eb.purchaseCount/eb.previewCount)*100):0;
+  const fmtTotal=eb.downloadsByFormat||{PDF:0,EPUB:0,MOBI:0};
+  const fmtPct=f=>eb.totalDownloads>0?Math.round((fmtTotal[f]/eb.totalDownloads)*100):0;
+  return `
+<div class="seller-section">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+    <button class="btn btn-sm btn-outline-secondary" onclick="acctTab='seller-ebooks';renderAccount();">← Quay lại</button>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;">Thống kê: ${escHtml(eb.name)}</h2>
+  </div>
+  <!-- KPI cards -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+    <div class="stat-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px;text-align:center;">
+      <div style="font-size:28px;font-weight:700;color:#1565c0;">${fmtBig(eb.totalDownloads)}</div>
+      <div style="font-size:13px;color:#666;margin-top:4px;">Tổng lượt tải</div>
+    </div>
+    <div class="stat-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px;text-align:center;">
+      <div style="font-size:28px;font-weight:700;color:#2e7d32;">${fmtMil(eb.revenue)}đ</div>
+      <div style="font-size:13px;color:#666;margin-top:4px;">Tổng doanh thu</div>
+    </div>
+    <div class="stat-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px;text-align:center;">
+      <div style="font-size:28px;font-weight:700;color:#e65100;">${fmtBig(eb.previewCount)}</div>
+      <div style="font-size:13px;color:#666;margin-top:4px;">Lượt đọc thử</div>
+    </div>
+    <div class="stat-card" style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:18px;text-align:center;">
+      <div style="font-size:28px;font-weight:700;color:#6a1b9a;">${funnelPct}%</div>
+      <div style="font-size:13px;color:#666;margin-top:4px;">Tỷ lệ đọc thử → mua</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+    <!-- Lượt tải theo định dạng -->
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;">Lượt tải theo định dạng</h3>
+      ${['PDF','EPUB','MOBI'].map(f=>`
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:600;">${f}</span>
+          <span style="font-size:13px;color:#666;">${fmtBig(fmtTotal[f]||0)} lượt (${fmtPct(f)}%)</span>
+        </div>
+        <div style="background:#f0f0f0;border-radius:4px;height:10px;">
+          <div style="background:#1565c0;height:10px;border-radius:4px;width:${fmtPct(f)}%;"></div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <!-- Funnel -->
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;">Phễu chuyển đổi</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#e3f2fd;border-radius:8px;padding:14px 16px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:#1565c0;">${fmtBig(eb.previewCount)}</div>
+          <div style="font-size:12px;color:#666;">Lượt xem / đọc thử</div>
+        </div>
+        <div style="text-align:center;color:#999;font-size:18px;">↓ ${funnelPct}%</div>
+        <div style="background:#e8f5e9;border-radius:8px;padding:14px 16px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:#2e7d32;">${fmtBig(eb.purchaseCount)}</div>
+          <div style="font-size:12px;color:#666;">Lượt mua / tải</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Revenue chart 7 days -->
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:20px;">
+    <h3 style="font-size:1rem;font-weight:700;margin:0 0 16px;">Doanh thu 7 ngày gần nhất</h3>
+    <div class="chart-wrap" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding-bottom:24px;position:relative;">
+      ${chart.map((val,i)=>{
+        const h=Math.round((val/maxVal)*120);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+          <div style="font-size:10px;color:#666;margin-bottom:3px;">${val>0?fmtMil(val)+'đ':''}</div>
+          <div style="width:100%;background:#1565c0;border-radius:4px 4px 0 0;height:${h}px;min-height:${val>0?4:0}px;"></div>
+          <div style="font-size:11px;color:#888;margin-top:4px;">${days[i]}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="text-align:center;font-size:13px;color:#388e3c;font-weight:600;">Tổng 7 ngày: ${fmtMil(chart.reduce((a,b)=>a+b,0))}đ</div>
+  </div>
+</div>`;
+}
+
+function doSellerSaveEbook(ebookId){
+  const name=(document.getElementById('sef-name')||{}).value?.trim()||'';
+  const by=(document.getElementById('sef-by')||{}).value?.trim()||'';
+  const nxb=(document.getElementById('sef-nxb')||{}).value?.trim()||'';
+  const genre=(document.getElementById('sef-genre')||{}).value||'thamkhao';
+  const desc=(document.getElementById('sef-desc')||{}).value?.trim()||'';
+  const toc=(document.getElementById('sef-toc')||{}).value?.trim()||'';
+  const pages=parseInt((document.getElementById('sef-pages')||{}).value)||0;
+  const previewPages=parseInt((document.getElementById('sef-preview')||{}).value)||0;
+  const size=parseFloat((document.getElementById('sef-size')||{}).value)||0;
+  const price=parseInt((document.getElementById('sef-price')||{}).value)||0;
+  const statusEl=document.querySelector('input[name="sef-status"]:checked');
+  const status=statusEl?statusEl.value:'draft';
+  if(!name){toast('Vui lòng nhập tên ebook.');return;}
+  if(!by){toast('Vui lòng nhập tên tác giả.');return;}
+  if(!desc){toast('Vui lòng nhập mô tả.');return;}
+  if(price<=0){toast('Vui lòng nhập giá hợp lệ.');return;}
+  const fmtArr=['PDF','EPUB','MOBI'].filter(f=>{const el=document.getElementById('sef-fmt-'+f);return el&&el.checked;});
+  if(fmtArr.length===0){toast('Vui lòng chọn ít nhất một định dạng.');return;}
+  const audOpts=['tieuhoc','thcs','thpt','sinhvien','giaovien','nguoilon'];
+  const aud=audOpts.filter(a=>{const el=document.getElementById('sef-aud-'+a);return el&&el.checked;});
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  if(sIdx===-1){toast('Lỗi: không tìm thấy tài khoản seller.');return;}
+  if(!activeSellers[sIdx].ebooks) activeSellers[sIdx].ebooks=[];
+  const today=todayStr();
+  if(ebookId){
+    const eIdx=activeSellers[sIdx].ebooks.findIndex(e=>e.id===ebookId);
+    if(eIdx===-1){toast('Không tìm thấy ebook.');return;}
+    Object.assign(activeSellers[sIdx].ebooks[eIdx],{name,by,nxb,genre,aud,desc,tableOfContents:toc,pages,previewPages,size,price,formats:fmtArr,status,updatedAt:today});
+    saveActiveSellers();
+    toast('Đã cập nhật ebook thành công!');
+  } else {
+    const newEb={id:'sle-'+Date.now().toString(36),name,by,nxb,genre,aud,desc,tableOfContents:toc,pages,previewPages,size,price,formats:fmtArr,status,imageCount:0,totalDownloads:0,downloadsByFormat:{PDF:0,EPUB:0,MOBI:0},previewCount:0,purchaseCount:0,revenue:0,revenueChart:[0,0,0,0,0,0,0],createdAt:today,updatedAt:today};
+    activeSellers[sIdx].ebooks.push(newEb);
+    saveActiveSellers();
+    toast('Đã thêm ebook mới!');
+    addNotif('Ebook mới "'+name+'" đã được tạo.');
+  }
+  acctTab='seller-ebooks';
+  renderAccount();
+}
+
+function doSellerDeleteEbook(ebookId){
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  if(sIdx===-1) return;
+  const eb=(activeSellers[sIdx].ebooks||[]).find(e=>e.id===ebookId);
+  if(!eb) return;
+  if(!confirm('Xóa ebook "'+eb.name+'"?\nHành động này không thể khôi phục.')) return;
+  activeSellers[sIdx].ebooks=activeSellers[sIdx].ebooks.filter(e=>e.id!==ebookId);
+  saveActiveSellers();
+  toast('Đã xóa ebook.');
+  renderAccount();
+}
+
+function doSellerToggleEbookStatus(ebookId){
+  const sIdx=activeSellers.findIndex(s=>s.email===user.email);
+  if(sIdx===-1) return;
+  const eIdx=(activeSellers[sIdx].ebooks||[]).findIndex(e=>e.id===ebookId);
+  if(eIdx===-1) return;
+  const cur=activeSellers[sIdx].ebooks[eIdx].status;
+  const next=cur==='active'?'paused':'active';
+  activeSellers[sIdx].ebooks[eIdx].status=next;
+  activeSellers[sIdx].ebooks[eIdx].updatedAt=todayStr();
+  saveActiveSellers();
+  toast(next==='active'?'Đã kích hoạt ebook.':'Đã tạm dừng ebook.');
+  renderAccount();
 }
 
 /* ── 7. Shop Editor (edit business info) ── */
