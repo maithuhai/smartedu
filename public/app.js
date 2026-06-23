@@ -1736,6 +1736,10 @@ let sellerRestockProductId=null;
 let sellerEditEbookId=null;
 let sellerEbookStatusFilter='all';
 let sellerEbookStatsId=null;
+let sellerEditVppId=null;
+let sellerVppSearch='';
+let sellerVppStatusFilter='all';
+let sellerRestockVppId=null;
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3039,6 +3043,21 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
       {id:'sle-001',name:'Hướng dẫn ôn thi THPT Quốc gia Toán 2025',by:'TS Nguyễn Văn Minh',nxb:'EduMart Digital',genre:'thamkhao',aud:['thpt'],desc:'Tài liệu ôn thi THPT Quốc gia môn Toán từ cơ bản đến nâng cao, có bài giải chi tiết và đề thi thử cập nhật.',price:49000,formats:['PDF','EPUB'],pages:324,previewPages:30,size:8.5,tableOfContents:'Chương 1: Đại số tổ hợp\nChương 2: Hàm số và đồ thị\nChương 3: Tích phân & Ứng dụng\nChương 4: Số phức\nChương 5: Hình học không gian',status:'active',imageCount:1,totalDownloads:284,downloadsByFormat:{PDF:198,EPUB:86,MOBI:0},previewCount:1240,purchaseCount:284,revenue:13916000,revenueChart:[1200000,980000,1540000,890000,2100000,1680000,780000],createdAt:'01/05/2025',updatedAt:'20/06/2025'},
       {id:'sle-002',name:'Sổ Tay Từ Vựng Tiếng Anh 2000 Từ Thiết Yếu',by:'Nhóm giáo viên EduMart',nxb:'EduMart Digital',genre:'ngoaingu',aud:['thcs','thpt','sinhvien'],desc:'Bộ 2000 từ vựng tiếng Anh thiết yếu theo chủ đề, kèm ví dụ câu và phiên âm quốc tế. Phù hợp ôn thi và giao tiếp.',price:35000,formats:['PDF','EPUB','MOBI'],pages:186,previewPages:20,size:4.2,tableOfContents:'Phần 1: Gia đình & Bạn bè\nPhần 2: Trường học & Giáo dục\nPhần 3: Nghề nghiệp & Công việc\nPhần 4: Công nghệ & Số hóa',status:'active',imageCount:1,totalDownloads:512,downloadsByFormat:{PDF:280,EPUB:167,MOBI:65},previewCount:1890,purchaseCount:512,revenue:17920000,revenueChart:[2200000,1900000,2800000,1600000,3100000,2400000,1400000],createdAt:'15/04/2025',updatedAt:'22/06/2025'},
       {id:'sle-003',name:'Kỹ Năng Tư Duy Phản Biện cho Học Sinh',by:'PGS.TS Lê Thị Mai',nxb:'EduMart Digital',genre:'kynang',aud:['thpt','sinhvien'],desc:'Hướng dẫn thực hành tư duy phản biện, giải quyết vấn đề và ra quyết định có căn cứ dành cho học sinh và sinh viên.',price:55000,formats:['PDF'],pages:210,previewPages:15,size:5.8,tableOfContents:'Bài 1: Tư duy phản biện là gì?\nBài 2: Phân tích và đánh giá lập luận\nBài 3: Nhận biết ngụy biện phổ biến\nBài 4: Kỹ thuật ra quyết định',status:'draft',imageCount:1,totalDownloads:0,downloadsByFormat:{PDF:0,EPUB:0,MOBI:0},previewCount:0,purchaseCount:0,revenue:0,revenueChart:[0,0,0,0,0,0,0],createdAt:'15/06/2025',updatedAt:'23/06/2025'}
+    ];
+    saveActiveSellers();
+  }
+})();
+
+/* ── Seed seller-sapp-001 VPP products ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx!==-1&&!activeSellers[sIdx].vppProducts){
+    activeSellers[sIdx].vppProducts=[
+      {id:'svp-001',name:'Bút bi Thiên Long TL-027',brand:'Thiên Long',category:'viet',unit:'Cây',desc:'Bút bi ngòi 0.5mm, mực xanh bền màu, êm tay khi viết.',price:4500,oldPrice:5000,stock:240,lowStockThreshold:20,sold:520,rating:4.7,ratingCount:98,imageCount:2,status:'active',createdAt:'10/04/2025',updatedAt:'20/06/2025',restockHistory:[{qty:200,reason:'Nhập hàng tháng 6',date:'01/06/2025'}]},
+      {id:'svp-002',name:'Vở ô ly Hồng Hà 96 trang',brand:'Hồng Hà',category:'giay',unit:'Quyển',desc:'Vở ô ly 96 trang bìa cứng, giấy trắng 70gsm, đường kẻ mờ.',price:8500,oldPrice:0,stock:185,lowStockThreshold:15,sold:310,rating:4.5,ratingCount:62,imageCount:1,status:'active',createdAt:'10/04/2025',updatedAt:'18/06/2025',restockHistory:[]},
+      {id:'svp-003',name:'Kẹp bướm 19mm (Hộp 12 cái)',brand:'Stacom',category:'giam',unit:'Hộp',desc:'Kẹp bướm inox 19mm, lực kẹp mạnh, không rỉ sét. Hộp 12 cái.',price:12000,oldPrice:15000,stock:7,lowStockThreshold:10,sold:88,rating:4.3,ratingCount:31,imageCount:1,status:'active',createdAt:'12/04/2025',updatedAt:'19/06/2025',restockHistory:[]},
+      {id:'svp-004',name:'Băng keo trong 5cm×50m',brand:'Tesa',category:'muc',unit:'Cuộn',desc:'Băng keo trong suốt rộng 5cm, dài 50m, dính tốt, không vàng theo thời gian.',price:18000,oldPrice:22000,stock:0,lowStockThreshold:8,sold:145,rating:4.6,ratingCount:47,imageCount:1,status:'outofstock',createdAt:'15/04/2025',updatedAt:'15/06/2025',restockHistory:[]},
+      {id:'svp-005',name:'Bộ màu sáp Faber-Castell 24 màu',brand:'Faber-Castell',category:'viet',unit:'Bộ',desc:'Màu sáp chất lượng cao 24 màu chuẩn EU, an toàn cho trẻ em, màu tươi sáng.',price:68000,oldPrice:80000,stock:42,lowStockThreshold:5,sold:73,rating:4.9,ratingCount:55,imageCount:3,status:'active',createdAt:'20/04/2025',updatedAt:'22/06/2025',restockHistory:[]}
     ];
     saveActiveSellers();
   }
@@ -7458,7 +7477,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8343,6 +8362,8 @@ function sellerContent(){
   if(acctTab==='seller-ebooks')        return isApproved?sellerEbookList():sellerAppStatus(myApp);
   if(acctTab==='seller-ebook-form')    return isApproved?sellerEbookForm(sellerEditEbookId):sellerAppStatus(myApp);
   if(acctTab==='seller-ebook-stats')   return isApproved?sellerEbookStats(sellerEbookStatsId):sellerAppStatus(myApp);
+  if(acctTab==='seller-vpp')           return isApproved?sellerVppList():sellerAppStatus(myApp);
+  if(acctTab==='seller-vpp-form')      return isApproved?sellerVppForm(sellerEditVppId):sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -9501,6 +9522,311 @@ function doSellerToggleEbookStatus(ebookId){
   activeSellers[sIdx].ebooks[eIdx].updatedAt=todayStr();
   saveActiveSellers();
   toast(next==='active'?'Đã kích hoạt ebook.':'Đã tạm dừng ebook.');
+  renderAccount();
+}
+
+/* ── 6c. VPP (Stationery) Management ── */
+const VPP_CAT=[
+  {k:'viet',lbl:'Bút viết'},
+  {k:'giay',lbl:'Giấy & Vở'},
+  {k:'giam',lbl:'Kẹp & Bìa hồ sơ'},
+  {k:'bang',lbl:'Bảng & Phấn'},
+  {k:'cat', lbl:'Cắt & Dán'},
+  {k:'muc', lbl:'Mực & Băng keo'},
+  {k:'khac',lbl:'Khác'}
+];
+const VPP_CAT_LBL=Object.fromEntries(VPP_CAT.map(c=>[c.k,c.lbl]));
+const VPP_UNITS=['Cái','Cây','Quyển','Hộp','Bộ','Tập','Cuộn'];
+const VPP_LOW_DEFAULT=10;
+
+function sellerVppList(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const all=s.vppProducts||[];
+  let list=all.slice();
+  if(sellerVppSearch){const q=sellerVppSearch.toLowerCase();list=list.filter(v=>v.name.toLowerCase().includes(q)||(v.brand||'').toLowerCase().includes(q));}
+  if(sellerVppStatusFilter==='outofstock') list=list.filter(v=>v.stock===0);
+  else if(sellerVppStatusFilter!=='all') list=list.filter(v=>v.status===sellerVppStatusFilter);
+
+  const total=all.length;
+  const activeCnt=all.filter(v=>v.status==='active').length;
+  const draftCnt=all.filter(v=>v.status==='draft').length;
+  const outCnt=all.filter(v=>v.stock===0).length;
+  const lowStockItems=all.filter(v=>v.stock>0&&v.stock<=(v.lowStockThreshold||VPP_LOW_DEFAULT)&&v.status==='active');
+
+  const stBadge={
+    active:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#27ae6020;color:#27ae60;font-weight:600">Đang bán</span>',
+    draft:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#95a5a620;color:#7f8c8d;font-weight:600">Nháp</span>',
+    outofstock:'<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#e67e2220;color:#e67e22;font-weight:600">Hết hàng</span>'
+  };
+
+  const filterTabs=[['all','Tất cả',total],['active','Đang bán',activeCnt],['draft','Nháp',draftCnt],['outofstock','Hết hàng',outCnt]];
+
+  const rows=list.length
+    ?list.map(v=>{
+      const thr=v.lowStockThreshold||VPP_LOW_DEFAULT;
+      const stockClr=v.stock===0?'#e74c3c':v.stock<=thr?'#e67e22':'#27ae60';
+      const lowWarn=v.stock>0&&v.stock<=thr?'<span title="Sắp hết hàng" style="margin-left:4px;font-size:11px;color:#e67e22">⚠</span>':'';
+      const disc=v.oldPrice>0?Math.round((1-v.price/v.oldPrice)*100):0;
+      const badge=v.stock===0&&v.status!=='draft'?stBadge.outofstock:(stBadge[v.status]||stBadge.draft);
+      return '<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:10px 8px;width:40px">'+
+          '<div style="width:36px;height:36px;background:#f0ebe420;border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">'+
+            (v.category==='viet'?'✏️':v.category==='giay'?'📋':v.category==='giam'?'📎':v.category==='bang'?'🖊️':v.category==='cat'?'✂️':v.category==='muc'?'🖨️':'📦')+
+          '</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px">'+
+          '<div style="font-weight:600;font-size:13.5px;color:var(--ink-deep)">'+escHtml(v.name)+'</div>'+
+          '<div style="font-size:11.5px;color:var(--text-soft);margin-top:2px">'+
+            (v.brand?escHtml(v.brand)+' · ':'')+
+            '<span style="background:#f0ebe4;border-radius:4px;padding:1px 6px;font-size:11px">'+escHtml(VPP_CAT_LBL[v.category]||v.category)+'</span>'+
+            ' · ĐVT: '+escHtml(v.unit||'Cái')+
+          '</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<div style="font-weight:700;font-size:13.5px;color:var(--coral)">'+fmtBig(v.price)+'đ</div>'+
+          (disc>0?'<div style="font-size:11px;color:var(--text-soft);text-decoration:line-through">'+fmtBig(v.oldPrice)+'đ</div>'+
+            '<span style="font-size:10.5px;background:#e74c3c20;color:#e74c3c;padding:1px 5px;border-radius:4px">-'+disc+'%</span>':'')+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:center">'+
+          '<span style="font-weight:700;font-size:14px;color:'+stockClr+'">'+v.stock+'</span>'+lowWarn+
+          '<div style="font-size:10.5px;color:var(--text-soft)">ngưỡng: '+thr+'</div>'+
+        '</td>'+
+        '<td style="padding:10px 8px;text-align:center;color:var(--text-soft);font-size:13.5px">'+v.sold+'</td>'+
+        '<td style="padding:10px 8px">'+badge+'</td>'+
+        '<td style="padding:10px 8px;white-space:nowrap">'+
+          '<button title="Sửa" onclick="sellerEditVppId=\''+v.id+'\';acctTab=\'seller-vpp-form\';renderAccount()" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">✏</button>'+
+          '<button title="Nhập hàng" onclick="doSellerToggleVppRestock(\''+v.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;margin-right:3px">📦</button>'+
+          '<button title="Xóa" onclick="doSellerDeleteVpp(\''+v.id+'\')" style="padding:5px 9px;font-size:12px;border:1.5px solid #f5c0c0;border-radius:6px;background:transparent;cursor:pointer;color:#e74c3c">🗑</button>'+
+        '</td>'+
+      '</tr>'+
+      (sellerRestockVppId===v.id?'<tr><td colspan="7" style="padding:0 8px 12px;background:#faf8f5">'+_sellerVppRestockInline(v)+'</td></tr>':'');
+    }).join('')
+    :'<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-soft);font-size:13.5px">Không tìm thấy sản phẩm VPP nào.</td></tr>';
+
+  const lowWarnBanner=lowStockItems.length
+    ?'<div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span style="font-size:18px">⚠️</span>'+
+        '<div><strong style="font-size:13.5px;color:#f57f17">'+lowStockItems.length+' sản phẩm sắp hết hàng:</strong>'+
+          '<div style="font-size:12.5px;color:#795548;margin-top:3px">'+
+            lowStockItems.map(v=>'<strong>'+escHtml(v.name)+'</strong> (còn '+v.stock+' '+escHtml(v.unit||'cái')+')').join(' · ')+
+          '</div>'+
+        '</div>'+
+      '</div>'
+    :'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<div><h3 style="margin:0">Quản lý Văn phòng phẩm</h3>'+
+        '<p style="margin:4px 0 0;font-size:13px;color:var(--text-soft)">'+total+' sản phẩm · '+activeCnt+' đang bán · '+draftCnt+' nháp · '+outCnt+' hết hàng</p>'+
+      '</div>'+
+      '<button onclick="sellerEditVppId=null;sellerVppSearch=\'\';acctTab=\'seller-vpp-form\';renderAccount()" class="btn-primary" style="font-size:13px">+ Thêm VPP mới</button>'+
+    '</div>'+
+    lowWarnBanner+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'+
+      '<input placeholder="🔍 Tìm theo tên, thương hiệu..." value="'+escHtml(sellerVppSearch)+'" oninput="sellerVppSearch=this.value;renderAccount()" style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        filterTabs.map(([k,lbl,cnt])=>
+          '<button onclick="sellerVppStatusFilter=\''+k+'\';renderAccount()" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(sellerVppStatusFilter===k?'var(--ink)':'var(--line)')+';background:'+(sellerVppStatusFilter===k?'var(--ink)':'transparent')+';color:'+(sellerVppStatusFilter===k?'#fff':'var(--text-soft)')+';font-size:12.5px;cursor:pointer">'+lbl+' ('+cnt+')</button>'
+        ).join('')+
+      '</div>'+
+    '</div>'+
+    '<div style="overflow-x:auto">'+
+      '<table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr style="background:var(--paper-alt,#f8f6f3)">'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600"></th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Sản phẩm</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Giá</th>'+
+          '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Tồn kho</th>'+
+          '<th style="padding:9px 8px;text-align:center;font-size:12px;color:var(--text-soft);font-weight:600">Đã bán</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:12px;color:var(--text-soft);font-weight:600">Hành động</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</div>';
+}
+
+function _sellerVppRestockInline(v){
+  return '<div style="background:#fff9f0;border:1.5px solid #ffe0b2;border-radius:8px;padding:14px 16px;margin-top:4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">'+
+    '<span style="font-weight:600;font-size:13px;color:#e65100">📦 Nhập hàng: '+escHtml(v.name)+'</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<input id="vrsQty_'+v.id+'" type="number" min="1" placeholder="Số lượng nhập" style="width:140px;padding:6px 10px;border:1.5px solid #ffe0b2;border-radius:6px;font-size:13px">'+
+      '<input id="vrsReason_'+v.id+'" placeholder="Lý do (tùy chọn)" style="width:200px;padding:6px 10px;border:1.5px solid #ffe0b2;border-radius:6px;font-size:13px">'+
+      '<button onclick="doSellerRestockVpp(\''+v.id+'\')" style="padding:6px 14px;background:#e65100;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">✓ Xác nhận</button>'+
+      '<button onclick="sellerRestockVppId=null;renderAccount()" style="padding:6px 12px;border:1.5px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;font-size:13px">Hủy</button>'+
+    '</div>'+
+    '<div style="font-size:12px;color:#795548">Tồn hiện tại: <strong>'+v.stock+'</strong> '+escHtml(v.unit||'cái')+'</div>'+
+  '</div>';
+}
+
+function sellerVppForm(vppId){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const all=s.vppProducts||[];
+  const v=vppId?all.find(x=>x.id===vppId):null;
+  const isEdit=!!v;
+  const val=k=>v?escHtml(String(v[k]??'')):'';
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'+
+      '<button onclick="acctTab=\'seller-vpp\';sellerEditVppId=null;renderAccount()" class="btn-ghost" style="padding:5px 12px;font-size:13px">← Danh sách</button>'+
+      '<h3 style="margin:0">'+(isEdit?'Chỉnh sửa VPP':'Thêm VPP mới')+'</h3>'+
+    '</div>'+
+
+    /* Section 1: Basic info */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:16px">'+
+      '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)">1. Thông tin cơ bản</h4>'+
+      '<div style="display:grid;gap:12px">'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Tên sản phẩm <span style="color:#e74c3c">*</span></label>'+
+          '<input id="vf-name" class="form-input" value="'+val('name')+'" placeholder="VD: Bút bi Thiên Long TL-027" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+          '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Thương hiệu</label>'+
+            '<input id="vf-brand" class="form-input" value="'+val('brand')+'" placeholder="VD: Thiên Long, Hồng Hà..." style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+          '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Đơn vị tính <span style="color:#e74c3c">*</span></label>'+
+            '<select id="vf-unit" style="width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+              VPP_UNITS.map(u=>'<option value="'+u+'"'+(v&&v.unit===u?' selected':'')+'>'+u+'</option>').join('')+
+            '</select></div>'+
+        '</div>'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Danh mục <span style="color:#e74c3c">*</span></label>'+
+          '<select id="vf-cat" style="width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+            VPP_CAT.map(c=>'<option value="'+c.k+'"'+(v&&v.category===c.k?' selected':'')+'>'+c.lbl+'</option>').join('')+
+          '</select></div>'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Mô tả sản phẩm</label>'+
+          '<textarea id="vf-desc" rows="3" placeholder="Mô tả ngắn về sản phẩm, chất liệu, thông số kỹ thuật..." style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper);resize:vertical">'+
+            (v?escHtml(v.desc||''):'')+
+          '</textarea></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Section 2: Pricing */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:16px">'+
+      '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)">2. Giá bán</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giá bán (đ) <span style="color:#e74c3c">*</span></label>'+
+          '<input id="vf-price" type="number" min="0" step="100" value="'+(v?v.price:'')+'" placeholder="VD: 4500" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Giá gốc (đ) <span style="font-size:11.5px;font-weight:400;color:var(--text-soft)">để hiện khuyến mãi</span></label>'+
+          '<input id="vf-oldprice" type="number" min="0" step="100" value="'+(v&&v.oldPrice?v.oldPrice:'')+'" placeholder="Để trống nếu không giảm giá" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Section 3: Stock */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:16px">'+
+      '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)">3. Kho hàng</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Số lượng tồn kho <span style="color:#e74c3c">*</span></label>'+
+          '<input id="vf-stock" type="number" min="0" value="'+(v?v.stock:'')+'" placeholder="VD: 100" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+        '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ngưỡng cảnh báo hết hàng <span style="font-size:11.5px;font-weight:400;color:var(--text-soft)">mặc định: '+VPP_LOW_DEFAULT+'</span></label>'+
+          '<input id="vf-low" type="number" min="0" value="'+(v?v.lowStockThreshold:VPP_LOW_DEFAULT)+'" placeholder="'+VPP_LOW_DEFAULT+'" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Section 4: Images */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:16px">'+
+      '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)">4. Ảnh sản phẩm</h4>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+        [1,2,3].map(i=>`
+          <div onclick="toast('Demo: upload ảnh sẽ tích hợp với server thực tế.')" style="width:90px;height:90px;border:2px dashed ${isEdit&&v.imageCount>=i?'#27ae60':'var(--line)'};border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:${isEdit&&v.imageCount>=i?'#f0fff4':'transparent'}">
+            <span style="font-size:24px">${isEdit&&v.imageCount>=i?'🖼️':'+'}</span>
+            <span style="font-size:10.5px;color:var(--text-soft);margin-top:4px">${isEdit&&v.imageCount>=i?'Ảnh '+i:'Thêm ảnh'}</span>
+          </div>`).join('')+
+        '<div style="align-self:flex-end;padding-bottom:6px">'+
+          '<label style="font-size:12.5px;color:var(--text-soft)">Số ảnh (demo):</label>'+
+          '<input id="vf-imgcnt" type="number" min="0" max="10" value="'+(v?v.imageCount:1)+'" style="width:60px;padding:5px 8px;border:1.5px solid var(--line);border-radius:6px;font-size:13px;margin-left:6px;background:var(--paper)">'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Section 5: Status */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:10px;padding:18px 20px;margin-bottom:20px">'+
+      '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700;color:var(--ink-deep)">5. Trạng thái</h4>'+
+      '<div style="display:flex;gap:20px;flex-wrap:wrap">'+
+        [['active','Đang bán','#27ae60'],['draft','Nháp','#7f8c8d'],['outofstock','Hết hàng','#e67e22']].map(([val2,lbl,clr])=>
+          '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 14px;border-radius:8px;border:1.5px solid '+(!v&&val2==='active'||v&&v.status===val2?clr:'var(--line)')+';background:'+(!v&&val2==='active'||v&&v.status===val2?clr+'15':'transparent')+'">'+
+            '<input type="radio" name="vfStatus" value="'+val2+'" '+(!v&&val2==='active'||v&&v.status===val2?'checked':'')+' style="accent-color:'+clr+'">'+
+            '<span style="font-size:13.5px;font-weight:600;color:'+clr+'">'+lbl+'</span>'+
+          '</label>'
+        ).join('')+
+      '</div>'+
+    '</div>'+
+
+    '<div style="display:flex;gap:10px;justify-content:flex-end">'+
+      '<button onclick="acctTab=\'seller-vpp\';sellerEditVppId=null;renderAccount()" class="btn-ghost" style="padding:8px 20px;font-size:13.5px">Hủy</button>'+
+      '<button onclick="doSellerSaveVpp('+(isEdit?'\''+v.id+'\'':'null')+')" class="btn-primary" style="padding:8px 20px;font-size:13.5px">'+
+        (isEdit?'💾 Lưu thay đổi':'+ Thêm sản phẩm')+
+      '</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function doSellerSaveVpp(vppId){
+  const name=((document.getElementById('vf-name')||{}).value||'').trim();
+  if(!name){toast('Vui lòng nhập tên sản phẩm.');return;}
+  const brand=((document.getElementById('vf-brand')||{}).value||'').trim();
+  const unit=(document.getElementById('vf-unit')||{}).value||'Cái';
+  const category=(document.getElementById('vf-cat')||{}).value||'khac';
+  const desc=((document.getElementById('vf-desc')||{}).value||'').trim();
+  const price=parseFloat((document.getElementById('vf-price')||{}).value)||0;
+  if(price<=0){toast('Vui lòng nhập giá bán hợp lệ (lớn hơn 0).');return;}
+  const oldPrice=parseFloat((document.getElementById('vf-oldprice')||{}).value)||0;
+  const stock=Math.max(0,parseInt((document.getElementById('vf-stock')||{}).value||0)||0);
+  const lowStockThreshold=Math.max(0,parseInt((document.getElementById('vf-low')||{}).value||VPP_LOW_DEFAULT)||VPP_LOW_DEFAULT);
+  const imageCount=Math.max(0,Math.min(10,parseInt((document.getElementById('vf-imgcnt')||{}).value||1)||1));
+  const statusEl=document.querySelector('input[name="vfStatus"]:checked');
+  const rawStatus=statusEl?statusEl.value:'active';
+  const status=stock===0&&rawStatus==='active'?'outofstock':rawStatus;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);
+  if(sIdx===-1) return;
+  activeSellers[sIdx].vppProducts=activeSellers[sIdx].vppProducts||[];
+  const today=todayStr();
+  if(vppId){
+    const pIdx=activeSellers[sIdx].vppProducts.findIndex(x=>x.id===vppId);
+    if(pIdx===-1){toast('Không tìm thấy sản phẩm.');return;}
+    const old=activeSellers[sIdx].vppProducts[pIdx];
+    activeSellers[sIdx].vppProducts[pIdx]={...old,name,brand,unit,category,desc,price,oldPrice,stock,lowStockThreshold,imageCount,status,updatedAt:today};
+    toast('✓ Đã cập nhật sản phẩm VPP!');
+  } else {
+    activeSellers[sIdx].vppProducts.unshift({id:'svp-'+Date.now().toString(36),name,brand,unit,category,desc,price,oldPrice,stock,lowStockThreshold,sold:0,rating:0,ratingCount:0,imageCount,status,createdAt:today,updatedAt:today,restockHistory:[]});
+    addNotif('VPP mới "'+name+'" đã được thêm vào gian hàng.');
+    toast('✓ Đã thêm sản phẩm VPP mới!');
+  }
+  saveActiveSellers();
+  acctTab='seller-vpp';sellerEditVppId=null;
+  renderAccount();
+}
+
+function doSellerDeleteVpp(id){
+  if(!confirm('Xóa sản phẩm này? Hành động không thể hoàn tác.'))return;
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=(activeSellers[sIdx].vppProducts||[]).findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const name=activeSellers[sIdx].vppProducts[pIdx].name;
+  activeSellers[sIdx].vppProducts.splice(pIdx,1);
+  saveActiveSellers();
+  if(sellerRestockVppId===id)sellerRestockVppId=null;
+  toast('Đã xóa: '+name);renderAccount();
+}
+
+function doSellerToggleVppRestock(id){
+  sellerRestockVppId=(sellerRestockVppId===id?null:id);renderAccount();
+}
+
+function doSellerRestockVpp(id){
+  const qty=parseInt((document.getElementById('vrsQty_'+id)||{}).value||0);
+  const reason=((document.getElementById('vrsReason_'+id)||{}).value||'Nhập hàng').trim();
+  if(!qty||qty<=0){toast('Vui lòng nhập số lượng nhập hàng hợp lệ.');return;}
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  const pIdx=(activeSellers[sIdx].vppProducts||[]).findIndex(x=>x.id===id);if(pIdx===-1)return;
+  const v=activeSellers[sIdx].vppProducts[pIdx];
+  v.stock+=qty;
+  v.restockHistory=v.restockHistory||[];
+  v.restockHistory.push({qty,reason,date:todayStr()});
+  if(v.status==='outofstock')v.status='active';
+  v.updatedAt=todayStr();
+  saveActiveSellers();
+  sellerRestockVppId=null;
+  toast('✓ Đã nhập thêm '+qty+' '+v.unit+' — tồn kho mới: '+v.stock);
+  addNotif('Nhập hàng thành công: +'+qty+' "'+v.name+'" — tồn kho: '+v.stock);
   renderAccount();
 }
 
