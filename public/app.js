@@ -1758,6 +1758,8 @@ let sellerReceiptLines=[];
 let sellerReceiptSupplier='';
 let sellerReceiptNote='';
 let sellerReceiptStatus='';
+let sellerRevenuePeriod='month';
+let sellerPayTab='balance';
 let admEmailPage=0, admEmailSearch='';
 let admSubsPage=0, admSubsSearch='', admSubsStatusFilter='all', admSubsSourceFilter='all';
 let orderFilter='all';
@@ -3138,6 +3140,35 @@ function saveActiveSellers(){LS.set('activeSellers',activeSellers);}
         {productId:'svp-004',productType:'vpp',productName:'Băng keo trong 5cm×50m',unit:'Cuộn',qty:30,importPrice:11000,total:330000}
       ],totalQty:80,totalValue:3430000}
   ];
+  saveActiveSellers();
+})();
+
+/* ── Seed seller-sapp-001 revenue & payment data ── */
+(function(){
+  const sIdx=activeSellers.findIndex(s=>s.id==='seller-sapp-001');
+  if(sIdx===-1||activeSellers[sIdx].revenueData) return;
+  activeSellers[sIdx].revenueData={
+    balance:{available:3240000,pendingFromOrders:1890000,totalEarned:27480000,totalWithdrawn:22350000},
+    revenueByCategory:{books:14200000,ebook:5800000,vpp:4300000,tbgd:3180000},
+    dailyChart:[185000,420000,310000,680000,240000,890000,520000],
+    weeklyChart:[1850000,2340000,1620000,3100000,2580000,1940000,2720000],
+    monthlyChart:[3800000,4200000,3500000,5100000,4800000,4200000,4600000,3900000,5300000,4700000,5800000,4900000],
+    yearlyChart:[38000000,45000000,42000000,51000000],
+    transactions:[
+      {id:'TXN-089',orderId:'ORD-2025-089',buyer:'Nguyễn Thị Hoa',category:'books',orderTotal:445000,commissionRate:8,commissionAmt:35600,netAmt:409400,status:'pending',date:'23/06/2025'},
+      {id:'TXN-088',orderId:'ORD-2025-088',buyer:'Trần Văn Nam',category:'books',orderTotal:55000,commissionRate:8,commissionAmt:4400,netAmt:50600,status:'settled',date:'22/06/2025'},
+      {id:'TXN-087',orderId:'ORD-2025-087',buyer:'Lê Thị Linh',category:'books',orderTotal:228000,commissionRate:8,commissionAmt:18240,netAmt:209760,status:'settled',date:'22/06/2025'},
+      {id:'TXN-086',orderId:'ORD-2025-086',buyer:'Phạm Hoài Nam',category:'vpp',orderTotal:276500,commissionRate:10,commissionAmt:27650,netAmt:248850,status:'settled',date:'21/06/2025'},
+      {id:'TXN-085',orderId:'ORD-2025-085',buyer:'Nguyễn Văn Tú',category:'books',orderTotal:150000,commissionRate:8,commissionAmt:12000,netAmt:138000,status:'settled',date:'20/06/2025'},
+      {id:'TXN-084',orderId:'ORD-2025-084',buyer:'Vũ Thị Thanh',category:'vpp',orderTotal:216000,commissionRate:10,commissionAmt:21600,netAmt:194400,status:'processing',date:'23/06/2025'},
+      {id:'TXN-082',orderId:'ORD-2025-082',buyer:'Đặng Thu Hà',category:'tbgd',orderTotal:6290000,commissionRate:12,commissionAmt:754800,netAmt:5535200,status:'settled',date:'17/06/2025'}
+    ],
+    withdrawals:[
+      {id:'WD-003',amount:5000000,bankName:'Techcombank',bankAcc:'****5678',bankHolder:'NGUYEN VAN LONG',status:'completed',note:'Rút tháng 6/2025 lần 2',requestedAt:'15/06/2025',completedAt:'17/06/2025'},
+      {id:'WD-002',amount:8000000,bankName:'Techcombank',bankAcc:'****5678',bankHolder:'NGUYEN VAN LONG',status:'completed',note:'Rút tháng 5/2025',requestedAt:'31/05/2025',completedAt:'02/06/2025'},
+      {id:'WD-001',amount:9350000,bankName:'Techcombank',bankAcc:'****5678',bankHolder:'NGUYEN VAN LONG',status:'completed',note:'Rút tháng 4/2025',requestedAt:'30/04/2025',completedAt:'03/05/2025'}
+    ]
+  };
   saveActiveSellers();
 })();
 
@@ -7555,7 +7586,7 @@ function navForRole(r){
     const myApp=user?sellerApps.find(a=>a.email===user.email):null;
     const isApproved=myApp&&myApp.status==='approved';
     const nav=isApproved
-      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
+      ?[['seller-dashboard','Tổng quan'],['seller-notif','Thông báo'],['seller-orders','Đơn hàng'],['seller-warehouse','Kho hàng'],['seller-revenue','Doanh thu'],['seller-products','Sách giấy'],['seller-ebooks','Ebook'],['seller-vpp','VPP'],['seller-tbgd','Thiết bị'],['seller-shop','Thông tin shop'],['seller-payment','Thanh toán'],['profile','Hồ sơ cá nhân']]
       :[['seller-reg',myApp?'Hồ sơ đăng ký':'Đăng ký bán hàng'],['seller-payment','Thông tin thanh toán'],['profile','Hồ sơ cá nhân']];
     return nav;
   }
@@ -8447,6 +8478,7 @@ function sellerContent(){
   if(acctTab==='seller-orders')        return isApproved?sellerOrderList():sellerAppStatus(myApp);
   if(acctTab==='seller-order-detail')  return isApproved?sellerOrderDetail(sellerViewOrderId):sellerAppStatus(myApp);
   if(acctTab==='seller-warehouse')     return isApproved?sellerWarehouse():sellerAppStatus(myApp);
+  if(acctTab==='seller-revenue')       return isApproved?sellerRevenueReport():sellerAppStatus(myApp);
   if(acctTab==='seller-shop')    return isApproved?sellerShopEditor(myApp):sellerAppStatus(myApp);
   if(acctTab==='seller-payment') return sellerPaymentSettings(myApp);
   if(acctTab==='seller-dashboard')return isApproved?sellerDashboard(myApp):sellerAppStatus(myApp);
@@ -11064,6 +11096,349 @@ function doSellerSaveAllThresholds(){
   const sIdx=activeSellers.findIndex(x=>x.email===user.email);
   if(sIdx!==-1)saveActiveSellers();
   toast('✓ Đã lưu ngưỡng cảnh báo cho '+saved+' sản phẩm.');
+  renderAccount();
+}
+
+/* ── 6g. Revenue Report ── */
+function sellerRevenueReport(){
+  const s=activeSellers.find(x=>x.email===user.email);
+  if(!s) return '<div class="panel"><p>Không tìm thấy tài khoản.</p></div>';
+  const rd=s.revenueData||{balance:{},revenueByCategory:{},dailyChart:[],weeklyChart:[],monthlyChart:[],yearlyChart:[],transactions:[]};
+
+  const periodCfg={
+    day:  {lbl:'Hôm nay',    chart:rd.dailyChart||[],   days:['6h','9h','12h','15h','18h','21h','23h'],  totalKey:'todayRev'},
+    week: {lbl:'Tuần này',   chart:rd.weeklyChart||[],  days:['T2','T3','T4','T5','T6','T7','CN'],       totalKey:'thisWeekRev'},
+    month:{lbl:'Tháng này',  chart:rd.monthlyChart||[], days:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'], totalKey:'thisMonthRev'},
+    year: {lbl:'Năm nay',    chart:rd.yearlyChart||[],  days:['Q1','Q2','Q3','Q4'],                      totalKey:'totalRevenue'}
+  };
+  const cfg=periodCfg[sellerRevenuePeriod]||periodCfg.month;
+  const chart=cfg.chart;
+  const total=(s.stats||{})[cfg.totalKey]||chart.reduce((a,b)=>a+b,0);
+  const prevTotal=Math.round(total*(0.78+Math.random()*0.15));
+  const growth=prevTotal>0?Math.round(((total-prevTotal)/prevTotal)*100):0;
+  const maxVal=Math.max(...chart,1);
+
+  /* Category breakdown */
+  const catData=[
+    {k:'books', lbl:'Sách giấy', clr:'#1565c0', val:(rd.revenueByCategory||{}).books||0},
+    {k:'ebook', lbl:'Ebook',     clr:'#6a1b9a', val:(rd.revenueByCategory||{}).ebook||0},
+    {k:'vpp',   lbl:'VPP',       clr:'#2e7d32', val:(rd.revenueByCategory||{}).vpp||0},
+    {k:'tbgd',  lbl:'Thiết bị',  clr:'#e65100', val:(rd.revenueByCategory||{}).tbgd||0}
+  ];
+  const catTotal=catData.reduce((a,c)=>a+c.val,0)||1;
+
+  const periodBtns=[['day','Ngày'],['week','Tuần'],['month','Tháng'],['year','Năm']].map(([k,l])=>
+    '<button onclick="sellerRevenuePeriod=\''+k+'\';renderAccount()" style="padding:6px 16px;border-radius:20px;border:1.5px solid '+(sellerRevenuePeriod===k?'#1565c0':'var(--line)')+';background:'+(sellerRevenuePeriod===k?'#1565c0':'transparent')+';color:'+(sellerRevenuePeriod===k?'#fff':'var(--text-soft)')+';font-size:13px;cursor:pointer;font-weight:'+(sellerRevenuePeriod===k?'700':'400')+'">'+l+'</button>'
+  ).join('');
+
+  const barChart='<div style="display:flex;align-items:flex-end;gap:4px;height:140px;padding-bottom:22px;position:relative;">'+
+    chart.map((val,i)=>{
+      const h=Math.round((val/maxVal)*110);
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">'+
+        (val>0?'<div style="font-size:9px;color:#1565c0;margin-bottom:2px;font-weight:600">'+fmtMil(val)+'</div>':'')+
+        '<div style="width:100%;background:#1565c0;border-radius:3px 3px 0 0;height:'+(val>0?h:2)+'px;opacity:'+(val>0?'1':'0.15')+'"></div>'+
+        '<div style="font-size:10.5px;color:#888;margin-top:5px;white-space:nowrap">'+escHtml(cfg.days[i]||'')+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  const txRows=(rd.transactions||[]).slice(0,7).map(tx=>{
+    const stClr={pending:'#f57f17',processing:'#1565c0',settled:'#2e7d32',refunded:'#b71c1c'};
+    const stLbl={pending:'Chờ thanh toán',processing:'Đang xử lý',settled:'Đã quyết toán',refunded:'Hoàn tiền'};
+    const catClr={books:'#1565c0',ebook:'#6a1b9a',vpp:'#2e7d32',tbgd:'#e65100'};
+    const catLbl={books:'Sách',ebook:'Ebook',vpp:'VPP',tbgd:'Thiết bị'};
+    return '<tr style="border-top:1px solid var(--line)">'+
+      '<td style="padding:9px 8px;font-size:12.5px;font-weight:600;color:#1565c0">#'+escHtml(tx.orderId)+'</td>'+
+      '<td style="padding:9px 8px;font-size:12.5px">'+escHtml(tx.buyer)+'</td>'+
+      '<td style="padding:9px 8px;text-align:center">'+
+        '<span style="font-size:10.5px;padding:2px 7px;border-radius:4px;background:'+(catClr[tx.category]||'#555')+'15;color:'+(catClr[tx.category]||'#555')+';font-weight:600">'+escHtml(catLbl[tx.category]||tx.category)+'</span>'+
+      '</td>'+
+      '<td style="padding:9px 8px;text-align:right;font-size:12.5px">'+fmtBig(tx.orderTotal)+'đ</td>'+
+      '<td style="padding:9px 8px;text-align:right;font-size:12.5px;color:#e74c3c">'+tx.commissionRate+'% (−'+fmtBig(tx.commissionAmt)+'đ)</td>'+
+      '<td style="padding:9px 8px;text-align:right;font-weight:700;font-size:13px;color:#2e7d32">'+fmtBig(tx.netAmt)+'đ</td>'+
+      '<td style="padding:9px 8px">'+
+        '<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:'+(stClr[tx.status]||'#555')+'15;color:'+(stClr[tx.status]||'#555')+';font-weight:600">'+escHtml(stLbl[tx.status]||tx.status)+'</span>'+
+      '</td>'+
+      '<td style="padding:9px 8px;font-size:11.5px;color:var(--text-soft)">'+escHtml(tx.date)+'</td>'+
+    '</tr>';
+  }).join('');
+
+  return '<div class="panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'+
+      '<h3 style="margin:0">Báo cáo Doanh thu</h3>'+
+      '<div style="display:flex;gap:6px">'+periodBtns+'</div>'+
+    '</div>'+
+
+    /* KPI row */
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">'+
+      '<div style="background:#e8f4fd;border-radius:12px;padding:16px 18px">'+
+        '<div style="font-size:12px;color:#555;margin-bottom:6px">Tổng doanh thu</div>'+
+        '<div style="font-size:22px;font-weight:700;color:#1565c0">'+fmtMil(total)+'đ</div>'+
+        '<div style="font-size:11.5px;margin-top:4px;color:'+(growth>=0?'#2e7d32':'#e74c3c')+'">'+
+          (growth>=0?'▲ +':' ▼ ')+Math.abs(growth)+'% so với kỳ trước'+
+        '</div>'+
+      '</div>'+
+      '<div style="background:#e8f5e9;border-radius:12px;padding:16px 18px">'+
+        '<div style="font-size:12px;color:#555;margin-bottom:6px">Thực nhận (sau phí)</div>'+
+        '<div style="font-size:22px;font-weight:700;color:#2e7d32">'+fmtMil(Math.round(total*0.91))+'đ</div>'+
+        '<div style="font-size:11.5px;margin-top:4px;color:var(--text-soft)">Trung bình phí: ~9%</div>'+
+      '</div>'+
+      '<div style="background:#fff8e1;border-radius:12px;padding:16px 18px">'+
+        '<div style="font-size:12px;color:#555;margin-bottom:6px">Phí nền tảng</div>'+
+        '<div style="font-size:22px;font-weight:700;color:#f57f17">'+fmtMil(Math.round(total*0.09))+'đ</div>'+
+        '<div style="font-size:11.5px;margin-top:4px;color:var(--text-soft)">Tính theo từng giao dịch</div>'+
+      '</div>'+
+      '<div style="background:#f3e5f5;border-radius:12px;padding:16px 18px">'+
+        '<div style="font-size:12px;color:#555;margin-bottom:6px">Đơn hoàn thành</div>'+
+        '<div style="font-size:22px;font-weight:700;color:#6a1b9a">'+((s.orders||[]).filter(o=>o.status==='delivered').length)+'</div>'+
+        '<div style="font-size:11.5px;margin-top:4px;color:var(--text-soft)">Tổng '+((s.orders||[]).length)+' đơn</div>'+
+      '</div>'+
+    '</div>'+
+
+    /* Chart + category breakdown side by side */
+    '<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">'+
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:14px">📊 Biểu đồ doanh thu — '+cfg.lbl+'</div>'+
+        barChart+
+        '<div style="text-align:center;font-size:12.5px;color:#2e7d32;font-weight:600;margin-top:4px">Tổng: '+fmtMil(chart.reduce((a,b)=>a+b,0))+'đ</div>'+
+      '</div>'+
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:16px">📦 Theo loại sản phẩm</div>'+
+        catData.map(c=>{
+          const pct=Math.round((c.val/catTotal)*100);
+          return '<div style="margin-bottom:14px">'+
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px">'+
+              '<span style="font-size:13px;font-weight:600;color:'+c.clr+'">'+c.lbl+'</span>'+
+              '<span style="font-size:12.5px;color:var(--text-soft)">'+pct+'%</span>'+
+            '</div>'+
+            '<div style="background:#e0e0e0;border-radius:4px;height:8px">'+
+              '<div style="background:'+c.clr+';height:8px;border-radius:4px;width:'+pct+'%"></div>'+
+            '</div>'+
+            '<div style="font-size:12px;color:var(--text-soft);margin-top:3px;text-align:right">'+fmtMil(c.val)+'đ</div>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+
+    /* Transaction table */
+    '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+      '<div style="font-weight:700;font-size:13.5px;margin-bottom:14px">🧾 Chi tiết giao dịch gần đây</div>'+
+      '<div style="overflow-x:auto">'+
+        '<table style="width:100%;border-collapse:collapse">'+
+          '<thead><tr style="background:#fff">'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Mã đơn</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Khách</th>'+
+            '<th style="padding:8px;text-align:center;font-size:11.5px;color:var(--text-soft);font-weight:600">Loại</th>'+
+            '<th style="padding:8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Doanh thu</th>'+
+            '<th style="padding:8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Phí nền tảng</th>'+
+            '<th style="padding:8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Thực nhận</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Ngày</th>'+
+          '</tr></thead>'+
+          '<tbody>'+txRows+'</tbody>'+
+        '</table>'+
+        (!(rd.transactions&&rd.transactions.length)?'<div style="text-align:center;padding:30px;color:var(--text-soft)">Chưa có giao dịch nào.</div>':'')+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ── 6h. Enhanced Payment (replace simple bank form) ── */
+function sellerPaymentSettings(app){
+  const s=app?activeSellers.find(x=>x.email===user.email):null;
+  const rd=(s&&s.revenueData)||{balance:{available:0,pendingFromOrders:0,totalEarned:0,totalWithdrawn:0},withdrawals:[],transactions:[]};
+  const bal=rd.balance||{};
+  const bank=app&&app.shopInfo&&app.shopInfo.bank?app.shopInfo.bank:'';
+  const parts=bank.split(' – ');
+  const bankName=parts[0]||'',bankAcc=parts[1]||'',bankHolder=parts[2]||'';
+  const BANKS=['Vietcombank','Techcombank','MB Bank','BIDV','VietinBank','Agribank','TPBank','VPBank','SHB','ACB','Sacombank','HDBank','OCB','SeABank'];
+  const hasBank=bankName&&bankAcc&&bankHolder;
+  const maskAcc=bankAcc?'****'+bankAcc.slice(-4):'—';
+
+  const tabBtn=(k,lbl)=>'<button onclick="sellerPayTab=\''+k+'\';renderAccount()" style="padding:8px 20px;border:none;border-bottom:2.5px solid '+(sellerPayTab===k?'#1565c0':'transparent')+';background:transparent;color:'+(sellerPayTab===k?'#1565c0':'var(--text-soft)')+';font-size:13.5px;font-weight:'+(sellerPayTab===k?'700':'400')+';cursor:pointer">'+lbl+'</button>';
+  const tabNav='<div style="display:flex;border-bottom:1.5px solid var(--line);margin-bottom:20px">'+
+    tabBtn('balance','💰 Số dư & Rút tiền')+
+    tabBtn('history','📋 Lịch sử giao dịch')+
+    tabBtn('bank','🏦 Tài khoản ngân hàng')+
+  '</div>';
+
+  /* Tab: Balance & Withdrawal */
+  if(sellerPayTab==='balance'){
+    const wdStatusBadge={
+      pending:'<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:#fff8e1;color:#f57f17;font-weight:600">Đang chờ</span>',
+      processing:'<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:#e8f4fd;color:#1565c0;font-weight:600">Đang xử lý</span>',
+      completed:'<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:#e8f5e9;color:#2e7d32;font-weight:600">Hoàn thành</span>',
+      rejected:'<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:#ffebee;color:#b71c1c;font-weight:600">Từ chối</span>'
+    };
+    const withdrawalRows=(rd.withdrawals||[]).length
+      ?(rd.withdrawals||[]).map(w=>'<tr style="border-top:1px solid var(--line)">'+
+          '<td style="padding:9px 8px;font-size:12.5px;font-weight:600">#'+escHtml(w.id)+'</td>'+
+          '<td style="padding:9px 8px;text-align:right;font-weight:700;font-size:13.5px;color:#1565c0">'+fmtMil(w.amount)+'đ</td>'+
+          '<td style="padding:9px 8px;font-size:12.5px">'+escHtml(w.bankName)+' · '+escHtml(w.bankAcc)+'</td>'+
+          '<td style="padding:9px 8px;font-size:12.5px;color:var(--text-soft)">'+escHtml(w.note||'—')+'</td>'+
+          '<td style="padding:9px 8px">'+escHtml(w.requestedAt)+'</td>'+
+          '<td style="padding:9px 8px">'+(w.completedAt?escHtml(w.completedAt):'—')+'</td>'+
+          '<td style="padding:9px 8px">'+(wdStatusBadge[w.status]||w.status)+'</td>'+
+        '</tr>').join('')
+      :'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-soft)">Chưa có lệnh rút tiền nào.</td></tr>';
+
+    return '<div class="panel">'+
+      '<h3 style="margin:0 0 4px">Thanh toán</h3>'+
+      '<p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Quản lý số dư và yêu cầu rút tiền.</p>'+tabNav+
+      /* Balance cards */
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">'+
+        '<div style="background:#e8f5e9;border-radius:12px;padding:18px 20px">'+
+          '<div style="font-size:12px;color:#555;margin-bottom:8px">Số dư có thể rút</div>'+
+          '<div style="font-size:26px;font-weight:700;color:#2e7d32">'+fmtMil(bal.available||0)+'đ</div>'+
+          '<div style="font-size:11.5px;color:#555;margin-top:6px">Sau khi trừ phí nền tảng</div>'+
+        '</div>'+
+        '<div style="background:#fff8e1;border-radius:12px;padding:18px 20px">'+
+          '<div style="font-size:12px;color:#555;margin-bottom:8px">Đang chờ từ đơn hàng</div>'+
+          '<div style="font-size:26px;font-weight:700;color:#f57f17">'+fmtMil(bal.pendingFromOrders||0)+'đ</div>'+
+          '<div style="font-size:11.5px;color:#555;margin-top:6px">Sẽ khả dụng sau T+3</div>'+
+        '</div>'+
+        '<div style="background:#f3e5f5;border-radius:12px;padding:18px 20px">'+
+          '<div style="font-size:12px;color:#555;margin-bottom:8px">Tổng đã rút</div>'+
+          '<div style="font-size:26px;font-weight:700;color:#6a1b9a">'+fmtMil(bal.totalWithdrawn||0)+'đ</div>'+
+          '<div style="font-size:11.5px;color:#555;margin-top:6px">Lịch sử tất cả kỳ</div>'+
+        '</div>'+
+      '</div>'+
+      /* Withdrawal form */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px;margin-bottom:20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:14px">💸 Yêu cầu rút tiền</div>'+
+        (!hasBank?'<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:8px;padding:12px 14px;font-size:13.5px;margin-bottom:12px">⚠ Vui lòng <button onclick="sellerPayTab=\'bank\';renderAccount()" style="background:none;border:none;color:#1565c0;cursor:pointer;font-weight:700;font-size:13.5px">thêm tài khoản ngân hàng</button> trước khi rút tiền.</div>':'')+
+        '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:flex-end">'+
+          '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Số tiền rút (đ)</label>'+
+            '<input id="wdAmount" type="number" min="100000" step="100000" max="'+(bal.available||0)+'" placeholder="Tối thiểu 100,000đ" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+          '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ghi chú (tùy chọn)</label>'+
+            '<input id="wdNote" placeholder="VD: Rút tháng 7/2025" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+          '<button onclick="doSellerRequestWithdrawal()" style="padding:9px 20px;border:none;border-radius:8px;background:'+(hasBank?'#1565c0':'#9e9e9e')+';color:#fff;cursor:'+(hasBank?'pointer':'not-allowed')+';font-size:13.5px;font-weight:600;white-space:nowrap">Yêu cầu rút</button>'+
+        '</div>'+
+        (hasBank?'<div style="margin-top:10px;font-size:12.5px;color:var(--text-soft)">Chuyển về: <strong>'+escHtml(bankName)+'</strong> · '+escHtml(maskAcc)+' · '+escHtml(bankHolder)+' — Xử lý trong 1–3 ngày làm việc.</div>':'')+
+      '</div>'+
+      /* Withdrawal history */
+      '<div style="background:var(--paper-alt,#f8f6f3);border-radius:12px;padding:18px 20px">'+
+        '<div style="font-weight:700;font-size:13.5px;margin-bottom:14px">📋 Lịch sử rút tiền</div>'+
+        '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+          '<thead><tr style="background:#fff">'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Mã lệnh</th>'+
+            '<th style="padding:8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Số tiền</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Tài khoản</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Ghi chú</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Ngày yêu cầu</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Ngày hoàn thành</th>'+
+            '<th style="padding:8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+          '</tr></thead>'+
+          '<tbody>'+withdrawalRows+'</tbody>'+
+        '</table></div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  /* Tab: Transaction history */
+  if(sellerPayTab==='history'){
+    const txRows=(rd.transactions||[]).map(tx=>{
+      const stClr={pending:'#f57f17',processing:'#1565c0',settled:'#2e7d32',refunded:'#b71c1c'};
+      const stLbl={pending:'Chờ thanh toán',processing:'Đang xử lý',settled:'Đã quyết toán',refunded:'Hoàn tiền'};
+      const catLbl={books:'Sách',ebook:'Ebook',vpp:'VPP',tbgd:'Thiết bị'};
+      return '<tr style="border-top:1px solid var(--line)">'+
+        '<td style="padding:9px 8px;font-size:12.5px;font-weight:600">#'+escHtml(tx.id)+'</td>'+
+        '<td style="padding:9px 8px;font-size:12.5px;color:#1565c0;font-weight:600">#'+escHtml(tx.orderId)+'</td>'+
+        '<td style="padding:9px 8px;font-size:12.5px">'+escHtml(tx.buyer)+'</td>'+
+        '<td style="padding:9px 8px;font-size:12.5px;color:var(--text-soft)">'+escHtml(catLbl[tx.category]||tx.category)+'</td>'+
+        '<td style="padding:9px 8px;text-align:right;font-size:12.5px">'+fmtBig(tx.orderTotal)+'đ</td>'+
+        '<td style="padding:9px 8px;text-align:right;font-size:12.5px;color:#e74c3c">'+tx.commissionRate+'%<br><span style="font-size:11px">−'+fmtBig(tx.commissionAmt)+'đ</span></td>'+
+        '<td style="padding:9px 8px;text-align:right;font-weight:700;color:#2e7d32">'+fmtBig(tx.netAmt)+'đ</td>'+
+        '<td style="padding:9px 8px">'+
+          '<span style="font-size:11px;padding:2px 8px;border-radius:5px;background:'+(stClr[tx.status]||'#555')+'15;color:'+(stClr[tx.status]||'#555')+';font-weight:600">'+escHtml(stLbl[tx.status]||tx.status)+'</span>'+
+        '</td>'+
+        '<td style="padding:9px 8px;font-size:11.5px;color:var(--text-soft)">'+escHtml(tx.date)+'</td>'+
+      '</tr>';
+    }).join('');
+
+    const netSum=(rd.transactions||[]).reduce((a,tx)=>a+tx.netAmt,0);
+    const commSum=(rd.transactions||[]).reduce((a,tx)=>a+tx.commissionAmt,0);
+    const grossSum=(rd.transactions||[]).reduce((a,tx)=>a+tx.orderTotal,0);
+
+    return '<div class="panel">'+
+      '<h3 style="margin:0 0 4px">Thanh toán</h3>'+
+      '<p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Lịch sử chi tiết từng giao dịch.</p>'+tabNav+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">'+
+        '<div style="background:#e8f4fd;border-radius:8px;padding:12px 14px;text-align:center"><div style="font-size:14px;font-weight:700;color:#1565c0">'+fmtMil(grossSum)+'đ</div><div style="font-size:11.5px;color:#555;margin-top:3px">Tổng doanh thu</div></div>'+
+        '<div style="background:#ffebee;border-radius:8px;padding:12px 14px;text-align:center"><div style="font-size:14px;font-weight:700;color:#b71c1c">−'+fmtMil(commSum)+'đ</div><div style="font-size:11.5px;color:#555;margin-top:3px">Tổng phí nền tảng</div></div>'+
+        '<div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;text-align:center"><div style="font-size:14px;font-weight:700;color:#2e7d32">'+fmtMil(netSum)+'đ</div><div style="font-size:11.5px;color:#555;margin-top:3px">Tổng thực nhận</div></div>'+
+      '</div>'+
+      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr style="background:var(--paper-alt,#f8f6f3)">'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Mã TXN</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Đơn hàng</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Khách</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Loại</th>'+
+          '<th style="padding:9px 8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Doanh thu</th>'+
+          '<th style="padding:9px 8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Phí (%)</th>'+
+          '<th style="padding:9px 8px;text-align:right;font-size:11.5px;color:var(--text-soft);font-weight:600">Thực nhận</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Trạng thái</th>'+
+          '<th style="padding:9px 8px;text-align:left;font-size:11.5px;color:var(--text-soft);font-weight:600">Ngày</th>'+
+        '</tr></thead>'+
+        '<tbody>'+txRows+
+          (!txRows?'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-soft)">Chưa có giao dịch nào.</td></tr>':'')+
+        '</tbody>'+
+      '</table></div>'+
+    '</div>';
+  }
+
+  /* Tab: Bank settings */
+  return '<div class="panel">'+
+    '<h3 style="margin:0 0 4px">Thanh toán</h3>'+
+    '<p style="margin:0 0 16px;font-size:13px;color:var(--text-soft)">Tài khoản ngân hàng nhận tiền.</p>'+tabNav+
+    (hasBank
+      ?'<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px">'+
+          '<div style="width:44px;height:44px;background:#e8f4fd;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">🏦</div>'+
+          '<div><div style="font-weight:700;font-size:15px">'+escHtml(bankName)+'</div>'+
+            '<div style="font-size:13.5px;color:var(--text-soft)">'+maskAcc+' · '+escHtml(bankHolder)+'</div>'+
+          '</div>'+
+          '<span style="margin-left:auto;font-size:11px;padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:6px;font-weight:600">✓ Đã liên kết</span>'+
+        '</div>'
+      :'<div style="background:#fff9f0;border:1.5px solid #f5c518;border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:13.5px">'+
+          '⚠ Chưa có tài khoản ngân hàng. Vui lòng thêm để nhận thanh toán từ EduMart.'+
+        '</div>')+
+    '<h4 style="margin:0 0 14px;font-size:14px;font-weight:700">'+(hasBank?'Cập nhật':'Thêm')+'  Tài khoản Ngân hàng</h4>'+
+    '<div style="display:grid;gap:12px;max-width:480px">'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Ngân hàng <span style="color:#e74c3c">*</span></label>'+
+        '<select id="pyBankName" style="width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)">'+
+          BANKS.map(b=>'<option'+(b===bankName?' selected':'')+'>'+b+'</option>').join('')+
+        '</select></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Số tài khoản <span style="color:#e74c3c">*</span></label>'+
+        '<input id="pyBankAcc" value="'+escHtml(bankAcc)+'" placeholder="Nhập số tài khoản" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+      '<div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px">Tên chủ tài khoản <span style="color:#e74c3c">*</span></label>'+
+        '<input id="pyBankHolder" value="'+escHtml(bankHolder)+'" placeholder="NGUYEN VAN A (in hoa, đúng tên thẻ)" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13.5px;background:var(--paper)"></div>'+
+    '</div>'+
+    '<div style="background:#f0fff5;border:1.5px solid #b2dfcc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a5c38;margin:14px 0">'+
+      '🔒 Thông tin ngân hàng được mã hóa. EduMart không lưu CVV hoặc mã PIN.'+
+    '</div>'+
+    '<button class="btn-primary" onclick="doUpdateSellerPayment('+(app?'\''+app.id+'\'':"null")+')">Lưu tài khoản ngân hàng</button>'+
+  '</div>';
+}
+
+function doSellerRequestWithdrawal(){
+  const s=activeSellers.find(x=>x.email===user.email);if(!s)return;
+  const amount=parseInt((document.getElementById('wdAmount')||{}).value||0);
+  if(!amount||amount<100000){toast('Số tiền rút tối thiểu 100.000đ.');return;}
+  const available=(s.revenueData&&s.revenueData.balance&&s.revenueData.balance.available)||0;
+  if(amount>available){toast('Số tiền rút vượt quá số dư có thể rút ('+fmtMil(available)+'đ).');return;}
+  const note=((document.getElementById('wdNote')||{}).value||'').trim();
+  const sIdx=activeSellers.findIndex(x=>x.email===user.email);if(sIdx===-1)return;
+  if(!activeSellers[sIdx].revenueData) activeSellers[sIdx].revenueData={balance:{available:0,pendingFromOrders:0,totalEarned:0,totalWithdrawn:0},withdrawals:[],transactions:[]};
+  const app=sellerApps.find(a=>a.email===user.email);
+  const bank=app&&app.shopInfo&&app.shopInfo.bank?app.shopInfo.bank:'';
+  const parts=bank.split(' – ');
+  const wdId='WD-'+Date.now().toString(36).toUpperCase();
+  activeSellers[sIdx].revenueData.withdrawals.unshift({id:wdId,amount,bankName:parts[0]||'—',bankAcc:parts[1]?'****'+parts[1].slice(-4):'—',bankHolder:parts[2]||'—',status:'pending',note,requestedAt:todayStr(),completedAt:''});
+  activeSellers[sIdx].revenueData.balance.available-=amount;
+  activeSellers[sIdx].revenueData.balance.totalWithdrawn=(activeSellers[sIdx].revenueData.balance.totalWithdrawn||0)+amount;
+  saveActiveSellers();
+  toast('✓ Yêu cầu rút '+fmtMil(amount)+'đ đã được gửi — xử lý trong 1–3 ngày làm việc.');
+  addNotif('Yêu cầu rút tiền '+fmtMil(amount)+'đ đã được ghi nhận (#'+wdId+').');
   renderAccount();
 }
 
